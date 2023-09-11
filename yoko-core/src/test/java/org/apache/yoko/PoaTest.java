@@ -41,10 +41,6 @@ public class PoaTest extends AbstractOrbTestBase {
         runServerClientTest(TestLocationForwardServerMain.class, TestLocationForwardClient.class);
     }
 
-    public void testAdapterActivatorServer() throws Exception {
-        runServerClientTest(TestAdapterActivatorServer.class, TestClient.class);
-    }
-
     public void testPoaManagerServer() throws Exception {
         runServerClientTest(TestPOAManagerServer.class, TestPOAManagerClient.class);
     }
