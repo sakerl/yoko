@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public final class Test_impl extends TestPOA {
 
     private POA poa_;
 
-    org.omg.PortableServer.Current current_;
+    public org.omg.PortableServer.Current current_;
 
     private String name_;
 
