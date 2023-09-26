@@ -19,8 +19,6 @@ package org.apache.yoko;
 
 import test.poa.TestDispatchStrategyClient;
 import test.poa.TestDispatchStrategyServer;
-import test.poa.TestLocationForwardClient;
-import test.poa.TestLocationForwardServerMain;
 import test.poa.TestMultipleOrbsClient;
 import test.poa.TestMultipleOrbsServer;
 import test.poa.TestMultipleOrbsThreadedClient;
