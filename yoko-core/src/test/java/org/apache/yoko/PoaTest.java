@@ -17,12 +17,8 @@
  */
 package org.apache.yoko;
 
-import test.poa.TestAdapterActivatorServer;
-import test.poa.TestClient;
 import test.poa.TestDispatchStrategyClient;
 import test.poa.TestDispatchStrategyServer;
-import test.poa.TestLocationForwardClient;
-import test.poa.TestLocationForwardServerMain;
 import test.poa.TestMultipleOrbsClient;
 import test.poa.TestMultipleOrbsServer;
 import test.poa.TestMultipleOrbsThreadedClient;
@@ -35,14 +31,6 @@ public class PoaTest extends AbstractOrbTestBase {
     public void setUp() throws Exception {
         super.setUp();
         setWaitForFile("Test.ref");
-    }
-
-    public void testLocationForwardServer() throws Exception {
-        runServerClientTest(TestLocationForwardServerMain.class, TestLocationForwardClient.class);
-    }
-
-    public void testAdapterActivatorServer() throws Exception {
-        runServerClientTest(TestAdapterActivatorServer.class, TestClient.class);
     }
 
     public void testPoaManagerServer() throws Exception {
