@@ -17,7 +17,6 @@
  */
 package test.tnaming;
 
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -38,8 +37,9 @@ import org.omg.CosNaming.NamingContextPackage.InvalidName;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
+import test.common.RefFiles;
 
-final class Server extends test.common.TestBase implements AutoCloseable {
+final class Server implements AutoCloseable {
     private static final NameComponent LEVEL1 = new NameComponent("level1", "test");
     private static final NameComponent LEVEL2 = new NameComponent("level2", "");
 
@@ -152,9 +152,9 @@ final class Server extends test.common.TestBase implements AutoCloseable {
             // server not being ready yet.
             //
             System.out.println("Writing IORs to file");
-            writeRef(orb, out, test1, rootNamingContext, new NameComponent[]{TEST1});
-            writeRef(orb, out, test2, rootNamingContext, new NameComponent[]{LEVEL1, TEST2});
-            writeRef(orb, out, test3, rootNamingContext, new NameComponent[]{LEVEL1, LEVEL2, TEST3});
+            RefFiles.writeRef(orb, out, test1, rootNamingContext, new NameComponent[]{TEST1});
+            RefFiles.writeRef(orb, out, test2, rootNamingContext, new NameComponent[]{LEVEL1, TEST2});
+            RefFiles.writeRef(orb, out, test3, rootNamingContext, new NameComponent[]{LEVEL1, LEVEL2, TEST3});
             out.flush();
             System.out.println("IORs written to file");
         } catch (java.io.IOException ex) {

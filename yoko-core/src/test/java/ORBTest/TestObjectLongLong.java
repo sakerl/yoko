@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.omg.CORBA.*;
 
-public class TestObjectLongLong extends test.common.TestBase implements
+public class TestObjectLongLong implements
         TestObject {
     private ORB m_orb;
 

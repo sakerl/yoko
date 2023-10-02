@@ -35,7 +35,7 @@ import org.apache.yoko.orb.OB.TimeoutPolicy;
 import org.apache.yoko.orb.OB.TimeoutPolicyHelper;
 import org.apache.yoko.util.MinorCodes;
 
-public class TestPolicyIntf extends test.common.TestBase {
+public class TestPolicyIntf {
     static void run(ORB orb) {
         PolicyManager pm = null;
         try {

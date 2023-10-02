@@ -21,7 +21,7 @@ import java.util.Properties;
 import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
 
-public class Server extends test.common.TestBase {
+public class Server {
     private static final String refFile = "TestIntf.ref";
 
     public static int run(ORB orb, boolean nonBlocking, String[] args)

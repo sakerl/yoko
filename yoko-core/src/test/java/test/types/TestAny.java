@@ -20,14 +20,13 @@ package test.types;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TypeCode;
-import test.common.TestBase;
 
 import java.math.BigDecimal;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-public class TestAny extends TestBase {
+public class TestAny {
     public TestAny(ORB orb) {
         Any any = orb.create_any();
         Any anyEq = orb.create_any();

@@ -19,7 +19,7 @@ package test.poa;
 
 import java.util.concurrent.CountDownLatch;
 
-final class PMSTestThread extends Thread {
+public final class PMSTestThread extends Thread {
     private final Test test_;
 
     private final CountDownLatch startLatch = new CountDownLatch(1);
@@ -58,7 +58,7 @@ final class PMSTestThread extends Thread {
         }
     }
 
-    PMSTestThread(Test test) {
+    public PMSTestThread(Test test) {
         test_ = test;
     }
 }

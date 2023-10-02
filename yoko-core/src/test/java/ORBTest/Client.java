@@ -20,7 +20,7 @@ package ORBTest;
 import java.util.Properties;
 import org.omg.CORBA.*;
 
-public class Client extends test.common.TestBase {
+public class Client {
     public static int run(ORB orb, boolean local, String[] args)
             throws org.omg.CORBA.UserException {
         //

@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.omg.CORBA.*;
 
-public class TestObjectExceptionsExt_2_3 extends test.common.TestBase implements
+public class TestObjectExceptionsExt_2_3 implements
         TestObject {
     private ORB m_orb;
 

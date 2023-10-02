@@ -27,7 +27,6 @@ import org.omg.CORBA.portable.OutputStream;
 import org.omg.DynamicAny.DynAny;
 import org.omg.DynamicAny.DynAnyFactory;
 import org.omg.DynamicAny.DynAnyFactoryHelper;
-import test.common.TestBase;
 import test.types.DynAnyTypes.TestAnySeqHelper;
 import test.types.DynAnyTypes.TestBoundedString10SeqHelper;
 import test.types.DynAnyTypes.TestBoundedStringHelper;
@@ -51,7 +50,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-public class TestPortableTypes extends TestBase {
+public class TestPortableTypes {
     private static void testTypeCode(ORB orb,
                                      ORB singleton) {
         //

@@ -58,7 +58,7 @@ import java.util.Properties;
 import static org.junit.Assert.*;
 import static org.omg.CORBA.SetOverrideType.ADD_OVERRIDE;
 
-public final class Client extends test.common.TestBase {
+public final class Client {
     private static void TestTranslation(ORB orb, ClientProxyManager manager, TestInterface ti) {
         //
         // Set up the correct interceptor

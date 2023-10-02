@@ -23,7 +23,7 @@ import java.util.Properties;
 
 import org.omg.CORBA.*;
 
-public class TestClient extends test.common.TestBase {
+public class TestClient {
     public static void main(String[] args) {
         java.util.Properties props = new Properties();
         props.putAll(System.getProperties());

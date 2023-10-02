@@ -20,7 +20,7 @@ package test.poa;
 import java.util.Properties;
 import java.io.*;
 
-final public class TestMultipleOrbsServer extends test.common.TestBase {
+final public class TestMultipleOrbsServer {
 
     public static void main(String[] args) {
         java.util.Properties props = new Properties();

@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-public final class TestDispatchStrategyServer extends test.common.TestBase {
+public final class TestDispatchStrategyServer {
     //
     // Implementation to test same thread dispatch strategy
     //

@@ -19,9 +19,8 @@ package ORBTest;
 
 import java.util.Properties;
 import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
 
-public class Collocated extends test.common.TestBase {
+public class Collocated {
     public static void main(String[] args) {
         java.util.Properties props = new Properties();
         props.putAll(System.getProperties());

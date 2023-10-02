@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
 
-public class Client extends test.common.TestBase {
+public class Client {
     static void testLocationForward(org.omg.CORBA.ORB orb, RetryServer server) {
         System.out.print("Testing forwarding loop detection... ");
         System.out.flush();

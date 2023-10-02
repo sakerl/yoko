@@ -22,9 +22,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Properties;
 
 import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
 
-public class Client extends test.common.TestBase {
+public class Client {
     public static int run(ORB orb, String[] args)
             throws org.omg.CORBA.UserException {
         //

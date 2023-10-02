@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.omg.CORBA.*;
 
-public class TestObjectStubTimeout extends test.common.TestBase implements
+public class TestObjectStubTimeout implements
         TestObject {
     private ORB m_orb;
 

@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.omg.CORBA.*;
 
-public class TestObjectWChar extends test.common.TestBase implements TestObject {
+public class TestObjectWChar implements TestObject {
     private ORB m_orb;
 
     ORBTest.Intf m_test_intf;

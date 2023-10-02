@@ -27,11 +27,11 @@ import org.omg.PortableServer.POAPackage.*;
 
 import java.io.*;
 
-public final class TestPOAManagerServer extends test.common.TestBase {
-    final static class POAManagerProxy_impl extends POAManagerProxyPOA {
+public final class TestPOAManagerServer {
+    public final static class POAManagerProxy_impl extends POAManagerProxyPOA {
         private POAManager manager_;
 
-        POAManagerProxy_impl(POAManager manager) {
+        public POAManagerProxy_impl(POAManager manager) {
             manager_ = manager;
         }
 

@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.*;
 
-final public class TestMultipleOrbsThreadedClient extends test.common.TestBase {
+final public class TestMultipleOrbsThreadedClient {
     public static void main(String args[]) {
         java.util.Properties props = new Properties();
         props.putAll(System.getProperties());

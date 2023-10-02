@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.*;
 
-final public class TestDispatchStrategyClient extends test.common.TestBase {
+final public class TestDispatchStrategyClient {
     public static void main(String args[]) {
         java.util.Properties props = new Properties();
         props.putAll(System.getProperties());

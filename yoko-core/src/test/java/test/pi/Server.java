@@ -42,7 +42,6 @@ import org.omg.PortableServer.SERVANT_RETENTION_POLICY_ID;
 import org.omg.PortableServer.ServantLocator;
 import org.omg.PortableServer.ServantRetentionPolicyValue;
 import org.omg.PortableServer.ServantRetentionPolicyValueHelper;
-import test.common.TestBase;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -51,7 +50,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-public final class Server extends TestBase {
+public final class Server {
     private static String refFile = "TestInterface.ref";
 
     private static TestLocator_impl locatorImpl;

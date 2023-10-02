@@ -19,13 +19,12 @@ package test.types;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
-import test.common.TestBase;
 
 import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-public class TestUnion extends TestBase {
+public class TestUnion {
     TestUnion(ORB orb) {
         TestUnion1 u = new TestUnion1();
         u.l(123);

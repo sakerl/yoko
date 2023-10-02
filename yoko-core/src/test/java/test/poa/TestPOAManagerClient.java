@@ -22,10 +22,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Properties;
 
 import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POAPackage.*;
 
-public final class TestPOAManagerClient extends test.common.TestBase {
+public final class TestPOAManagerClient {
     public static void main(String[] args) {
         java.util.Properties props = new Properties();
         props.putAll(System.getProperties());

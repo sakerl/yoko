@@ -53,7 +53,7 @@ public final class Test_impl extends TestPOA {
         TEST(current_ != null);
     }
 
-    Test_impl(ORB orb, POA poa) {
+    public Test_impl(ORB orb, POA poa) {
         poa_ = poa;
         name_ = "";
         compare_ = false;

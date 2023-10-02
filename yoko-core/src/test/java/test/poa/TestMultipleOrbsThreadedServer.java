@@ -20,7 +20,7 @@ package test.poa;
 import java.io.*;
 import java.util.Properties;
 
-final public class TestMultipleOrbsThreadedServer extends test.common.TestBase {
+final public class TestMultipleOrbsThreadedServer {
     //
     // Define the number of ORB instances to run in separate threads.
     //

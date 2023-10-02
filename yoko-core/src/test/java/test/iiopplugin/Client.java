@@ -27,13 +27,12 @@ import org.omg.IOP.CodecFactory;
 import org.omg.IOP.CodecFactoryHelper;
 import org.omg.IOP.ENCODING_CDR_ENCAPS;
 import org.omg.IOP.Encoding;
-import test.common.TestBase;
 
 import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-public class Client extends TestBase {
+public class Client {
     private static int run(ORB orb) throws UserException {
         //
         // Get "test" object
