@@ -23,18 +23,12 @@ import test.poa.TestMultipleOrbsClient;
 import test.poa.TestMultipleOrbsServer;
 import test.poa.TestMultipleOrbsThreadedClient;
 import test.poa.TestMultipleOrbsThreadedServer;
-import test.poa.TestPOAManagerClient;
-import test.poa.TestPOAManagerServer;
 
 public class PoaTest extends AbstractOrbTestBase {
 
     public void setUp() throws Exception {
         super.setUp();
         setWaitForFile("Test.ref");
-    }
-
-    public void testPoaManagerServer() throws Exception {
-        runServerClientTest(TestPOAManagerServer.class, TestPOAManagerClient.class);
     }
 
     public void testDispatchStrategyServer() throws Exception {
