@@ -17,11 +17,55 @@
  */
 package testify.util;
 
+import org.junit.jupiter.api.function.Executable;
 import org.opentest4j.AssertionFailedError;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public enum Assertions {
     ;
     public static AssertionFailedError failf(String format, Object... params) {
         throw new AssertionFailedError(String.format(format, params));
+    }
+
+    public static <T extends Throwable> T assertThrows(Class<T> type, Executable executable) {
+        return org.junit.jupiter.api.Assertions.assertThrows(type, executable);
+    }
+
+    public static <T extends Throwable> T assertThrows(Class<? extends Throwable> type, Class<T> causeType, Executable executable) {
+        Throwable cause = assertThrows(type,executable).getCause();
+        assertThat(cause, is(instanceOf(causeType)));
+        return causeType.cast(cause);
+    }
+
+    public static <T extends Throwable> T assertThrows(Class<? extends Throwable> type, Class<? extends Throwable> type2, Class<T> causeType, Executable executable) {
+        Throwable cause = assertThrows(type,type2,executable).getCause();
+        assertThat(cause, is(instanceOf(causeType)));
+        return causeType.cast(cause);
+    }
+
+    public static <T extends Throwable> T assertThrowsExactly(Class<T> type, Executable executable) {
+        return org.junit.jupiter.api.Assertions.assertThrowsExactly(type, executable);
+    }
+
+    public static <T extends Throwable> T assertThrowsExactly(Class<? extends Throwable> type, Class<T> causeType, Executable executable) {
+        Throwable cause = assertThrowsExactly(type,executable).getCause();
+        assertSame(causeType, notNull(cause).getClass());
+        return causeType.cast(cause);
+    }
+
+    public static <T extends Throwable> T assertThrowsExactly(Class<? extends Throwable> type, Class<? extends Throwable> type2, Class<T> causeType, Executable executable) {
+        Throwable cause = assertThrowsExactly(type,type2,executable).getCause();
+        assertSame(causeType, notNull(cause).getClass());
+        return causeType.cast(cause);
+    }
+
+    private static <T> T notNull(T t) {
+        assertNotNull(t);
+        return t;
     }
 }
