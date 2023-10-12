@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import org.apache.yoko.orb.OB.TimeoutPolicy;
 import org.apache.yoko.orb.OB.TimeoutPolicyHelper;
 import org.apache.yoko.util.MinorCodes;
 
-public class TestPolicyIntf extends test.common.TestBase {
+public class TestPolicyIntf {
     static void run(ORB orb) {
         PolicyManager pm = null;
         try {

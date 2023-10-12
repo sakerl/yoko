@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import org.omg.CORBA.portable.OutputStream;
 import org.omg.DynamicAny.DynAny;
 import org.omg.DynamicAny.DynAnyFactory;
 import org.omg.DynamicAny.DynAnyFactoryHelper;
-import test.common.TestBase;
 import test.types.DynAnyTypes.TestAnySeqHelper;
 import test.types.DynAnyTypes.TestBoundedString10SeqHelper;
 import test.types.DynAnyTypes.TestBoundedStringHelper;
@@ -51,7 +50,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-public class TestPortableTypes extends TestBase {
+public class TestPortableTypes {
     private static void testTypeCode(ORB orb,
                                      ORB singleton) {
         //

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
 
-public class Client extends test.common.TestBase {
+public class Client {
     static void testLocationForward(org.omg.CORBA.ORB orb, RetryServer server) {
         System.out.print("Testing forwarding loop detection... ");
         System.out.flush();

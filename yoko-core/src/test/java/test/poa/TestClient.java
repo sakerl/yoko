@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import java.util.Properties;
 
 import org.omg.CORBA.*;
 
-public class TestClient extends test.common.TestBase {
+public class TestClient {
     public static void main(String[] args) {
         java.util.Properties props = new Properties();
         props.putAll(System.getProperties());

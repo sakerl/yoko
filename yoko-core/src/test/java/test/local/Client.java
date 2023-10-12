@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Properties;
 
 import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
 
-public class Client extends test.common.TestBase {
+public class Client {
     public static int run(ORB orb, String[] args)
             throws org.omg.CORBA.UserException {
         //

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,8 @@ package ORBTest;
 
 import java.util.Properties;
 import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
 
-public class Collocated extends test.common.TestBase {
+public class Collocated {
     public static void main(String[] args) {
         java.util.Properties props = new Properties();
         props.putAll(System.getProperties());

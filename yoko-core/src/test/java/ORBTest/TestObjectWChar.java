@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.omg.CORBA.*;
 
-public class TestObjectWChar extends test.common.TestBase implements TestObject {
+public class TestObjectWChar implements TestObject {
     private ORB m_orb;
 
     ORBTest.Intf m_test_intf;

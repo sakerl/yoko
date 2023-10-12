@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package test.poa;
 import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
 
-class TestDSI_impl extends org.omg.PortableServer.DynamicImplementation {
+public class TestDSI_impl extends org.omg.PortableServer.DynamicImplementation {
     //
     // From TestBase (no multiple inheritance)
     //
@@ -52,7 +52,7 @@ class TestDSI_impl extends org.omg.PortableServer.DynamicImplementation {
         TEST(current_ != null);
     }
 
-    TestDSI_impl(ORB orb, POA poa) {
+    public TestDSI_impl(ORB orb, POA poa) {
         orb_ = orb;
         poa_ = poa;
         name_ = "";

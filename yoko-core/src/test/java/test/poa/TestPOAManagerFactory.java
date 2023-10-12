@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,11 @@ import java.util.Properties;
 
 import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
-import org.omg.PortableServer.POAPackage.*;
 import org.omg.PortableServer.POAManagerFactoryPackage.*;
 
 import java.lang.System;
 
-final class TestPOAManagerFactory extends test.common.TestBase {
+final class TestPOAManagerFactory {
     static void TestAll(ORB orb, POA root) {
         POAManagerFactory factory = root.the_POAManagerFactory();
         org.apache.yoko.orb.OBPortableServer.POAManagerFactory pmFactory = org.apache.yoko.orb.OBPortableServer.POAManagerFactoryHelper

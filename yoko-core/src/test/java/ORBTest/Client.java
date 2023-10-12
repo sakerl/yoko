@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package ORBTest;
 import java.util.Properties;
 import org.omg.CORBA.*;
 
-public class Client extends test.common.TestBase {
+public class Client {
     public static int run(ORB orb, boolean local, String[] args)
             throws org.omg.CORBA.UserException {
         //

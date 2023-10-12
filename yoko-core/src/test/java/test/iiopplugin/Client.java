@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,12 @@ import org.omg.IOP.CodecFactory;
 import org.omg.IOP.CodecFactoryHelper;
 import org.omg.IOP.ENCODING_CDR_ENCAPS;
 import org.omg.IOP.Encoding;
-import test.common.TestBase;
 
 import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-public class Client extends TestBase {
+public class Client {
     private static int run(ORB orb) throws UserException {
         //
         // Get "test" object

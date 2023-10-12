@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,10 @@ package test.poa;
 import static org.junit.Assert.assertTrue;
 
 import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POAPackage.*;
 
 import java.util.concurrent.CountDownLatch;
 
-final class TestPOAManagerCommon extends test.common.TestBase {
+public final class TestPOAManagerCommon {
     final static class TestHoldingState extends Thread {
         private Test test_;
 
@@ -75,7 +73,7 @@ final class TestPOAManagerCommon extends test.common.TestBase {
         }
     }
 
-    TestPOAManagerCommon(POAManagerProxy manager, TestInfo[] info) {
+    public TestPOAManagerCommon(POAManagerProxy manager, TestInfo[] info) {
         for (int i = 0; i < info.length; i++) {
             try {
                 manager.activate();

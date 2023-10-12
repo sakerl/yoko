@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,13 @@ package test.types;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TypeCode;
-import test.common.TestBase;
 
 import java.math.BigDecimal;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-public class TestAny extends TestBase {
+public class TestAny {
     public TestAny(ORB orb) {
         Any any = orb.create_any();
         Any anyEq = orb.create_any();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,13 +89,12 @@ import org.omg.CORBA.UnionMemberSeqHelper;
 import org.omg.CORBA.VM_NONE;
 import org.omg.CORBA.ValueMember;
 import org.omg.CORBA.VersionSpecHelper;
-import test.common.TestBase;
 
 import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-public class TestTypeCode extends TestBase {
+public class TestTypeCode {
     private static final boolean CHECK_IDL_NAMES = false;
     public TestTypeCode(ORB orb) {
         //

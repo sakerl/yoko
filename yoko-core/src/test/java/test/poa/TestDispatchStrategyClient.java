@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.*;
 
-final public class TestDispatchStrategyClient extends test.common.TestBase {
+final public class TestDispatchStrategyClient {
     public static void main(String args[]) {
         java.util.Properties props = new Properties();
         props.putAll(System.getProperties());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package test.poa;
 import java.io.*;
 import java.util.Properties;
 
-final public class TestMultipleOrbsThreadedServer extends test.common.TestBase {
+final public class TestMultipleOrbsThreadedServer {
     //
     // Define the number of ORB instances to run in separate threads.
     //

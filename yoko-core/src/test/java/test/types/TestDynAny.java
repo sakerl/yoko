@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ import org.omg.DynamicAny.DynValueBoxHelper;
 import org.omg.DynamicAny.DynValueHelper;
 import org.omg.DynamicAny.NameDynAnyPair;
 import org.omg.DynamicAny.NameValuePair;
-import test.common.TestBase;
+import test.common.TypeCodes;
 import test.types.DynAnyTypes.TestAnySeqHelper;
 import test.types.DynAnyTypes.TestBoundedString10SeqHelper;
 import test.types.DynAnyTypes.TestBoundedStringHelper;
@@ -81,7 +81,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-public class TestDynAny extends TestBase {
+public class TestDynAny {
     //
     // TestStructBox factory implementation - not needed in Java
     //
@@ -159,7 +159,7 @@ public class TestDynAny extends TestBase {
         try {
             Any badAny = orb.create_any();
             DynAny d1 = null, d2 = null, d3 = null, copy = null;
-            TypeCode origTC = getOrigType(tc);
+            TypeCode origTC = TypeCodes.getOrigType(tc);
 
             //
             // Create an any having a TypeCode that will not match tc

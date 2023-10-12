@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ import java.util.Properties;
 import static org.junit.Assert.*;
 import static org.omg.CORBA.SetOverrideType.ADD_OVERRIDE;
 
-public final class Client extends test.common.TestBase {
+public final class Client {
     private static void TestTranslation(ORB orb, ClientProxyManager manager, TestInterface ti) {
         //
         // Set up the correct interceptor

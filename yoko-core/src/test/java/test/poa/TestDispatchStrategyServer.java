@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-public final class TestDispatchStrategyServer extends test.common.TestBase {
+public final class TestDispatchStrategyServer {
     //
     // Implementation to test same thread dispatch strategy
     //

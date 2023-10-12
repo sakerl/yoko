@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 IBM Corporation and others.
+ * Copyright 2023 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import static org.junit.Assert.assertTrue;
 import static test.tnaming.Client.NameServiceType.READ_ONLY;
 
 import java.io.BufferedReader;
-import java.rmi.Remote;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -44,8 +43,9 @@ import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 import org.omg.CosNaming.NamingContextPackage.InvalidName;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
+import test.common.RefFiles;
 
-final class Client extends test.common.TestBase implements AutoCloseable {
+final class Client implements AutoCloseable {
     enum NameServiceType {
         READ_ONLY, INTEGRAL, STANDALONE
     };
@@ -67,17 +67,17 @@ final class Client extends test.common.TestBase implements AutoCloseable {
         // Get "test" objects
         //
         System.out.println("Started ORB, getting test object IORs from file");
-        try (BufferedReader file = openFileReader(refFile)) {
+        try (BufferedReader file = RefFiles.openFileReader(refFile)) {
             String[] refStrings = new String[2];
-            readRef(file, refStrings);
+            RefFiles.readRef(file, refStrings);
             test1 = getTestObjectFromReference(refStrings[0]);
             name1 = refStrings[1];
 
-            readRef(file, refStrings);
+            RefFiles.readRef(file, refStrings);
             test2 = getTestObjectFromReference(refStrings[0]);
             name2 = refStrings[1];
 
-            readRef(file, refStrings);
+            RefFiles.readRef(file, refStrings);
             test3 = getTestObjectFromReference(refStrings[0]);
             name3 = refStrings[1];
         } catch (java.io.IOException ex) {
