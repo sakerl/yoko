@@ -212,7 +212,7 @@ public class PoaManagerServerTest {
     }
 
     @Test
-    void testDiscarding(Proxy proxy) throws Exception {
+    void testDeactivate(Proxy proxy) throws Exception {
         // Try to deactivate with wait completion == true, shouldn't work since the hold_request call is done through the POAManagerProxy.
         proxy.activate();
         assertThrowsExactly(RemoteException.class, BAD_INV_ORDER.class, () -> proxy.deactivate(true, true));
