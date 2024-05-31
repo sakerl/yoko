@@ -49,11 +49,11 @@
       # -t disables logging and info
       -h|--help) usage; exit 0;;
       # -t disables logging and info
-      -t|--terse)   exec 3>/dev/null 4>/dev/null 5>&2;        shift;;
+      -t|--terse)   exec 3>/dev/null 4>/dev/null 5>&1;        wrn() { for arg in "$@"; do :; done; echo "$arg" >&5; }; shift;;
       # -q disables logging, info, and warning
       -q|--quiet)   exec 3>/dev/null 4>/dev/null 5>/dev/null; shift;;
       # -v enables logging
-      -v|--verbose) exec 3>&1        4>&1        5>&2;        shift;;
+      -v|--verbose) exec 3>&1        4>&1        5>&1;        shift;;
       # -- indicates the explicit end of options, so consume it and exit the loop
       --) shift; break;;
       # any other option-like string is an error
@@ -100,7 +100,7 @@
     while read filePath; do
       [ -f "$filePath" ] || die "Cannot check copyright in non-existent file: '$filePath'"
       grep -Eq "SPDX-License-Identifier: Apache-2.0" "$filePath" || {
-        wrn "👿 License identifier not found: $filePath"
+        wrn "👿 License identifier not found:" "$filePath"
         echo "$filePath"
         continue
       }
@@ -109,8 +109,8 @@
         existingModifiedYear="$(grep -Eo 'Copyright [0-9]{4} IBM Corporation and' "$filePath" | cut -d ' ' -f 2 )"
         case "$existingModifiedYear" in
           "$yearModified") continue ;;
-          "")              wrn "🤬 No copyright year in '$filePath': expected '$yearModified'." ;;
-          *)               wrn "😡 Wrong copyright year in '$filePath': expected '$yearModified' but found '$existingModifiedYear'." ;;
+          "")              wrn "🤬 No copyright year (expected '$yearModified'):" "$filePath" ;;
+          *)               wrn "😡 Wrong copyright year (expected '$yearModified' but was '$existingModifiedYear'):" "$filePath" ;;
         esac
         echo "$filePath"
       }
