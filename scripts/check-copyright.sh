@@ -137,6 +137,8 @@
     while read status && read src && read dst
     do
       case "$status" in
+        R100) log "🫥 Ignoring renamed file: $src -> $dst" ;;
+        C100) log "🫥 Ignoring copied file: $src -> $dst" ;;
         R*) isReallyDifferent "$BASE:$src" "$dst" || log "🫥 Ignoring renamed file: $src -> $dst" ;;
         C*) isReallyDifferent "$BASE:$src" "$dst" || log "🫥 Ignoring copied file: $src -> $dst" ;;
         *) die "Unexpected status while parsing git diff output: status='$status' src='$src' dst='$dst'" ;;
