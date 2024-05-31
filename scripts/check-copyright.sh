@@ -92,14 +92,9 @@ FAILED=$((FAILED + $(git diff --name-only --find-copies-harder --diff-filter=AM 
 # This is apparently due to metadata changes. Shrug.
 # So check whether the contents have changed significantly.
 
-# Define how to compare a file against its origin for significant content changes
-isReallyDifferent() {
-  if git diff --ignore-all-space --quiet "$1" "$2" 2>/dev/null; then
-    echo "$2"
-  else
-    return 1;
-  fi
-}
+# Define how to compare a file against its origin for significant content changes.
+# Succeed if there are differences, and print the filename.
+isReallyDifferent() { ! git diff --ignore-all-space --quiet "$1" "$2" 2>/dev/null && echo "$2"; }
 
 # Read status, source, and destination as separate records (lines).
 # Check the status is R... or C... (otherwise it was parsed incorrectly).
