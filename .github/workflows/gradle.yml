@@ -1,6 +1,20 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+# Copyright 2024 IBM Corporation and others.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an \"AS IS\" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
 
+# Workflow to build a Java project with Gradle
 name: Gradle-CI
 
 on:
@@ -21,50 +35,13 @@ jobs:
       with:
         java-version: 11
         distribution: 'adopt'
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Get changed yoko files
-      id: changed-files
-      uses: tj-actions/changed-files@v37
-      with:
-        files: yoko*/
-        files_ignore: yoko*/**/*generated*/**
-    - name: Check for correct copyright in changed Yoko files
+    - name: Grant execute permission for gradlew and scripts
+      run: chmod +x gradlew scripts/*
+    - name: Check for correct copyright in changed files on pull requests
+      if: github.event_name == 'pull_request'
       run: |
-        RC=0
-        echo "Checking copyright in Yoko src files..."
-        for filePath in ${{ steps.changed-files.outputs.all_changed_files }}; do
-          export yearModified=`git log -1 --pretty=format:%cd --date=format:%Y -- "$filePath"`
-          if grep -Eq "Licensed under the Apache License, Version 2\.0" $filePath; then
-            if grep -Eq "Copyright $yearModified IBM Corporation and" $filePath; then
-              echo "✅ Copyright OK: $filePath"
-            else
-              existingModifiedYear=$(awk '/Copyright ([[:digit:]]{4}?) IBM Corporation and/ {print $3}' $filePath)
-              echo "🔴 Existing copyright year $existingModifiedYear does not match last modification year $yearModified: $filePath"
-              RC=1
-            fi
-          else
-            echo "❌ Copyright not found: $filePath"
-            RC=1
-          fi
-          done
-        exit $RC
-    - name: Check copyright Tag in Testify source files
-      run: |
-        SRC=$(find testify/ -name '*.java')
-        export year_modified=`git log -n 1 --pretty=format:%cd --date=format:%Y $i`
-        RC=0
-        echo "Checking copyright"
-        for i in $SRC; do
-            if grep -Eq "Copyright ([[:digit:]]{4}, ?)?$year_modified IBM Corporation and " $i; then
-                echo "✅ Copyright ok: $i"
-            else
-                echo "❌ Copyright not found or incorrect year in $i"
-                echo "🔴 Last modification year should be: $year_modified"
-                RC=1
-            fi
-        done
-        exit $RC
+        git fetch --depth=1 origin ${{github.base_ref}}
+        scripts/check-copyright.sh origin/${{github.base_ref}}
     - name: Build with Gradle
       run: ./gradlew build
     - name: Upload test reports
