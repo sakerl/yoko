@@ -41,7 +41,7 @@ jobs:
       if: github.event_name == 'pull_request'
       run: |
         git fetch --depth=1 origin ${{github.base_ref}}
-        scripts/check-copyright.sh origin/${{github.base_ref}}
+        scripts/check-copyright.sh -- origin/${{github.base_ref}}
     - name: Build with Gradle
       run: ./gradlew build
     - name: Upload test reports
