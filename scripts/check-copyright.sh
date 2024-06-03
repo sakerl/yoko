@@ -23,10 +23,10 @@
 
   usage() {
     echo "usage:\t$0 [-q|--quiet|-t|--terse|-v|--verbose] git-base-ref"
-    echo "\t-h,--help\tprints this usage info"
-    echo "\t-t,--terse\tsuppresses all informational outpout"
-    echo "\t-q,--quiet\tsuppresses all non-error outpout"
-    echo "\t-v,--verbose\tenables verbose output"
+    echo "\t-h,--help\tprint this usage info"
+    echo "\t-t,--terse\tprint only the failing file paths"
+    echo "\t-q,--quiet\tsuppress all non-error output"
+    echo "\t-v,--verbose\tenable verbose output"
   }
 
   # Copy stdout and stderr to other file descriptors for logging and error reporting
@@ -46,18 +46,40 @@
   # Parse script options
   while [ $# -gt 0 ]; do
     case "$1" in
-      # -t disables logging and info
-      -h|--help) usage; exit 0;;
-      # -t disables logging and info
-      -t|--terse)   exec 3>/dev/null 4>/dev/null 5>&1;        wrn() { for arg in "$@"; do :; done; echo "$arg" >&5; }; shift;;
+      # -h print a usage message and exits successfully
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      # -t disable logging and info
+      # print only last arg to warning
+      # (this should be just the pathname to make it easy to open in an editor)
+      -t|--terse)
+        exec 3>/dev/null 4>/dev/null 5>&1
+        wrn() { [ $# -le 1 ] || shift $(($#-1)); echocat "$@" >&5; }
+        shift
+        ;;
       # -q disables logging, info, and warning
-      -q|--quiet)   exec 3>/dev/null 4>/dev/null 5>/dev/null; shift;;
+      -q|--quiet)
+        exec 3>/dev/null 4>/dev/null 5>/dev/null;
+        shift
+        ;;
       # -v enables logging
-      -v|--verbose) exec 3>&1        4>&1        5>&1;        shift;;
+      -v|--verbose)
+        exec 3>&1        4>&1        5>&1
+        shift
+        ;;
       # -- indicates the explicit end of options, so consume it and exit the loop
-      --) shift; break;;
+      --)
+        shift
+        break
+        ;;
       # any other option-like string is an error
-      -*) err "$0: unknown option '$1'"; usage | die;;
+      # print error and usage and exit with an error code
+      -*)
+        err "$0: unknown option '$1'";
+        usage | die
+        ;;
       # any non-option-like string indicates the end of the options
       *) break;;
     esac
@@ -95,7 +117,7 @@
   # Log deleted files
   git diff --name-only --diff-filter=D "$BASE" | sed 's/^/🫥 Ignoring deleted file: /' | log
 
-  # Function to print each file from stdin to stdout unless it has good copyright
+  # Function to print each pathname from stdin to stdout unless it has good copyright
   badCopyrightFilter() {
     while read filePath; do
       [ -f "$filePath" ] || die "Cannot check copyright in non-existent file: '$filePath'"
