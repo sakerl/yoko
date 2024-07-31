@@ -23,5 +23,7 @@ dependencies {
   implementation project(':yoko-spec-corba')
   implementation project(':yoko-rmi-spec')
   implementation project(':yoko-util')
+  implementation project(':yoko-rmi-impl')
+  implementation project(':yoko-core')
   implementation project(":testify")
 }
