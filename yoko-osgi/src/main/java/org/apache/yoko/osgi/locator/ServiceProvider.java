@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,10 +64,12 @@ public final class ServiceProvider implements Comparable<ServiceProvider> {
         return priority;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> Class<T> getServiceClass() throws ClassNotFoundException {
         return (Class<T>) localFactory.forName(className);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T getServiceInstance() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         return (T) localFactory.newInstance(getServiceClass());
     }

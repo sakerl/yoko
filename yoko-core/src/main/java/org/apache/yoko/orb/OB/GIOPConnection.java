@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -549,7 +549,7 @@ abstract class GIOPConnection extends Connection implements DowncallEmitter, Upc
                 try {
                     IOR ior = IORHelper.read(in);
                     down.setLocationForward(ior, false);
-                    if (REQ_OUT_LOG.isLoggable(FINE)) REQ_OUT_LOG.fine("Locate request forwarded to " + IORDump.PrintObjref(orbInstance_.getORB(), ior));
+                    if (REQ_OUT_LOG.isLoggable(FINE)) REQ_OUT_LOG.fine("Locate request forwarded to " + IORDump.describeIor(orbInstance_.getORB(), ior));
 
                 } catch (SystemException ex) {
                     warned(REQ_OUT_LOG, ex, "An error occurred while reading a locate reply, possibly indicating "
@@ -563,7 +563,7 @@ abstract class GIOPConnection extends Connection implements DowncallEmitter, Upc
                 try {
                     IOR ior = IORHelper.read(in);
                     down.setLocationForward(ior, true);
-                    if (REQ_OUT_LOG.isLoggable(FINE)) REQ_OUT_LOG.fine("Locate request forwarded to " + IORDump.PrintObjref(orbInstance_.getORB(), ior));
+                    if (REQ_OUT_LOG.isLoggable(FINE)) REQ_OUT_LOG.fine("Locate request forwarded to " + IORDump.describeIor(orbInstance_.getORB(), ior));
                 } catch (SystemException ex) {
                     warned(REQ_OUT_LOG, ex,"An error occurred while reading a locate reply, possibly indicating "
                                     + "an interoperability problem. You may need to set the LocateRequestPolicy to false.");
@@ -885,7 +885,7 @@ abstract class GIOPConnection extends Connection implements DowncallEmitter, Upc
         ReplyStatusType_1_2 status = perm ? ReplyStatusType_1_2.LOCATION_FORWARD_PERM : ReplyStatusType_1_2.LOCATION_FORWARD;
         try {
             outgoing.writeReplyHeader(reqId, status, contexts);
-            if (REQ_IN_LOG.isLoggable(FINE)) REQ_IN_LOG.fine("Sending forward reply to " + IORDump.PrintObjref(orbInstance_.getORB(), ior));
+            if (REQ_IN_LOG.isLoggable(FINE)) REQ_IN_LOG.fine("Sending forward reply to " + IORDump.describeIor(orbInstance_.getORB(), ior));
             IORHelper.write(out, ior);
         } catch (SystemException ex) {
             // Nothing may go wrong here, otherwise we might have a

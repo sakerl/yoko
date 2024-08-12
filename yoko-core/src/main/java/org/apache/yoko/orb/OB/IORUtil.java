@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,8 +76,16 @@ import org.omg.IOP.TAG_SPKM_2_SEC_MECH;
 import org.omg.IOP.TAG_SSL_SEC_TRANS;
 import org.omg.IOP.TaggedComponent;
 
+import static java.lang.Integer.toHexString;
 import static org.apache.yoko.util.Hex.formatHexLine;
 import static org.apache.yoko.util.Hex.formatHexPara;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 
 public final class IORUtil {
     private static void describeCSISecMechList(TaggedComponent component, StringBuilder sb) {
@@ -126,78 +134,37 @@ public final class IORUtil {
             }
         }
     }
-    
-    
-    private static void describeTransportFlags(int flag, StringBuilder sb) {
 
-        if ((NoProtection.value & flag) != 0) {
-            sb.append("NoProtection ");
-        }
-        if ((Integrity.value & flag) != 0) {
-            sb.append("Integrity ");
-        }
-        if ((Confidentiality.value & flag) != 0) {
-            sb.append("Confidentiality ");
-        }
-        if ((DetectReplay.value & flag) != 0) {
-            sb.append("DetectReplay ");
-        }
-        if ((DetectMisordering.value & flag) != 0) {
-            sb.append("DetectMisordering ");
-        }
-        if ((EstablishTrustInTarget.value & flag) != 0) {
-            sb.append("EstablishTrustInTarget ");
-        }
-        if ((EstablishTrustInClient.value & flag) != 0) {
-            sb.append("EstablishTrustInClient ");
-        }
-        if ((NoDelegation.value & flag) != 0) {
-            sb.append("NoDelegation ");
-        }
-        if ((SimpleDelegation.value & flag) != 0) {
-            sb.append("SimpleDelegation ");
-        }
-        if ((CompositeDelegation.value & flag) != 0) {
-            sb.append("CompositeDelegation ");
-        }
-        if ((IdentityAssertion.value & flag) != 0) {
-            sb.append("IdentityAssertion ");
-        }
-        if ((DelegationByClient.value & flag) != 0) {
-            sb.append("DelegationByClient ");
-        }
-        
+    private static void describeTransportFlags(int flag, StringBuilder sb) {
+        if ((NoProtection.value & flag) != 0) sb.append("NoProtection ");
+        if ((Integrity.value & flag) != 0) sb.append("Integrity ");
+        if ((Confidentiality.value & flag) != 0) sb.append("Confidentiality ");
+        if ((DetectReplay.value & flag) != 0) sb.append("DetectReplay ");
+        if ((DetectMisordering.value & flag) != 0) sb.append("DetectMisordering ");
+        if ((EstablishTrustInTarget.value & flag) != 0) sb.append("EstablishTrustInTarget ");
+        if ((EstablishTrustInClient.value & flag) != 0) sb.append("EstablishTrustInClient ");
+        if ((NoDelegation.value & flag) != 0) sb.append("NoDelegation ");
+        if ((SimpleDelegation.value & flag) != 0) sb.append("SimpleDelegation ");
+        if ((CompositeDelegation.value & flag) != 0) sb.append("CompositeDelegation ");
+        if ((IdentityAssertion.value & flag) != 0) sb.append("IdentityAssertion ");
+        if ((DelegationByClient.value & flag) != 0) sb.append("DelegationByClient ");
     }
-    
-    
+
     private static void describeIdentityToken(int flag, StringBuilder sb) {
-        
         if (flag == ITTAbsent.value) {
             sb.append("Absent"); 
             return;
         }
-        
-
-        if ((ITTAnonymous.value & flag) != 0) {
-            sb.append("Anonymous ");
-        }
-        if ((ITTPrincipalName.value & flag) != 0) {
-            sb.append("PrincipalName ");
-        }
-        if ((ITTX509CertChain.value & flag) != 0) {
-            sb.append("X509CertChain ");
-        }
-        if ((ITTDistinguishedName.value & flag) != 0) {
-            sb.append("DistinguishedName ");
-        }
-        
+        if ((ITTAnonymous.value & flag) != 0) sb.append("Anonymous ");
+        if ((ITTPrincipalName.value & flag) != 0) sb.append("PrincipalName ");
+        if ((ITTX509CertChain.value & flag) != 0) sb.append("X509CertChain ");
+        if ((ITTDistinguishedName.value & flag) != 0) sb.append("DistinguishedName ");
     }
-    
+
     private static void describeTLS_SEC_TRANS(TaggedComponent component, StringBuilder sb) {
         InputStream in = new InputStream(component.component_data);
         in._OB_readEndian();
         TLS_SEC_TRANS info = TLS_SEC_TRANSHelper.read(in);
-        
         sb.append("        TLS_SEC_TRANS component:\n"); 
         sb.append("            target_supports: "); describeTransportFlags(info.target_supports, sb); sb.append("\n"); 
         sb.append("            target_requires: "); describeTransportFlags(info.target_requires, sb); sb.append("\n"); 
@@ -206,14 +173,12 @@ public final class IORUtil {
             sb.append("                host_name: ").append(address.host_name).append("\n"); 
             sb.append("                port: ").append(address.port).append("\n"); 
         }
-        
     }
-    
+
     private static void describeSECIOP_SEC_TRANS(TaggedComponent component, StringBuilder sb) {
         InputStream in = new InputStream(component.component_data);
         in._OB_readEndian();
         SECIOP_SEC_TRANS info = SECIOP_SEC_TRANSHelper.read(in);
-        
         sb.append("        SECIOP_SEC_TRANS component:\n"); 
         sb.append("            target_supports: "); describeTransportFlags(info.target_supports, sb); sb.append("\n"); 
         sb.append("            target_requires: "); describeTransportFlags(info.target_requires, sb); sb.append("\n"); 
@@ -224,50 +189,31 @@ public final class IORUtil {
             sb.append("                host_name: ").append(address.host_name).append("\n"); 
             sb.append("                port: ").append(address.port).append("\n"); 
         }
-        
     }
-    
-    
-    
+
     private static void describeCodeSets(TaggedComponent component, StringBuilder sb) {
         InputStream in = new InputStream(component.component_data);
         in._OB_readEndian();
-        CodeSetComponentInfo info = CodeSetComponentInfoHelper
-                .read(in);
-
+        CodeSetComponentInfo info = CodeSetComponentInfoHelper.read(in);
         CodeSetInfo charInfo;
 
-        //
-        // Print char codeset information
-        //
         sb.append("Native char codeset: \n");
         charInfo = CodeSetInfo.forRegistryId(info.ForCharData.native_code_set);
-        if (charInfo != null) {
-            sb.append("  \"");
-            sb.append(charInfo.description);
-            sb.append("\"\n");
-        } else if (info.ForCharData.native_code_set == 0)
+        if (charInfo != null)
+            sb.append("  \"").append(charInfo.description).append("\"\n");
+        else if (info.ForCharData.native_code_set == 0)
             sb.append("  [No codeset information]\n");
-        else {
-            sb.append("  [Unknown codeset id: ");
-            sb.append(info.ForCharData.native_code_set);
-            sb.append("]\n");
-        }
+        else
+            sb.append("  [Unknown codeset id: ").append(info.ForCharData.native_code_set).append("]\n");
 
         for (int i = 0; i < info.ForCharData.conversion_code_sets.length; i++) {
+            charInfo = CodeSetInfo.forRegistryId(info.ForCharData.conversion_code_sets[i]);
             if (i == 0)
                 sb.append("Char conversion codesets:\n");
-
-            charInfo = CodeSetInfo.forRegistryId(info.ForCharData.conversion_code_sets[i]);
-            if (charInfo != null) {
-                sb.append("  \"");
-                sb.append(charInfo.description);
-                sb.append("\"\n");
-            } else {
-                sb.append("  [Unknown codeset id: ");
-                sb.append(info.ForCharData.conversion_code_sets[i]);
-                sb.append("]\n");
-            }
+            if (charInfo != null)
+                sb.append("  \"").append(charInfo.description).append("\"\n");
+            else
+                sb.append("  [Unknown codeset id: ").append(info.ForCharData.conversion_code_sets[i]).append("]\n");
         }
 
         //
@@ -275,17 +221,12 @@ public final class IORUtil {
         //
         sb.append("Native wchar codeset: \n");
         charInfo = CodeSetInfo.forRegistryId(info.ForWcharData.native_code_set);
-        if (charInfo != null) {
-            sb.append("  \"");
-            sb.append(charInfo.description);
-            sb.append("\"\n");
-        } else if (info.ForWcharData.native_code_set == 0)
+        if (charInfo != null)
+            sb.append("  \"").append(charInfo.description).append("\"\n");
+        else if (info.ForWcharData.native_code_set == 0)
             sb.append("  [No codeset information]\n");
-        else {
-            sb.append("  [Unknown codeset id: ");
-            sb.append(info.ForWcharData.native_code_set);
-            sb.append("]\n");
-        }
+        else
+            sb.append("  [Unknown codeset id: ").append(info.ForWcharData.native_code_set).append("]\n");
 
         for (int i = 0; i < info.ForWcharData.conversion_code_sets.length; i++) {
             if (i == 0)
@@ -293,193 +234,125 @@ public final class IORUtil {
 
             charInfo = CodeSetInfo
                     .forRegistryId(info.ForWcharData.conversion_code_sets[i]);
-            if (charInfo != null) {
-                sb.append("  \"");
-                sb.append(charInfo.description);
-                sb.append("\"\n");
-            } else {
-                sb.append("  [Unknown codeset id: ");
-                sb.append(info.ForWcharData.conversion_code_sets[i]);
-                sb.append("]\n");
+            if (charInfo != null)
+                sb.append("  \"").append(charInfo.description).append("\"\n");
+            else
+                sb.append("  [Unknown codeset id: ").append(info.ForWcharData.conversion_code_sets[i]).append("]\n");
+        }
+    }
+
+    private static void describeGenericComponent(TaggedComponent component, String name, StringBuilder sb) {
+        sb.append("Component: ").append(name).append('\n');
+        sb.append("Component data: (").append(component.component_data.length).append(")\n");
+        formatHexPara(component.component_data, 0, component.component_data.length, sb).append('\n');
+    }
+
+    private static void describeJavaCodebase(TaggedComponent component, StringBuilder sb) {
+        InputStream in = new InputStream(component.component_data);
+        in._OB_readEndian();
+        String codebase = in.read_string();
+        sb.append("Component: TAG_JAVA_CODEBASE = '").append(codebase).append("'\n");
+    }
+
+    private static void describeAlternateIiop(TaggedComponent component, StringBuilder sb) {
+        InputStream in = new InputStream(component.component_data);
+        in._OB_readEndian();
+        String host = in.read_string();
+        int port = 0xFFFF & in.read_ushort();
+        sb.append("Alternate IIOP address:\n");
+        sb.append("  host: ").append(host).append('\n');
+        sb.append("  port: ").append(port).append('\n');
+    }
+
+    private static void describeOrbType(TaggedComponent component, StringBuilder sb) {
+        InputStream in = new InputStream(component.component_data);
+        in._OB_readEndian();
+        sb.append("Component: TAG_ORB_TYPE = 0x").append(toHexString(in.read_ulong())).append('\n');
+    }
+
+    private static void describeUnknown(TaggedComponent component, StringBuilder sb) {
+        describeGenericComponent(component, String.format("unknown (tag = 0x%x)", component.tag), sb);
+    }
+
+    private enum TagComp {
+        _TAG_POLICIES,
+        _TAG_ASSOCIATION_OPTIONS,
+        _TAG_SEC_NAME,
+        _TAG_SPKM_1_SEC_MECH,
+        _TAG_SPKM_2_SEC_MECH,
+        _TAG_KerberosV5_SEC_MECH,
+        _TAG_CSI_ECMA_Secret_SEC_MECH,
+        _TAG_CSI_ECMA_Hybrid_SEC_MECH,
+        _TAG_OTS_POLICY,
+        _TAG_INV_POLICY,
+        _TAG_SECIOP_SEC_TRANS,
+        _TAG_NULL_TAG,
+        _TAG_TLS_SEC_TRANS,
+        _TAG_SSL_SEC_TRANS,
+        _TAG_CSI_ECMA_Public_SEC_MECH,
+        _TAG_GENERIC_SEC_MECH,
+        _TAG_COMPLETE_OBJECT_KEY,
+        _TAG_ENDPOINT_ID_POSITION,
+        _TAG_LOCATION_POLICY,
+        _TAG_DCE_STRING_BINDING,
+        _TAG_DCE_BINDING_NAME,
+        _TAG_DCE_NO_PIPES,
+        _TAG_DCE_SEC_MECH,
+        _TAG_CODE_SETS(IORUtil::describeCodeSets),
+        _TAG_ORB_TYPE(IORUtil::describeOrbType),
+        _TAG_ALTERNATE_IIOP_ADDRESS(IORUtil::describeAlternateIiop),
+        _TAG_CSI_SEC_MECH_LIST(IORUtil::describeCSISecMechList),
+        _TAG_JAVA_CODEBASE(IORUtil::describeJavaCodebase),
+        _UNKNOWN(IORUtil::describeUnknown);
+        final BiConsumer<TaggedComponent, StringBuilder> describer;
+        TagComp(BiConsumer<TaggedComponent, StringBuilder> describer) { this.describer = describer; }
+        TagComp() { this(null); }
+        void describe(TaggedComponent component, StringBuilder sb) {
+            if (null == describer) describeGenericComponent(component, this.toString(), sb);
+            else describer.accept(component, sb);
+        }
+        @Override
+        public String toString() {
+            return super.toString().substring(1);
+        }
+        
+        static TagComp findById(int id) {
+            switch (id) {
+                case TAG_POLICIES.value: return _TAG_POLICIES;
+                case TAG_ASSOCIATION_OPTIONS.value: return _TAG_ASSOCIATION_OPTIONS;
+                case TAG_SEC_NAME.value: return _TAG_SEC_NAME;
+                case TAG_SPKM_1_SEC_MECH.value: return _TAG_SPKM_1_SEC_MECH;
+                case TAG_SPKM_2_SEC_MECH.value: return _TAG_SPKM_2_SEC_MECH;
+                case TAG_KerberosV5_SEC_MECH.value: return _TAG_KerberosV5_SEC_MECH;
+                case TAG_CSI_ECMA_Secret_SEC_MECH.value: return _TAG_CSI_ECMA_Secret_SEC_MECH;
+                case TAG_CSI_ECMA_Hybrid_SEC_MECH.value: return _TAG_CSI_ECMA_Hybrid_SEC_MECH;
+                case TAG_OTS_POLICY.value: return _TAG_OTS_POLICY;
+                case TAG_INV_POLICY.value: return _TAG_INV_POLICY;
+                case TAG_SECIOP_SEC_TRANS.value: return _TAG_SECIOP_SEC_TRANS;
+                case TAG_NULL_TAG.value: return _TAG_NULL_TAG;
+                case TAG_TLS_SEC_TRANS.value: return _TAG_TLS_SEC_TRANS;
+                case TAG_SSL_SEC_TRANS.value: return _TAG_SSL_SEC_TRANS;
+                case TAG_CSI_ECMA_Public_SEC_MECH.value: return _TAG_CSI_ECMA_Public_SEC_MECH;
+                case TAG_GENERIC_SEC_MECH.value: return _TAG_GENERIC_SEC_MECH;
+                case TAG_COMPLETE_OBJECT_KEY.value: return _TAG_COMPLETE_OBJECT_KEY;
+                case TAG_ENDPOINT_ID_POSITION.value: return _TAG_ENDPOINT_ID_POSITION;
+                case TAG_LOCATION_POLICY.value: return _TAG_LOCATION_POLICY;
+                case TAG_DCE_STRING_BINDING.value: return _TAG_DCE_STRING_BINDING;
+                case TAG_DCE_BINDING_NAME.value: return _TAG_DCE_BINDING_NAME;
+                case TAG_DCE_NO_PIPES.value: return _TAG_DCE_NO_PIPES;
+                case TAG_DCE_SEC_MECH.value: return _TAG_DCE_SEC_MECH;
+                case TAG_CODE_SETS.value: return _TAG_CODE_SETS;
+                case TAG_ORB_TYPE.value: return _TAG_ORB_TYPE;
+                case TAG_ALTERNATE_IIOP_ADDRESS.value: return _TAG_ALTERNATE_IIOP_ADDRESS;
+                case TAG_CSI_SEC_MECH_LIST.value: return _TAG_CSI_SEC_MECH_LIST;
+                case TAG_JAVA_CODEBASE.value: return _TAG_JAVA_CODEBASE;
+                default: return _UNKNOWN;
             }
         }
-
     }
 
-    private static void describeGenericComponent(
-            TaggedComponent component, String name, StringBuilder sb) {
-        sb.append("Component: ");
-        sb.append(name);
-        sb.append('\n');
-        sb.append("Component data: (");
-        sb.append(component.component_data.length);
-        sb.append(")\n");
-        formatHexPara(component.component_data, 0,
-                component.component_data.length, sb);
-    }
-
-    //
-    // Produce a human-friendly description of an IOR tagged component
-    //
     public static void describe_component(TaggedComponent component, StringBuilder sb) {
-
-        switch (component.tag) {
-        case TAG_ORB_TYPE.value: {
-            InputStream in = new InputStream(component.component_data);
-            in._OB_readEndian();
-            int id = in.read_ulong();
-            sb.append("Component: TAG_ORB_TYPE = ");
-            sb.append("0x");
-            sb.append(Integer.toHexString(id));
-            sb.append('\n');
-            break;
-        }
-
-        case TAG_CODE_SETS.value:
-            describeCodeSets(component, sb);
-            break;
-
-        case TAG_POLICIES.value:
-            describeGenericComponent(component, "TAG_POLICIES", sb);
-            break;
-
-        case TAG_ALTERNATE_IIOP_ADDRESS.value: {
-            InputStream in = new InputStream(component.component_data);
-            in._OB_readEndian();
-            String host = in.read_string();
-            short port = in.read_ushort();
-            sb.append("Alternate IIOP address:\n");
-            sb.append("  host: ");
-            sb.append(host);
-            sb.append('\n');
-            sb.append("  port: ");
-            sb.append(port < 0 ? 0xffff + (int) port + 1 : port);
-            sb.append('\n');
-            break;
-        }
-
-        case TAG_ASSOCIATION_OPTIONS.value:
-            describeGenericComponent(component,
-                    "TAG_ASSOCIATION_OPTIONS", sb);
-            break;
-
-        case TAG_SEC_NAME.value:
-            describeGenericComponent(component, "TAG_SEC_NAME", sb);
-            break;
-
-        case TAG_SPKM_1_SEC_MECH.value:
-            describeGenericComponent(component, "TAG_SPKM_1_SEC_MECH", sb);
-            break;
-
-        case TAG_SPKM_2_SEC_MECH.value:
-            describeGenericComponent(component, "TAG_SPKM_2_SEC_MECH", sb);
-            break;
-
-        case TAG_KerberosV5_SEC_MECH.value:
-            describeGenericComponent(component,
-                    "TAG_KerberosV5_SEC_MECH", sb);
-            break;
-
-        case TAG_CSI_ECMA_Secret_SEC_MECH.value:
-            describeGenericComponent(component,
-                    "TAG_CSI_ECMA_Secret_SEC_MECH", sb);
-            break;
-
-        case TAG_CSI_ECMA_Hybrid_SEC_MECH.value:
-            describeGenericComponent(component,
-                    "TAG_CSI_ECMA_Hybrid_SEC_MECH", sb);
-            break;
-
-        case TAG_CSI_SEC_MECH_LIST.value:
-            describeCSISecMechList(component, sb);
-            break;
-
-        case TAG_OTS_POLICY.value:
-            describeGenericComponent(component,
-                    "TAG_OTS_POLICY", sb);
-            break;
-
-        case TAG_INV_POLICY.value:
-            describeGenericComponent(component,
-                    "TAG_INV_POLICY", sb);
-            break;
-
-        case TAG_SECIOP_SEC_TRANS.value:
-            describeGenericComponent(component,
-                    "TAG_SECIOP_SEC_TRANS", sb);
-            break;
-
-        case TAG_NULL_TAG.value:
-            describeGenericComponent(component,
-                    "TAG_NULL_TAG", sb);
-            break;
-
-        case TAG_TLS_SEC_TRANS.value:
-            describeGenericComponent(component,
-                    "TAG_TLS_SEC_TRANS", sb);
-            break;
-
-        case TAG_SSL_SEC_TRANS.value:
-            describeGenericComponent(component, "TAG_SSL_SEC_TRANS", sb);
-            break;
-
-        case TAG_CSI_ECMA_Public_SEC_MECH.value:
-            describeGenericComponent(component,
-                    "TAG_CSI_ECMA_Public_SEC_MECH", sb);
-            break;
-
-        case TAG_GENERIC_SEC_MECH.value:
-            describeGenericComponent(component, "TAG_GENERIC_SEC_MECH", sb);
-            break;
-
-        case TAG_JAVA_CODEBASE.value: {
-            InputStream in = new InputStream(component.component_data);
-            in._OB_readEndian();
-            String codebase = in.read_string();
-            sb.append("Component: TAG_JAVA_CODEBASE = `");
-            sb.append(codebase);
-            sb.append("'\n");
-            break;
-        }
-
-        case TAG_COMPLETE_OBJECT_KEY.value:
-            describeGenericComponent(component,
-                    "TAG_COMPLETE_OBJECT_KEY", sb);
-            break;
-
-        case TAG_ENDPOINT_ID_POSITION.value:
-            describeGenericComponent(component,
-                    "TAG_ENDPOINT_ID_POSITION", sb);
-            break;
-
-        case TAG_LOCATION_POLICY.value:
-            describeGenericComponent(component, "TAG_LOCATION_POLICY", sb);
-            break;
-
-        case TAG_DCE_STRING_BINDING.value:
-            describeGenericComponent(component,
-                    "TAG_DCE_STRING_BINDING", sb);
-            break;
-
-        case TAG_DCE_BINDING_NAME.value:
-            describeGenericComponent(component, "TAG_DCE_BINDING_NAME", sb);
-            break;
-
-        case TAG_DCE_NO_PIPES.value:
-            describeGenericComponent(component, "TAG_DCE_NO_PIPES", sb);
-            break;
-
-        case TAG_DCE_SEC_MECH.value:
-            describeGenericComponent(component, "TAG_DCE_SEC_MECH", sb);
-            break;
-
-        default: {
-            String name = "unknown (tag = ";
-            name += component.tag;
-            name += ")";
-            describeGenericComponent(component, name, sb);
-            break;
-        }
-        }
+        TagComp.findById(component.tag).describe(component, sb);
     }
 }
+

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.OBPortableServer;
+
+import static org.apache.yoko.orb.OB.ObjectKey.ParseObjectKey;
+import static org.apache.yoko.orb.OB.Server.Blocking;
+import static org.apache.yoko.orb.OB.Server.Threaded;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
+import java.util.Hashtable;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.apache.yoko.orb.CORBA.Delegate;
 import org.apache.yoko.orb.OB.BootManager_impl;
@@ -37,11 +47,11 @@ import org.omg.CORBA.BAD_POLICY_VALUE;
 import org.omg.CORBA.INITIALIZE;
 import org.omg.CORBA.LocalObject;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
-import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CORBA.Object;
 import org.omg.CORBA.Policy;
 import org.omg.CORBA.PolicyError;
 import org.omg.CORBA.TRANSIENT;
+import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CORBA.portable.ObjectImpl;
 import org.omg.GIOP.Version;
 import org.omg.IOP.IOR;
@@ -52,18 +62,6 @@ import org.omg.PortableInterceptor.INACTIVE;
 import org.omg.PortableServer.CurrentPackage.NoContext;
 import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
 import org.omg.PortableServer.POAManagerPackage.State;
-
-import java.util.Hashtable;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.logging.Logger;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-import static org.apache.yoko.orb.OB.ObjectKey.ParseObjectKey;
-import static org.apache.yoko.orb.OB.Server.Blocking;
-import static org.apache.yoko.orb.OB.Server.Threaded;
-import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
 final public class POAManager_impl extends LocalObject implements POAManager {
     static final Logger logger = Logger.getLogger(POAManager_impl.class.getName());

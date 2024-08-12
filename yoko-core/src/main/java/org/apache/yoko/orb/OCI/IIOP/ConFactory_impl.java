@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ final class ConFactory_impl extends LocalObject implements
         final int port = ((char)body.port);
         result.append("port: " + port + '\n');
         result.append("object_key: (" + body.object_key.length + ")\n");
-        formatHexPara(body.object_key, 0, body.object_key.length, result);
+        formatHexPara(body.object_key, 0, body.object_key.length, result).append('\n');
 
         //
         // Print IIOP 1.1 information (components)
@@ -127,7 +127,7 @@ final class ConFactory_impl extends LocalObject implements
 
     public Connector[] create_connectors(IOR ior, Policy[] policies) {
         if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("Creating connection for ior: " + IORDump.PrintObjref(orb_, ior));
+            logger.finest("Creating connection for ior: " + IORDump.describeIor(orb_, ior));
         }
 
         //

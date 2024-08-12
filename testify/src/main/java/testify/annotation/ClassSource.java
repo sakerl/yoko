@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import java.util.stream.Stream.Builder;
 @Documented
 @ArgumentsSource(ClassSource.Provider.class)
 public @interface ClassSource {
-    Class[] value();
+    Class<?>[] value();
     class Provider implements ArgumentsProvider, AnnotationConsumer<ClassSource> {
         private static final String ANNO_NAME = '@' + ClassSource.class.getSimpleName();
         Class<?>[] classes;
