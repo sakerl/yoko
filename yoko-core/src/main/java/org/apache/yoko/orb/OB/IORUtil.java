@@ -90,7 +90,6 @@ import java.util.function.BiConsumer;
 public final class IORUtil {
     private static void describeCSISecMechList(TaggedComponent component, StringBuilder sb) {
         InputStream in = new InputStream(component.component_data);
-        boolean endianFlag = in.read_boolean();
         in._OB_readEndian();
         CompoundSecMechList info = CompoundSecMechListHelper.read(in);
         
