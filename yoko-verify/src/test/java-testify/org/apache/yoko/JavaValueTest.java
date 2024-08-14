@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.apache.yoko.orb.CORBA.InputStream;
 import org.apache.yoko.orb.CORBA.OutputStream;
 import org.apache.yoko.orb.OCI.GiopVersion;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.omg.CosNaming.NameComponent;
@@ -37,6 +38,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static testify.hex.HexParser.HEX_DUMP;
 
 /**
@@ -109,8 +111,9 @@ class JavaValueTest {
 
     @Test
     void marshalTwoDistinctLongs() {
-        Long l1 = new Long(2);
-        Long l2 = new Long(2);
+        Long l1 = 2019L;
+        Long l2 = Long.parseLong("2019");
+        assumeFalse(l1 == l2, "If this Java runtime makes the two longs equal to start with, this test cannot work");
         out.write_value(l1, Long.class);
         out.write_value(l2, Long.class);
         finishWriting();
@@ -125,7 +128,7 @@ class JavaValueTest {
 
     @Test
     void marshalTheSameLongTwiceToTestValueIndirection() {
-        Long l1 = new Long(2);
+        Long l1 = Long.valueOf(2000L);
         Long l2 = l1;
         out.write_value(l1, Long.class);
         out.write_value(l2, Long.class);

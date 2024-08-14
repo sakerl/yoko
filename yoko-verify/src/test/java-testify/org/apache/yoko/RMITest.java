@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -388,10 +388,10 @@ public class RMITest {
     @Test
     public void testHashMap(Sample sample) throws Exception {
         HashMap<Integer, Serializable> map = new HashMap<>();
-        String str = new String("hello");
+        String str = "hello";
         map.put(0, str);
         map.put(1, str);
-        Integer two = new Integer(2);
+        Integer two = 2;
         map.put(3, two);
         map.put(4, two);
         sample.setSerializable(map);

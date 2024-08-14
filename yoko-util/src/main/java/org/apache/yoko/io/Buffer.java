@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import static org.omg.CORBA.CompletionStatus.COMPLETED_MAYBE;
  * @param <T> the concrete child class
  */
 @SuppressWarnings("unchecked")
-public abstract class Buffer<T extends Buffer> implements Cloneable {
+public abstract class Buffer<T extends Buffer<T>> implements Cloneable {
     public static ReadBuffer createReadBuffer(byte[] data) { return new ReadBuffer(new Core(data)); }
     public static WriteBuffer createWriteBuffer() { return new WriteBuffer(new Core()); }
     public static WriteBuffer createWriteBuffer(int initialBufferSize) { return new WriteBuffer(new Core(initialBufferSize)); }
