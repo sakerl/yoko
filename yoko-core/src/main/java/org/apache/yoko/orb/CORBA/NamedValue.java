@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@
  */
 package org.apache.yoko.orb.CORBA;
 
+import org.omg.CORBA.Any;
+
 final public class NamedValue extends org.omg.CORBA.NamedValue {
     private String name_;
 
-    private org.omg.CORBA.Any value_;
+    private Any value_;
 
     private int flags_;
 
@@ -32,7 +34,7 @@ final public class NamedValue extends org.omg.CORBA.NamedValue {
         return name_;
     }
 
-    public org.omg.CORBA.Any value() {
+    public Any value() {
         return value_;
     }
 
@@ -45,7 +47,7 @@ final public class NamedValue extends org.omg.CORBA.NamedValue {
     // Application programs must not use these functions directly
     // ------------------------------------------------------------------
 
-    public NamedValue(String name, org.omg.CORBA.Any any, int flags) {
+    public NamedValue(String name, Any any, int flags) {
         name_ = name;
         value_ = any;
         flags_ = flags;
