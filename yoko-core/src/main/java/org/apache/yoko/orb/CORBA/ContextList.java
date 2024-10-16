@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,12 @@
  */
 package org.apache.yoko.orb.CORBA;
 
+import java.util.Vector;
+
+import org.omg.CORBA.Bounds;
+
 final public class ContextList extends org.omg.CORBA.ContextList {
-    private java.util.Vector stringVec_ = new java.util.Vector();
+    private Vector stringVec_ = new Vector();
 
     // ------------------------------------------------------------------
     // Standard IDL to Java Mapping
@@ -32,19 +36,19 @@ final public class ContextList extends org.omg.CORBA.ContextList {
         stringVec_.addElement(ctx);
     }
 
-    public String item(int index) throws org.omg.CORBA.Bounds {
+    public String item(int index) throws Bounds {
         try {
             return (String) stringVec_.elementAt(index);
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new org.omg.CORBA.Bounds();
+            throw new Bounds();
         }
     }
 
-    public void remove(int index) throws org.omg.CORBA.Bounds {
+    public void remove(int index) throws Bounds {
         try {
             stringVec_.removeElementAt(index);
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new org.omg.CORBA.Bounds();
+            throw new Bounds();
         }
     }
 
