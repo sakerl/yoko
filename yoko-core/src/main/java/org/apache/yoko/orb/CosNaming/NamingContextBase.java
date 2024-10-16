@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,31 +17,32 @@
  */
 package org.apache.yoko.orb.CosNaming;
 
-import java.util.List;
-import java.util.ArrayList;
+import static org.apache.yoko.util.MinorCodes.MinorObjectIsNull;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.yoko.util.MinorCodes;
-
 import org.omg.CORBA.BAD_PARAM;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.SystemException;
-
+import org.omg.CosNaming.BindingIteratorHolder;
+import org.omg.CosNaming.BindingListHolder;
 import org.omg.CosNaming.BindingType;
 import org.omg.CosNaming.BindingTypeHolder;
 import org.omg.CosNaming.NameComponent;
-import org.omg.CosNaming.NamingContextHelper;
 import org.omg.CosNaming.NamingContext;
 import org.omg.CosNaming.NamingContextExtPOA;
+import org.omg.CosNaming.NamingContextHelper;
 import org.omg.CosNaming.NamingContextExtPackage.InvalidAddress;
 import org.omg.CosNaming.NamingContextPackage.AlreadyBound;
+import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 import org.omg.CosNaming.NamingContextPackage.InvalidName;
-import org.omg.CosNaming.NamingContextPackage.NotFoundReason;
+import org.omg.CosNaming.NamingContextPackage.NotEmpty;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
-
+import org.omg.CosNaming.NamingContextPackage.NotFoundReason;
 import org.omg.PortableServer.POA;
 
 public abstract class NamingContextBase extends NamingContextExtPOA
@@ -63,9 +64,9 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      *
      * @param orb    The ORB this is hosted on.
      *
-     * @exception java.lang.Exception
+     * @exception Exception
      */
-    public NamingContextBase(ORB orb, POA poa) throws java.lang.Exception {
+    public NamingContextBase(ORB orb, POA poa) throws Exception {
         super();
         this.orb = orb;
         this.poa = poa;
@@ -82,12 +83,12 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      *               bound in the context tree.
      * @param obj    The object to be bound.
      *
-     * @exception org.omg.CosNaming.NamingContextPackage.NotFound
-     * @exception org.omg.CosNaming.NamingContextPackage.CannotProceed
-     * @exception org.omg.CosNaming.NamingContextPackage.InvalidName
-     * @exception org.omg.CosNaming.NamingContextPackage.AlreadyBound
+     * @exception NotFound
+     * @exception CannotProceed
+     * @exception InvalidName
+     * @exception AlreadyBound
      */
-    public void bind (org.omg.CosNaming.NameComponent[] n, org.omg.CORBA.Object obj) throws org.omg.CosNaming.NamingContextPackage.NotFound, org.omg.CosNaming.NamingContextPackage.CannotProceed, org.omg.CosNaming.NamingContextPackage.InvalidName, org.omg.CosNaming.NamingContextPackage.AlreadyBound {
+    public void bind (NameComponent[] n, org.omg.CORBA.Object obj) throws NotFound, CannotProceed, InvalidName, AlreadyBound {
         // perform various name validations
         validateName(n);
 
@@ -134,12 +135,12 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      *               bound in the context tree.
      * @param obj    The new value for this binding.
      *
-     * @exception org.omg.CosNaming.NamingContextPackage.NotFound
-     * @exception org.omg.CosNaming.NamingContextPackage.CannotProceed
-     * @exception org.omg.CosNaming.NamingContextPackage.InvalidName
-     * @exception org.omg.CosNaming.NamingContextPackage.AlreadyBound
+     * @exception NotFound
+     * @exception CannotProceed
+     * @exception InvalidName
+     * @exception AlreadyBound
      */
-    public void rebind (org.omg.CosNaming.NameComponent[] n, org.omg.CORBA.Object obj) throws org.omg.CosNaming.NamingContextPackage.NotFound, org.omg.CosNaming.NamingContextPackage.CannotProceed, org.omg.CosNaming.NamingContextPackage.InvalidName {
+    public void rebind (NameComponent[] n, org.omg.CORBA.Object obj) throws NotFound, CannotProceed, InvalidName {
         // perform various name validations
         validateName(n);
 
@@ -191,12 +192,12 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      *               bound in the context tree.
      * @param nc     The new naming context added to the tree.
      *
-     * @exception org.omg.CosNaming.NamingContextPackage.NotFound
-     * @exception org.omg.CosNaming.NamingContextPackage.CannotProceed
-     * @exception org.omg.CosNaming.NamingContextPackage.InvalidName
-     * @exception org.omg.CosNaming.NamingContextPackage.AlreadyBound
+     * @exception NotFound
+     * @exception CannotProceed
+     * @exception InvalidName
+     * @exception AlreadyBound
      */
-    public void bind_context(org.omg.CosNaming.NameComponent[] n, org.omg.CosNaming.NamingContext nc) throws org.omg.CosNaming.NamingContextPackage.NotFound, org.omg.CosNaming.NamingContextPackage.CannotProceed, org.omg.CosNaming.NamingContextPackage.InvalidName, org.omg.CosNaming.NamingContextPackage.AlreadyBound {
+    public void bind_context(NameComponent[] n, NamingContext nc) throws NotFound, CannotProceed, InvalidName, AlreadyBound {
         // perform various name validations
         validateName(n);
 
@@ -244,12 +245,12 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      *               bound in the context tree.
      * @param nc     The new context to be bound with the name.
      *
-     * @exception org.omg.CosNaming.NamingContextPackage.NotFound
-     * @exception org.omg.CosNaming.NamingContextPackage.CannotProceed
-     * @exception org.omg.CosNaming.NamingContextPackage.InvalidName
-     * @exception org.omg.CosNaming.NamingContextPackage.AlreadyBound
+     * @exception NotFound
+     * @exception CannotProceed
+     * @exception InvalidName
+     * @exception AlreadyBound
      */
-    public void rebind_context (org.omg.CosNaming.NameComponent[] n, org.omg.CosNaming.NamingContext nc) throws org.omg.CosNaming.NamingContextPackage.NotFound, org.omg.CosNaming.NamingContextPackage.CannotProceed, org.omg.CosNaming.NamingContextPackage.InvalidName {
+    public void rebind_context (NameComponent[] n, NamingContext nc) throws NotFound, CannotProceed, InvalidName {
         // perform various name validations
         validateName(n);
 
@@ -304,12 +305,12 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      *               bound in the context tree.
      *
      * @return The object bound at the indicated location.
-     * @exception org.omg.CosNaming.NamingContextPackage.NotFound
-     * @exception org.omg.CosNaming.NamingContextPackage.CannotProceed
-     * @exception org.omg.CosNaming.NamingContextPackage.InvalidName
-     * @exception org.omg.CosNaming.NamingContextPackage.AlreadyBound
+     * @exception NotFound
+     * @exception CannotProceed
+     * @exception InvalidName
+     * @exception AlreadyBound
      */
-    public org.omg.CORBA.Object resolve (org.omg.CosNaming.NameComponent[] n) throws org.omg.CosNaming.NamingContextPackage.NotFound, org.omg.CosNaming.NamingContextPackage.CannotProceed, org.omg.CosNaming.NamingContextPackage.InvalidName {
+    public org.omg.CORBA.Object resolve (NameComponent[] n) throws NotFound, CannotProceed, InvalidName {
         // perform various name validations
         validateName(n);
 
@@ -352,12 +353,12 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      *               current context.  All path contexts must already be
      *               bound in the context tree.
      *
-     * @exception org.omg.CosNaming.NamingContextPackage.NotFound
-     * @exception org.omg.CosNaming.NamingContextPackage.CannotProceed
-     * @exception org.omg.CosNaming.NamingContextPackage.InvalidName
-     * @exception org.omg.CosNaming.NamingContextPackage.AlreadyBound
+     * @exception NotFound
+     * @exception CannotProceed
+     * @exception InvalidName
+     * @exception AlreadyBound
      */
-    public void unbind (org.omg.CosNaming.NameComponent[] n) throws org.omg.CosNaming.NamingContextPackage.NotFound, org.omg.CosNaming.NamingContextPackage.CannotProceed, org.omg.CosNaming.NamingContextPackage.InvalidName {
+    public void unbind (NameComponent[] n) throws NotFound, CannotProceed, InvalidName {
         // perform various name validations
         validateName(n);
 
@@ -400,12 +401,12 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      *               bound in the context tree.
      *
      * @return The newly created context.
-     * @exception org.omg.CosNaming.NamingContextPackage.NotFound
-     * @exception org.omg.CosNaming.NamingContextPackage.CannotProceed
-     * @exception org.omg.CosNaming.NamingContextPackage.InvalidName
-     * @exception org.omg.CosNaming.NamingContextPackage.AlreadyBound
+     * @exception NotFound
+     * @exception CannotProceed
+     * @exception InvalidName
+     * @exception AlreadyBound
      */
-    public synchronized org.omg.CosNaming.NamingContext bind_new_context(org.omg.CosNaming.NameComponent[] n) throws org.omg.CosNaming.NamingContextPackage.NotFound, org.omg.CosNaming.NamingContextPackage.AlreadyBound, org.omg.CosNaming.NamingContextPackage.CannotProceed, org.omg.CosNaming.NamingContextPackage.InvalidName {
+    public synchronized NamingContext bind_new_context(NameComponent[] n) throws NotFound, AlreadyBound, CannotProceed, InvalidName {
         logNameComponent("bind_new_context() name", n);
 
         NamingContext context = new_context();
@@ -421,7 +422,7 @@ public abstract class NamingContextBase extends NamingContextExtPOA
             if (context != null) {
                 try {
                     context.destroy();
-                } catch (org.omg.CosNaming.NamingContextPackage.NotEmpty e) {
+                } catch (NotEmpty e) {
                     // new contexts should be empty.
                 }
             }
@@ -436,9 +437,9 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      * @param n      The array of NameComponents to convert.
      *
      * @return The context name, in string form.
-     * @exception org.omg.CosNaming.NamingContextPackage.InvalidName
+     * @exception InvalidName
      */
-    public String to_string(org.omg.CosNaming.NameComponent[] n) throws org.omg.CosNaming.NamingContextPackage.InvalidName {
+    public String to_string(NameComponent[] n) throws InvalidName {
         validateName(n);
 
         logNameComponent("to_string() name", n);
@@ -465,9 +466,9 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      * @param sn     The string form of the name.
      *
      * @return An array of NameComponents parsed from the String name.
-     * @exception org.omg.CosNaming.NamingContextPackage.InvalidName
+     * @exception InvalidName
      */
-    public org.omg.CosNaming.NameComponent[] to_name(String sn) throws org.omg.CosNaming.NamingContextPackage.InvalidName {
+    public NameComponent[] to_name(String sn) throws InvalidName {
         // must have a argument to parse
         if (sn == null || sn.length() == 0) {
             throw new InvalidName();
@@ -554,10 +555,10 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      * @param sn     The string mae of the target object.
      *
      * @return A URL for accessing this object, in String form.
-     * @exception org.omg.CosNaming.NamingContextExtPackage.InvalidAddress
-     * @exception org.omg.CosNaming.NamingContextPackage.InvalidName
+     * @exception InvalidAddress
+     * @exception InvalidName
      */
-    public String to_url (String addr, String sn) throws org.omg.CosNaming.NamingContextExtPackage.InvalidAddress, org.omg.CosNaming.NamingContextPackage.InvalidName {
+    public String to_url (String addr, String sn) throws InvalidAddress, InvalidName {
         // basic validation
         if (addr == null || addr.length() == 0) {
             throw new InvalidAddress();
@@ -580,11 +581,11 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      *               be a form parseable by to_name().
      *
      * @return The bound object or context.
-     * @exception org.omg.CosNaming.NamingContextPackage.NotFound
-     * @exception org.omg.CosNaming.NamingContextPackage.CannotProceed
-     * @exception org.omg.CosNaming.NamingContextPackage.InvalidName
+     * @exception NotFound
+     * @exception CannotProceed
+     * @exception InvalidName
      */
-    public org.omg.CORBA.Object resolve_str(String n) throws org.omg.CosNaming.NamingContextPackage.NotFound, org.omg.CosNaming.NamingContextPackage.CannotProceed, org.omg.CosNaming.NamingContextPackage.InvalidName {
+    public org.omg.CORBA.Object resolve_str(String n) throws NotFound, CannotProceed, InvalidName {
         // this is just a simple convenience method
         return resolve(to_name(n));
     }
@@ -597,18 +598,18 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      * calling context.
      *
      * @return A new NamingContext item.
-     * @exception org.omg.CosNaming.NamingContextPackage.NotFound
+     * @exception NotFound
      * @exception SystemException
      */
-    public abstract org.omg.CosNaming.NamingContext new_context()  throws SystemException;
+    public abstract NamingContext new_context()  throws SystemException;
 
     /**
      * Destroy a context.  This method should clean up
      * any backing resources associated with the context.
      *
-     * @exception org.omg.CosNaming.NamingContextPackage.NotEmpty
+     * @exception NotEmpty
      */
-    public abstract void destroy() throws org.omg.CosNaming.NamingContextPackage.NotEmpty;
+    public abstract void destroy() throws NotEmpty;
 
     /**
      * Create a list of bound objects an contexts contained
@@ -622,7 +623,7 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      *
      * @exception SystemException
      */
-    public abstract void list(int how_many, org.omg.CosNaming.BindingListHolder bl, org.omg.CosNaming.BindingIteratorHolder bi) throws SystemException ;
+    public abstract void list(int how_many, BindingListHolder bl, BindingIteratorHolder bi) throws SystemException ;
 
     // abstract methods for the sub class to implement
 
@@ -675,9 +676,9 @@ public abstract class NamingContextBase extends NamingContextExtPOA
      * @param name   The target name.
      *
      * @return The resolved NamingContext object.
-     * @exception org.omg.CosNaming.NamingContextPackage.NotFound
+     * @exception NotFound
      */
-    protected synchronized NamingContext resolveContext(NameComponent name) throws org.omg.CosNaming.NamingContextPackage.NotFound {
+    protected synchronized NamingContext resolveContext(NameComponent name) throws NotFound {
         BindingTypeHolder type = new BindingTypeHolder();
 	    // Resolve this to an object.  We must be able to resolve this.
 	    org.omg.CORBA.Object resolvedReference = resolveObject(name, type);
@@ -728,7 +729,7 @@ public abstract class NamingContextBase extends NamingContextExtPOA
     protected void validateName(NameComponent[] n) throws InvalidName {
         // perform various name validations
         if (n == null) {
-            throw new BAD_PARAM(MinorCodes.MinorObjectIsNull, CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(MinorObjectIsNull, COMPLETED_NO);
         }
 
         // Valid name?
