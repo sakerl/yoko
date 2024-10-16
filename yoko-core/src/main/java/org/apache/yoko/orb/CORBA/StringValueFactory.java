@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,15 @@
  */
 package org.apache.yoko.orb.CORBA;
 
+import java.io.Serializable;
+
+import org.omg.CORBA.portable.ValueFactory;
+import org.omg.CORBA_2_3.portable.InputStream;
+
 public final class StringValueFactory implements
-        org.omg.CORBA.portable.ValueFactory {
-    public java.io.Serializable read_value(
-            org.omg.CORBA_2_3.portable.InputStream is) {
+        ValueFactory {
+    public Serializable read_value(
+            InputStream is) {
         return is.read_string();
     }
 }
