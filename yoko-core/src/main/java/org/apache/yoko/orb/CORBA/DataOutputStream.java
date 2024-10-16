@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,12 @@
  */
 package org.apache.yoko.orb.CORBA;
 
+import java.io.Serializable;
+
+import org.omg.CORBA.Any;
+import org.omg.CORBA.NO_IMPLEMENT;
+import org.omg.CORBA.TypeCode;
+
 final public class DataOutputStream implements org.omg.CORBA.DataOutputStream {
     private OutputStream out_;
 
@@ -33,10 +39,10 @@ final public class DataOutputStream implements org.omg.CORBA.DataOutputStream {
     // ------------------------------------------------------------------
 
     public String[] _truncatable_ids() {
-        throw new org.omg.CORBA.NO_IMPLEMENT();
+        throw new NO_IMPLEMENT();
     }
 
-    public void write_any(org.omg.CORBA.Any value) {
+    public void write_any(Any value) {
         out_.write_any(value);
     }
 
@@ -100,19 +106,19 @@ final public class DataOutputStream implements org.omg.CORBA.DataOutputStream {
         out_.write_Object(value);
     }
 
-    public void write_Abstract(java.lang.Object value) {
+    public void write_Abstract(Object value) {
         out_.write_abstract_interface(value);
     }
 
-    public void write_Value(java.io.Serializable value) {
+    public void write_Value(Serializable value) {
         out_.write_value(value);
     }
 
-    public void write_TypeCode(org.omg.CORBA.TypeCode value) {
+    public void write_TypeCode(TypeCode value) {
         out_.write_TypeCode(value);
     }
 
-    public void write_any_array(org.omg.CORBA.Any[] seq, int offset, int length) {
+    public void write_any_array(Any[] seq, int offset, int length) {
         for (int i = offset; i < offset + length; i++)
             out_.write_any(seq[i]);
     }
