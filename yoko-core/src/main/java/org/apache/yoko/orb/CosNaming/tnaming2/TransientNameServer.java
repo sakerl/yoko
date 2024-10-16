@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@
  */
 package org.apache.yoko.orb.CosNaming.tnaming2;
 
+import static org.apache.yoko.orb.CosNaming.tnaming2.TransientNameService.DEFAULT_SERVICE_HOST;
+import static org.apache.yoko.orb.CosNaming.tnaming2.TransientNameService.DEFAULT_SERVICE_NAME;
+import static org.apache.yoko.orb.CosNaming.tnaming2.TransientNameService.DEFAULT_SERVICE_PORT;
+
 /**
  * A stand-alone naming service launchable from a command line.
  */
@@ -31,9 +35,9 @@ public class TransientNameServer {
      * @exception Exception
      */
     public static void main(String args[]) throws Exception {
-        int port = TransientNameService.DEFAULT_SERVICE_PORT;
-        String host = TransientNameService.DEFAULT_SERVICE_HOST;
-        String serviceName = TransientNameService.DEFAULT_SERVICE_NAME;
+        int port = DEFAULT_SERVICE_PORT;
+        String host = DEFAULT_SERVICE_HOST;
+        String serviceName = DEFAULT_SERVICE_NAME;
 
         // see if we have
         for (int i = 0; i < args.length; i++) {
