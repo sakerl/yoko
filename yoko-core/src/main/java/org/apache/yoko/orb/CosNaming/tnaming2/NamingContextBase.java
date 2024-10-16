@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.CosNaming.tnaming2;
+
+import static org.apache.yoko.util.MinorCodes.MinorObjectIsNull;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -604,7 +607,7 @@ public abstract class NamingContextBase extends NamingContextExtPOA {
     protected void validateName(NameComponent[] n) throws InvalidName {
         // perform various name validations
         if (n == null) {
-            throw new BAD_PARAM(MinorCodes.MinorObjectIsNull, CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(MinorObjectIsNull, COMPLETED_NO);
         }
 
         // Valid name?
