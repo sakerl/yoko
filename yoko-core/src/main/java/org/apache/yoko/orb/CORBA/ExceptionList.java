@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,13 @@
  */
 package org.apache.yoko.orb.CORBA;
 
+import java.util.Vector;
+
+import org.omg.CORBA.Bounds;
+import org.omg.CORBA.TypeCode;
+
 final public class ExceptionList extends org.omg.CORBA.ExceptionList {
-    java.util.Vector typeCodeVec_ = new java.util.Vector();
+    java.util.Vector typeCodeVec_ = new Vector();
 
     // ------------------------------------------------------------------
     // Standard IDL to Java Mapping
@@ -28,23 +33,23 @@ final public class ExceptionList extends org.omg.CORBA.ExceptionList {
         return typeCodeVec_.size();
     }
 
-    public void add(org.omg.CORBA.TypeCode exc) {
+    public void add(TypeCode exc) {
         typeCodeVec_.addElement(exc);
     }
 
-    public org.omg.CORBA.TypeCode item(int index) throws org.omg.CORBA.Bounds {
+    public TypeCode item(int index) throws Bounds {
         try {
-            return (org.omg.CORBA.TypeCode) typeCodeVec_.elementAt(index);
+            return (TypeCode) typeCodeVec_.elementAt(index);
         } catch (ArrayIndexOutOfBoundsException ex) {
             throw new org.omg.CORBA.Bounds();
         }
     }
 
-    public void remove(int index) throws org.omg.CORBA.Bounds {
+    public void remove(int index) throws Bounds {
         try {
             typeCodeVec_.removeElementAt(index);
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new org.omg.CORBA.Bounds();
+            throw new Bounds();
         }
     }
 
