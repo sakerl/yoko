@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@
  */
 package org.apache.yoko.orb.CosNaming.tnaming;
 
+import static org.apache.yoko.orb.CosNaming.tnaming.TransientNameService.DEFAULT_SERVICE_HOST;
+import static org.apache.yoko.orb.CosNaming.tnaming.TransientNameService.DEFAULT_SERVICE_NAME;
+import static org.apache.yoko.orb.CosNaming.tnaming.TransientNameService.DEFAULT_SERVICE_PORT;
+
 /**
  * A stand-alone naming service launchable from a command line.
  */
@@ -31,16 +35,16 @@ public class TransientNameServer {
      * @exception Exception
      */
     public static void main(String args[])throws Exception {
-        int port = TransientNameService.DEFAULT_SERVICE_PORT;
-        String host = TransientNameService.DEFAULT_SERVICE_HOST;
-        String serviceName = TransientNameService.DEFAULT_SERVICE_NAME;
+        int port = DEFAULT_SERVICE_PORT;
+        String host = DEFAULT_SERVICE_HOST;
+        String serviceName = DEFAULT_SERVICE_NAME;
 
         // see if we have
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-ORBInitialPort")) {
                 i++;
                 if (i < args.length) {
-                    port = java.lang.Integer.parseInt(args[i]);
+                    port = Integer.parseInt(args[i]);
                 }
                 else {
                     throw new IllegalArgumentException("Invalid -ORBInitialPort option");
