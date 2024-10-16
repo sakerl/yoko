@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,54 @@
  */
 package org.apache.yoko.orb.CORBA;
 
+import static org.apache.yoko.orb.OB.Util.isSystemException;
+import static org.apache.yoko.orb.OB.Util.unmarshalSystemException;
+import static org.apache.yoko.util.MinorCodes.MinorInvalidUseOfDSIArguments;
+import static org.apache.yoko.util.MinorCodes.MinorInvalidUseOfDSIContext;
+import static org.apache.yoko.util.MinorCodes.MinorInvalidUseOfDSIResult;
+import static org.apache.yoko.util.MinorCodes.MinorNoExceptionInAny;
+import static org.apache.yoko.util.MinorCodes.describeBadInvOrder;
+import static org.apache.yoko.util.MinorCodes.describeBadParam;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+import static org.omg.CORBA.TCKind.tk_except;
+
+import org.apache.yoko.orb.OB.LocationForward;
+import org.apache.yoko.orb.OB.PIUpcall;
+import org.apache.yoko.orb.OB.RuntimeLocationForward;
+import org.apache.yoko.orb.OB.Upcall;
+import org.apache.yoko.orb.PortableServer.Delegate;
 import org.apache.yoko.util.Assert;
 import org.apache.yoko.util.MinorCodes;
+import org.omg.CORBA.ARG_IN;
+import org.omg.CORBA.ARG_OUT;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.BAD_INV_ORDER;
+import org.omg.CORBA.BAD_PARAM;
+import org.omg.CORBA.Bounds;
+import org.omg.CORBA.NVList;
+import org.omg.CORBA.NamedValue;
+import org.omg.CORBA.SystemException;
+import org.omg.CORBA.TypeCodePackage.BadKind;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.PortableServer.DynamicImplementation;
 
 public class ServerRequest extends org.omg.CORBA.ServerRequest {
-    private org.omg.PortableServer.DynamicImplementation servant_;
+    private DynamicImplementation servant_;
 
-    private org.apache.yoko.orb.PortableServer.Delegate delegate_;
+    private Delegate delegate_;
 
-    private org.apache.yoko.orb.OB.Upcall up_;
+    private Upcall up_;
 
-    private org.omg.CORBA.portable.InputStream in_;
+    private InputStream in_;
 
-    private org.omg.CORBA.NVList arguments_;
+    private NVList arguments_;
 
     private org.omg.CORBA.Context ctx_;
 
-    private org.omg.CORBA.Any result_;
+    private Any result_;
 
-    private org.omg.CORBA.Any exception_;
+    private Any exception_;
 
     // ------------------------------------------------------------------
     // Standard IDL to Java Mapping
@@ -45,40 +74,39 @@ public class ServerRequest extends org.omg.CORBA.ServerRequest {
         return up_.operation();
     }
 
-    public void arguments(org.omg.CORBA.NVList parameters) {
+    public void arguments(NVList parameters) {
         if (arguments_ != null)
-            throw new org.omg.CORBA.BAD_INV_ORDER(
-                    MinorCodes
-                            .describeBadInvOrder(MinorCodes.MinorInvalidUseOfDSIArguments),
-                    MinorCodes.MinorInvalidUseOfDSIArguments,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_INV_ORDER(
+                    describeBadInvOrder(MinorInvalidUseOfDSIArguments),
+                    MinorInvalidUseOfDSIArguments,
+                    COMPLETED_NO);
 
         try {
             arguments_ = parameters;
             in_ = delegate_._OB_preUnmarshal(servant_, up_);
             try {
                 for (int i = 0; i < parameters.count(); i++) {
-                    org.omg.CORBA.NamedValue nv = parameters.item(i);
+                    NamedValue nv = parameters.item(i);
 
-                    if (nv.flags() != org.omg.CORBA.ARG_OUT.value)
+                    if (nv.flags() != ARG_OUT.value)
                         nv.value().read_value(in_, nv.value().type());
                 }
-            } catch (org.omg.CORBA.Bounds ex) {
+            } catch (Bounds ex) {
                 throw Assert.fail(ex);
-            } catch (org.omg.CORBA.SystemException ex) {
+            } catch (SystemException ex) {
                 delegate_._OB_unmarshalEx(servant_, up_, ex);
             }
-        } catch (org.apache.yoko.orb.OB.LocationForward ex) {
+        } catch (LocationForward ex) {
             //
             // Translate into a RuntimeException to bypass standardized
             // interfaces
             //
-            throw new org.apache.yoko.orb.OB.RuntimeLocationForward(ex.ior,
+            throw new RuntimeLocationForward(ex.ior,
                     ex.perm);
         }
 
-        if (up_ instanceof org.apache.yoko.orb.OB.PIUpcall) {
-            org.apache.yoko.orb.OB.PIUpcall piup = (org.apache.yoko.orb.OB.PIUpcall) up_;
+        if (up_ instanceof PIUpcall) {
+            PIUpcall piup = (PIUpcall) up_;
             piup.setArguments(parameters);
         }
     }
@@ -86,11 +114,10 @@ public class ServerRequest extends org.omg.CORBA.ServerRequest {
     public org.omg.CORBA.Context ctx() {
         if (arguments_ == null || ctx_ != null || result_ != null
                 || exception_ != null)
-            throw new org.omg.CORBA.BAD_INV_ORDER(
-                    MinorCodes
-                            .describeBadInvOrder(MinorCodes.MinorInvalidUseOfDSIContext),
-                    MinorCodes.MinorInvalidUseOfDSIContext,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_INV_ORDER(
+                    describeBadInvOrder(MinorInvalidUseOfDSIContext),
+                    MinorInvalidUseOfDSIContext,
+                    COMPLETED_NO);
 
         try {
             try {
@@ -99,57 +126,55 @@ public class ServerRequest extends org.omg.CORBA.ServerRequest {
                 for (int i = 0; i < len; i++)
                     strings[i] = in_.read_string();
                 ctx_ = new Context(up_.orbInstance().getORB(), "", strings);
-            } catch (org.omg.CORBA.SystemException ex) {
+            } catch (SystemException ex) {
                 delegate_._OB_unmarshalEx(servant_, up_, ex);
             }
-        } catch (org.apache.yoko.orb.OB.LocationForward ex) {
+        } catch (LocationForward ex) {
             //
             // Translate into a RuntimeException to bypass standardized
             // interfaces
             //
-            throw new org.apache.yoko.orb.OB.RuntimeLocationForward(ex.ior,
+            throw new RuntimeLocationForward(ex.ior,
                     ex.perm);
         }
 
         return ctx_;
     }
 
-    public void set_result(org.omg.CORBA.Any value) {
+    public void set_result(Any value) {
         if (arguments_ == null || result_ != null || exception_ != null)
-            throw new org.omg.CORBA.BAD_INV_ORDER(
-                    MinorCodes
-                            .describeBadInvOrder(MinorCodes.MinorInvalidUseOfDSIResult),
-                    MinorCodes.MinorInvalidUseOfDSIResult,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_INV_ORDER(
+                    describeBadInvOrder(MinorInvalidUseOfDSIResult),
+                    MinorInvalidUseOfDSIResult,
+                    COMPLETED_NO);
 
         result_ = value;
 
-        if (up_ instanceof org.apache.yoko.orb.OB.PIUpcall) {
-            org.apache.yoko.orb.OB.PIUpcall piup = (org.apache.yoko.orb.OB.PIUpcall) up_;
+        if (up_ instanceof PIUpcall) {
+            PIUpcall piup = (PIUpcall) up_;
             piup.setResult(value);
         }
     }
 
-    public void set_exception(org.omg.CORBA.Any value) {
+    public void set_exception(Any value) {
         if (arguments_ == null)
-            throw new org.omg.CORBA.BAD_INV_ORDER("arguments() has not "
+            throw new BAD_INV_ORDER("arguments() has not "
                     + "been called");
 
         if (result_ != null)
-            throw new org.omg.CORBA.BAD_INV_ORDER("set_result() has already "
+            throw new BAD_INV_ORDER("set_result() has already "
                     + "been called");
 
         if (exception_ != null)
-            throw new org.omg.CORBA.BAD_INV_ORDER("set_exception() has "
+            throw new BAD_INV_ORDER("set_exception() has "
                     + "already been called");
 
         org.omg.CORBA.TypeCode origTC = TypeCode._OB_getOrigType(value.type());
-        if (origTC.kind() != org.omg.CORBA.TCKind.tk_except)
-            throw new org.omg.CORBA.BAD_PARAM(
-                    MinorCodes
-                            .describeBadParam(MinorCodes.MinorNoExceptionInAny),
-                    MinorCodes.MinorNoExceptionInAny,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+        if (origTC.kind() != tk_except)
+            throw new BAD_PARAM(
+                    describeBadParam(MinorNoExceptionInAny),
+                    MinorNoExceptionInAny,
+                    COMPLETED_NO);
 
         exception_ = value;
     }
@@ -159,52 +184,51 @@ public class ServerRequest extends org.omg.CORBA.ServerRequest {
     // Application programs must not use these functions directly
     // ------------------------------------------------------------------
 
-    public ServerRequest(org.omg.PortableServer.DynamicImplementation servant,
-            org.apache.yoko.orb.OB.Upcall upcall) {
+    public ServerRequest(DynamicImplementation servant,
+            Upcall upcall) {
         servant_ = servant;
-        delegate_ = (org.apache.yoko.orb.PortableServer.Delegate) servant
+        delegate_ = (Delegate) servant
                 ._get_delegate();
         up_ = upcall;
     }
 
-    public org.omg.CORBA.Any _OB_exception() {
+    public Any _OB_exception() {
         return exception_;
     }
 
     public void _OB_finishUnmarshal()
-            throws org.apache.yoko.orb.OB.LocationForward {
+            throws LocationForward {
         if (arguments_ == null)
             delegate_._OB_preUnmarshal(servant_, up_);
 
         delegate_._OB_postUnmarshal(servant_, up_);
     }
 
-    public void _OB_postinvoke() throws org.apache.yoko.orb.OB.LocationForward {
+    public void _OB_postinvoke() throws LocationForward {
         if (exception_ == null)
             delegate_._OB_postinvoke(servant_, up_);
     }
 
-    public void _OB_doMarshal() throws org.apache.yoko.orb.OB.LocationForward {
+    public void _OB_doMarshal() throws LocationForward {
         if (exception_ != null) {
             org.omg.CORBA.TypeCode tc = exception_.type();
             String id = null;
             try {
                 id = tc.id();
-            } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {
+            } catch (BadKind ex) {
                 throw Assert.fail(ex);
             }
 
-            if (org.apache.yoko.orb.OB.Util.isSystemException(id)) {
-                org.omg.CORBA.portable.InputStream in = exception_
+            if (isSystemException(id)) {
+                InputStream in = exception_
                         .create_input_stream();
-                org.omg.CORBA.SystemException ex = org.apache.yoko.orb.OB.Util
-                        .unmarshalSystemException(in);
+                SystemException ex = unmarshalSystemException(in);
                 throw ex;
             } else {
                 up_.setUserException(exception_);
             }
         } else {
-            org.omg.CORBA.portable.OutputStream out = delegate_._OB_preMarshal(
+            OutputStream out = delegate_._OB_preMarshal(
                     servant_, up_);
 
             try {
@@ -214,16 +238,16 @@ public class ServerRequest extends org.omg.CORBA.ServerRequest {
                 if (arguments_ != null) {
                     try {
                         for (int i = 0; i < arguments_.count(); i++) {
-                            org.omg.CORBA.NamedValue nv = arguments_.item(i);
-                            if (nv.flags() != org.omg.CORBA.ARG_IN.value) {
+                            NamedValue nv = arguments_.item(i);
+                            if (nv.flags() != ARG_IN.value) {
                                 nv.value().write_value(out);
                             }
                         }
-                    } catch (org.omg.CORBA.Bounds ex) {
+                    } catch (Bounds ex) {
                         throw Assert.fail(ex);
                     }
                 }
-            } catch (org.omg.CORBA.SystemException ex) {
+            } catch (SystemException ex) {
                 delegate_._OB_marshalEx(servant_, up_, ex);
             }
 
