@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,14 @@
  */
 package org.apache.yoko.orb.CosNaming.tnaming;
 
+import static org.omg.PortableServer.IdAssignmentPolicyValue.SYSTEM_ID;
+import static org.omg.PortableServer.LifespanPolicyValue.TRANSIENT;
+import static org.omg.PortableServer.ServantRetentionPolicyValue.RETAIN;
+
 import java.util.Properties;
 
+import org.apache.yoko.orb.OB.BootManager;
+import org.apache.yoko.orb.OB.BootManagerHelper;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Policy;
 import org.omg.PortableServer.IdAssignmentPolicyValue;
@@ -33,11 +39,11 @@ import org.omg.PortableServer.ServantRetentionPolicyValue;
  */
 public class TransientNameService implements AutoCloseable {
     // the default registered name service
-    static public final String DEFAULT_SERVICE_NAME = "TNameService";
+    public static final String DEFAULT_SERVICE_NAME = "TNameService";
     // the default listening port
-    static public final int DEFAULT_SERVICE_PORT = 900;
+    public static final int DEFAULT_SERVICE_PORT = 900;
     // the default host name
-    static public final String DEFAULT_SERVICE_HOST = "localhost";
+    public static final String DEFAULT_SERVICE_HOST = "localhost";
 
     // the service root context
     protected TransientNamingContext initialContext;
@@ -115,9 +121,9 @@ public class TransientNameService implements AutoCloseable {
 
             // we need to create a POA to manage this named instance, and then activate a context on it.
             Policy[] policy = new Policy[3];
-            policy[0] = rootPOA.create_lifespan_policy(LifespanPolicyValue.TRANSIENT);
-            policy[1] = rootPOA.create_id_assignment_policy(IdAssignmentPolicyValue.SYSTEM_ID);
-            policy[2] = rootPOA.create_servant_retention_policy(ServantRetentionPolicyValue.RETAIN);
+            policy[0] = rootPOA.create_lifespan_policy(TRANSIENT);
+            policy[1] = rootPOA.create_id_assignment_policy(SYSTEM_ID);
+            policy[2] = rootPOA.create_servant_retention_policy(RETAIN);
 
             POA nameServicePOA = rootPOA.create_POA("TNameService", null, policy);
             nameServicePOA.the_POAManager().activate();
@@ -126,7 +132,7 @@ public class TransientNameService implements AutoCloseable {
             initialContext = new TransientNamingContext(orb, nameServicePOA);
 
             // Resolve the Boot Manager and register the context object so we can resolve it using a corbaloc:: URL
-            org.apache.yoko.orb.OB.BootManager bootManager = org.apache.yoko.orb.OB.BootManagerHelper.narrow(orb
+            BootManager bootManager = BootManagerHelper.narrow(orb
                     .resolve_initial_references("BootManager"));
             byte[] objectId = serviceName.getBytes();
             bootManager.add_binding(objectId, initialContext.getRootContext());
