@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public final class BindingIteratorImpl extends LocalObject implements BindingIte
          *            name is returned.
          * @return true if there is another item, false otherwise.
          */
-        public boolean next_one(org.omg.CosNaming.BindingHolder b) {
+        public boolean next_one(BindingHolder b) {
             if (iterator.hasNext()) {
                 // return this as a Binding value.
                 BoundObject obj = iterator.next();
@@ -86,7 +86,7 @@ public final class BindingIteratorImpl extends LocalObject implements BindingIte
          * @return true if any items were returned, false if there's nothing left
          *         to return.
          */
-        public boolean next_n(int how_many, org.omg.CosNaming.BindingListHolder bl) {
+        public boolean next_n(int how_many, BindingListHolder bl) {
             List<Binding> accum = new ArrayList<Binding>();
             BindingHolder holder = new BindingHolder();
             int i = 0;
@@ -140,7 +140,7 @@ public final class BindingIteratorImpl extends LocalObject implements BindingIte
          *         to return.
          */
         @Override
-        public boolean next_n(int how_many, org.omg.CosNaming.BindingListHolder bl) {
+        public boolean next_n(int how_many, BindingListHolder bl) {
             return core.next_n(how_many, bl);
         }
 
