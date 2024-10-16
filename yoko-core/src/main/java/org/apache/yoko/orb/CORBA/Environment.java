@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,17 @@
 package org.apache.yoko.orb.CORBA;
 
 final public class Environment extends org.omg.CORBA.Environment {
-    private java.lang.Exception exception_;
+    private Exception exception_;
 
     // ------------------------------------------------------------------
     // Standard IDL to Java Mapping
     // ------------------------------------------------------------------
 
-    public void exception(java.lang.Exception except) {
+    public void exception(Exception except) {
         exception_ = except;
     }
 
-    public java.lang.Exception exception() {
+    public Exception exception() {
         return exception_;
     }
 
