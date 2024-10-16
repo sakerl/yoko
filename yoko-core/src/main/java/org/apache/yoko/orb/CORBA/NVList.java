@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,15 @@
  */
 package org.apache.yoko.orb.CORBA;
 
+import java.util.Vector;
+
+import org.omg.CORBA.Bounds;
+import org.omg.CORBA.ORB;
+
 final public class NVList extends org.omg.CORBA.NVList {
     private org.omg.CORBA.ORB orb_;
 
-    private java.util.Vector namedValueVec_ = new java.util.Vector();
+    private Vector namedValueVec_ = new Vector();
 
     // ------------------------------------------------------------------
     // Standard IDL to Java Mapping
@@ -49,11 +54,11 @@ final public class NVList extends org.omg.CORBA.NVList {
         return n;
     }
 
-    public org.omg.CORBA.NamedValue item(int index) throws org.omg.CORBA.Bounds {
+    public org.omg.CORBA.NamedValue item(int index) throws Bounds {
         try {
             return (NamedValue) namedValueVec_.elementAt(index);
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new org.omg.CORBA.Bounds();
+            throw new Bounds();
         }
     }
 
@@ -61,7 +66,7 @@ final public class NVList extends org.omg.CORBA.NVList {
         try {
             namedValueVec_.removeElementAt(index);
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new org.omg.CORBA.Bounds();
+            throw new Bounds();
         }
     }
 
@@ -70,11 +75,11 @@ final public class NVList extends org.omg.CORBA.NVList {
     // Application programs must not use these functions directly
     // ------------------------------------------------------------------
 
-    public NVList(org.omg.CORBA.ORB orb) {
+    public NVList(ORB orb) {
         orb_ = orb;
     }
 
-    public NVList(org.omg.CORBA.ORB orb, int n) {
+    public NVList(ORB orb, int n) {
         orb_ = orb;
 
         //
