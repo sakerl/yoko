@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ package org.apache.yoko.rmi.api;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import org.omg.CORBA.ORB;
+
 /**
  * An instance of PortableRemoteObjectState represents a POA, with possible
  * sub-POA's that service the objects published through this state.
@@ -28,7 +30,7 @@ public interface PortableRemoteObjectState {
     /**
      * 
      */
-    org.omg.CORBA.ORB getORB();
+    ORB getORB();
 
     /**
      * Shutdown this state
