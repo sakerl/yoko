@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,9 @@ import org.omg.CosNaming.BindingHolder;
 import org.omg.CosNaming.BindingType;
 import org.omg.CosNaming.BindingTypeHolder;
 import org.omg.CosNaming.BindingIteratorHelper;
+import org.omg.CosNaming.BindingIteratorHolder;
 import org.omg.CosNaming.BindingIteratorPOA;
+import org.omg.CosNaming.BindingListHolder;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextHelper;
 import org.omg.CosNaming.NamingContext;
@@ -111,9 +113,9 @@ public class TransientNamingContext extends NamingContextBase {
      * Destroy a context.  This method should clean up
      * any backing resources associated with the context.
      *
-     * @exception org.omg.CosNaming.NamingContextPackage.NotEmpty
+     * @exception NotEmpty
      */
-    public synchronized void destroy () throws org.omg.CosNaming.NamingContextPackage.NotEmpty {
+    public synchronized void destroy () throws NotEmpty {
         // still holding bound objects?  Not allowed to destroy
         if (!bindings.isEmpty()) {
             throw new NotEmpty();
@@ -143,7 +145,7 @@ public class TransientNamingContext extends NamingContextBase {
      *
      * @exception SystemException
      */
-    public synchronized void list(int how_many, org.omg.CosNaming.BindingListHolder bl, org.omg.CosNaming.BindingIteratorHolder bi) throws SystemException {
+    public synchronized void list(int how_many, BindingListHolder bl, BindingIteratorHolder bi) throws SystemException {
 	    TransientBindingIterator iterator = new TransientBindingIterator(poa, (HashMap)bindings.clone());
         // have the iterator fill in the entries here
         iterator.next_n(how_many, bl);
@@ -387,7 +389,7 @@ public class TransientNamingContext extends NamingContextBase {
          *
          * @return true if there is another item, false otherwise.
          */
-        public boolean next_one(org.omg.CosNaming.BindingHolder b) {
+        public boolean next_one(BindingHolder b) {
             if (iterator.hasNext()) {
                 // return this as a Binding value.
                 BoundObject obj = (BoundObject)iterator.next();
@@ -413,7 +415,7 @@ public class TransientNamingContext extends NamingContextBase {
          * @return true if any items were returned, false if there's
          *         nothing left to return.
          */
-        public boolean next_n(int how_many, org.omg.CosNaming.BindingListHolder bl) {
+        public boolean next_n(int how_many, BindingListHolder bl) {
             List accum = new ArrayList();
             BindingHolder holder = new BindingHolder();
             int i = 0;
