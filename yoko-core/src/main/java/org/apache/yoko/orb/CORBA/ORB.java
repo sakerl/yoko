@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
  */
 package org.apache.yoko.orb.CORBA;
 
+import org.apache.yoko.orb.OBCORBA.ORB_impl;
+
 // This class must be public
-public final class ORB extends org.apache.yoko.orb.OBCORBA.ORB_impl {
+public final class ORB extends ORB_impl {
     //
     // This class exists solely for backward-compatibility and ease-of-use
     //
