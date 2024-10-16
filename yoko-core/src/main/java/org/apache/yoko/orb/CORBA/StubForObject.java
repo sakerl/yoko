@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,11 @@
  */
 package org.apache.yoko.orb.CORBA;
 
-final public class StubForObject extends org.omg.CORBA_2_4.portable.ObjectImpl
-        implements org.omg.CORBA.portable.IDLEntity {
+import org.omg.CORBA.portable.IDLEntity;
+import org.omg.CORBA_2_4.portable.ObjectImpl;
+
+final public class StubForObject extends ObjectImpl
+        implements IDLEntity {
     // ------------------------------------------------------------------
     // Standard IDL to Java Mapping
     // ------------------------------------------------------------------
