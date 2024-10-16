@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@ package org.apache.yoko.orb.CORBA;
 
 import java.rmi.Remote;
 
-public class StubForRemote extends javax.rmi.CORBA.Stub implements Remote {
+import javax.rmi.CORBA.Stub;
+
+public class StubForRemote extends Stub implements Remote {
 	public String[] _ids() {
 		return new String[0];
 	}
