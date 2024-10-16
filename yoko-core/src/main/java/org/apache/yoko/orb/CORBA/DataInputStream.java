@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,25 @@
  */
 package org.apache.yoko.orb.CORBA;
 
+import java.io.Serializable;
+
+import org.omg.CORBA.Any;
+import org.omg.CORBA.AnySeqHolder;
+import org.omg.CORBA.BooleanSeqHolder;
+import org.omg.CORBA.CharSeqHolder;
+import org.omg.CORBA.DoubleSeqHolder;
+import org.omg.CORBA.FloatSeqHolder;
+import org.omg.CORBA.LongLongSeqHolder;
+import org.omg.CORBA.LongSeqHolder;
+import org.omg.CORBA.NO_IMPLEMENT;
+import org.omg.CORBA.OctetSeqHolder;
+import org.omg.CORBA.ShortSeqHolder;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.ULongLongSeqHolder;
+import org.omg.CORBA.ULongSeqHolder;
+import org.omg.CORBA.UShortSeqHolder;
+import org.omg.CORBA.WCharSeqHolder;
+
 final public class DataInputStream implements org.omg.CORBA.DataInputStream {
     private InputStream in_;
 
@@ -33,10 +52,10 @@ final public class DataInputStream implements org.omg.CORBA.DataInputStream {
     // ------------------------------------------------------------------
 
     public String[] _truncatable_ids() {
-        throw new org.omg.CORBA.NO_IMPLEMENT();
+        throw new NO_IMPLEMENT();
     }
 
-    public org.omg.CORBA.Any read_any() {
+    public Any read_any() {
         return in_.read_any();
     }
 
@@ -100,80 +119,80 @@ final public class DataInputStream implements org.omg.CORBA.DataInputStream {
         return in_.read_Object();
     }
 
-    public java.lang.Object read_Abstract() {
+    public Object read_Abstract() {
         return in_.read_abstract_interface();
     }
 
-    public java.io.Serializable read_Value() {
+    public Serializable read_Value() {
         return in_.read_value();
     }
 
-    public org.omg.CORBA.TypeCode read_TypeCode() {
+    public TypeCode read_TypeCode() {
         return in_.read_TypeCode();
     }
 
-    public void read_any_array(org.omg.CORBA.AnySeqHolder seq, int offset,
+    public void read_any_array(AnySeqHolder seq, int offset,
             int length) {
         for (int i = offset; i < offset + length; i++)
             seq.value[i] = in_.read_any();
     }
 
-    public void read_boolean_array(org.omg.CORBA.BooleanSeqHolder seq,
+    public void read_boolean_array(BooleanSeqHolder seq,
             int offset, int length) {
         in_.read_boolean_array(seq.value, offset, length);
     }
 
-    public void read_char_array(org.omg.CORBA.CharSeqHolder seq, int offset,
+    public void read_char_array(CharSeqHolder seq, int offset,
             int length) {
         in_.read_char_array(seq.value, offset, length);
     }
 
-    public void read_wchar_array(org.omg.CORBA.WCharSeqHolder seq, int offset,
+    public void read_wchar_array(WCharSeqHolder seq, int offset,
             int length) {
         in_.read_wchar_array(seq.value, offset, length);
     }
 
-    public void read_octet_array(org.omg.CORBA.OctetSeqHolder seq, int offset,
+    public void read_octet_array(OctetSeqHolder seq, int offset,
             int length) {
         in_.read_octet_array(seq.value, offset, length);
     }
 
-    public void read_short_array(org.omg.CORBA.ShortSeqHolder seq, int offset,
+    public void read_short_array(ShortSeqHolder seq, int offset,
             int length) {
         in_.read_short_array(seq.value, offset, length);
     }
 
-    public void read_ushort_array(org.omg.CORBA.UShortSeqHolder seq,
+    public void read_ushort_array(UShortSeqHolder seq,
             int offset, int length) {
         in_.read_ushort_array(seq.value, offset, length);
     }
 
-    public void read_long_array(org.omg.CORBA.LongSeqHolder seq, int offset,
+    public void read_long_array(LongSeqHolder seq, int offset,
             int length) {
         in_.read_long_array(seq.value, offset, length);
     }
 
-    public void read_ulong_array(org.omg.CORBA.ULongSeqHolder seq, int offset,
+    public void read_ulong_array(ULongSeqHolder seq, int offset,
             int length) {
         in_.read_ulong_array(seq.value, offset, length);
     }
 
-    public void read_ulonglong_array(org.omg.CORBA.ULongLongSeqHolder seq,
+    public void read_ulonglong_array(ULongLongSeqHolder seq,
             int offset, int length) {
         in_.read_ulonglong_array(seq.value, offset, length);
     }
 
-    public void read_longlong_array(org.omg.CORBA.LongLongSeqHolder seq,
+    public void read_longlong_array(LongLongSeqHolder seq,
             int offset, int length) {
         in_.read_longlong_array(seq.value, offset, length);
     }
 
-    public void read_float_array(org.omg.CORBA.FloatSeqHolder seq, int offset,
+    public void read_float_array(FloatSeqHolder seq, int offset,
             int length) {
         in_.read_float_array(seq.value, offset, length);
     }
 
-    public void read_double_array(org.omg.CORBA.DoubleSeqHolder seq,
+    public void read_double_array(DoubleSeqHolder seq,
             int offset, int length) {
         in_.read_double_array(seq.value, offset, length);
     }
