@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,16 @@
  */
 package org.apache.yoko.orb.csi;
 
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
 import java.util.logging.Logger;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.CompletionStatus;
+import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.LocalObject;
 import org.omg.CORBA.MARSHAL;
+import org.omg.CORBA.NO_PERMISSION;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.OctetSeqHelper;
 import org.omg.CORBA.UserException;
@@ -88,10 +92,10 @@ public abstract class CSIInterceptorBase extends LocalObject {
                     .type());
         }
         catch (FormatMismatch ex) {
-            throw (org.omg.CORBA.INTERNAL)new org.omg.CORBA.INTERNAL(ex.getMessage()).initCause(ex);
+            throw (INTERNAL)new INTERNAL(ex.getMessage()).initCause(ex);
         }
         catch (TypeMismatch ex) {
-            throw (org.omg.CORBA.INTERNAL)new org.omg.CORBA.INTERNAL(ex.getMessage()).initCause(ex);
+            throw (INTERNAL)new INTERNAL(ex.getMessage()).initCause(ex);
         }
         return SASContextBodyHelper.extract(any);
     }
@@ -118,7 +122,7 @@ public abstract class CSIInterceptorBase extends LocalObject {
                 return text.getBytes("UTF8");
             }
             catch (java.io.UnsupportedEncodingException ex) {
-                throw (org.omg.CORBA.INTERNAL)new org.omg.CORBA.INTERNAL(ex.getMessage()).initCause(ex);
+                throw (INTERNAL)new INTERNAL(ex.getMessage()).initCause(ex);
             }
         }
     }
@@ -128,7 +132,7 @@ public abstract class CSIInterceptorBase extends LocalObject {
             return new String(data, "UTF8");
         }
         catch (java.io.UnsupportedEncodingException ex) {
-            throw (org.omg.CORBA.INTERNAL)new org.omg.CORBA.INTERNAL(ex.getMessage()).initCause(ex);
+            throw (INTERNAL)new INTERNAL(ex.getMessage()).initCause(ex);
         }
     }
 
@@ -159,7 +163,7 @@ public abstract class CSIInterceptorBase extends LocalObject {
         }
         catch (InvalidTypeForEncoding e) {
             MARSHAL me = new MARSHAL("cannot encode security descriptor", 0,
-                                     CompletionStatus.COMPLETED_NO);
+                                     COMPLETED_NO);
             me.initCause(e);
             throw me;
         }
@@ -183,7 +187,7 @@ public abstract class CSIInterceptorBase extends LocalObject {
         }
         catch (InvalidTypeForEncoding e) {
             MARSHAL me = new MARSHAL("cannot encode security descriptor", 0,
-                                     CompletionStatus.COMPLETED_NO);
+                                     COMPLETED_NO);
             me.initCause(e);
             throw me;
         }
@@ -220,7 +224,7 @@ public abstract class CSIInterceptorBase extends LocalObject {
             return result;
 
         } else {
-            throw new org.omg.CORBA.INTERNAL("user/password too long");
+            throw new INTERNAL("user/password too long");
         }
 
         // return data;
@@ -228,7 +232,7 @@ public abstract class CSIInterceptorBase extends LocalObject {
 
     InitialContextToken decodeGSSUPToken(byte[] data) {
         if (data[0] != 0x60)
-            throw new org.omg.CORBA.MARSHAL("Invalid Token");
+            throw new MARSHAL("Invalid Token");
 
         int idx = 1;
         int len = 0;
@@ -242,11 +246,11 @@ public abstract class CSIInterceptorBase extends LocalObject {
         while ((b & 0x80) == 0x80);
 
         if ((len + idx) != data.length)
-            throw new org.omg.CORBA.MARSHAL("Bad Token Size");
+            throw new MARSHAL("Bad Token Size");
 
         for (int i = 0; i < GSSUP_OID.length; i++) {
             if (data[idx + i] != GSSUP_OID[i]) {
-                throw new org.omg.CORBA.NO_PERMISSION("Not GSSUP_OID");
+                throw new NO_PERMISSION("Not GSSUP_OID");
             }
         }
 
@@ -261,7 +265,7 @@ public abstract class CSIInterceptorBase extends LocalObject {
         }
         catch (UserException e) {
             MARSHAL me = new MARSHAL("cannot decode local security descriptor",
-                                     0, CompletionStatus.COMPLETED_NO);
+                                     0, COMPLETED_NO);
             me.initCause(e);
             throw me;
         }
@@ -282,7 +286,7 @@ public abstract class CSIInterceptorBase extends LocalObject {
         }
         catch (UserException ex) {
             MARSHAL me = new MARSHAL("cannot encode local security descriptor",
-                                     0, CompletionStatus.COMPLETED_NO);
+                                     0, COMPLETED_NO);
             me.initCause(ex);
             throw me;
         }
@@ -397,7 +401,7 @@ public abstract class CSIInterceptorBase extends LocalObject {
             return new String(data, idx + 4, data.length - (idx + 4), "UTF8");
         }
         catch (java.io.UnsupportedEncodingException ex) {
-            throw (org.omg.CORBA.INTERNAL)new org.omg.CORBA.INTERNAL(ex.getMessage()).initCause(ex);
+            throw (INTERNAL)new INTERNAL(ex.getMessage()).initCause(ex);
         }
     }
 
