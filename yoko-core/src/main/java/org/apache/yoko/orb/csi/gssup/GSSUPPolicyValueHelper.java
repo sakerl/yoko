@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,43 +17,51 @@
  */
 package org.apache.yoko.orb.csi.gssup;
 
+import org.omg.CORBA.Any;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.StructMember;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.Security.RequiresSupportsHelper;
+
 public class GSSUPPolicyValueHelper {
 
-    private static org.omg.CORBA.TypeCode _type = org.omg.CORBA.ORB
+    private static TypeCode _type = ORB
             .init()
             .create_struct_tc(
                     GSSUPPolicyValueHelper.id(),
                     "GSSUPPolicyValue",
-                    new org.omg.CORBA.StructMember[]{
-                            new org.omg.CORBA.StructMember(
+                    new StructMember[]{
+                            new StructMember(
                                     "mode",
-                                    org.omg.CORBA.ORB
+                                    ORB
                                             .init()
                                             .create_enum_tc(
-                                            org.omg.Security.RequiresSupportsHelper
+                                            RequiresSupportsHelper
                                                     .id(),
                                             "RequiresSupports",
                                             new String[]{
                                                     "SecRequires",
                                                     "SecSupports"}),
                                     null),
-                            new org.omg.CORBA.StructMember("domain",
-                                                           org.omg.CORBA.ORB.init()
+                            new StructMember("domain",
+                                                           ORB.init()
                                                                    .create_string_tc(0), null)});
 
     public GSSUPPolicyValueHelper() {
     }
 
-    public static void insert(org.omg.CORBA.Any any, GSSUPPolicyValue s) {
+    public static void insert(Any any, GSSUPPolicyValue s) {
         any.type(type());
         write(any.create_output_stream(), s);
     }
 
-    public static GSSUPPolicyValue extract(org.omg.CORBA.Any any) {
+    public static GSSUPPolicyValue extract(Any any) {
         return read(any.create_input_stream());
     }
 
-    public static org.omg.CORBA.TypeCode type() {
+    public static TypeCode type() {
         return _type;
     }
 
@@ -65,13 +73,13 @@ public class GSSUPPolicyValueHelper {
         return type();
     }
 
-    public void write_Object(org.omg.CORBA.portable.OutputStream out,
-                             java.lang.Object obj)
+    public void write_Object(OutputStream out,
+                             Object obj)
     {
         throw new RuntimeException(" not implemented");
     }
 
-    public java.lang.Object read_Object(org.omg.CORBA.portable.InputStream in) {
+    public Object read_Object(InputStream in) {
         throw new RuntimeException(" not implemented");
     }
 
@@ -80,18 +88,18 @@ public class GSSUPPolicyValueHelper {
     }
 
     public static GSSUPPolicyValue read(
-            org.omg.CORBA.portable.InputStream in)
+            InputStream in)
     {
         GSSUPPolicyValue result = new GSSUPPolicyValue();
-        result.mode = org.omg.Security.RequiresSupportsHelper.read(in);
+        result.mode = RequiresSupportsHelper.read(in);
         result.domain = in.read_string();
         return result;
     }
 
-    public static void write(org.omg.CORBA.portable.OutputStream out,
+    public static void write(OutputStream out,
                              GSSUPPolicyValue s)
     {
-        org.omg.Security.RequiresSupportsHelper.write(out, s.mode);
+        RequiresSupportsHelper.write(out, s.mode);
         out.write_string(s.domain);
     }
 }
