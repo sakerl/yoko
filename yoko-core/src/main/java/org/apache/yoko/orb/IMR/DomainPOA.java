@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,24 @@
  */
 package org.apache.yoko.orb.IMR;
 
+import org.apache.yoko.orb.OAD.ProcessEndpointManagerHelper;
+import org.apache.yoko.orb.OAD.ProcessEndpointManagerHolder;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.InvokeHandler;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.ResponseHandler;
+import org.omg.PortableInterceptor.ObjectReferenceTemplate;
+import org.omg.PortableInterceptor.ObjectReferenceTemplateHelper;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.Servant;
+
 //
 // IDL:orb.yoko.apache.org/IMR/Domain:1.0
 //
 public abstract class DomainPOA
-    extends org.omg.PortableServer.Servant
-    implements org.omg.CORBA.portable.InvokeHandler,
+    extends Servant
+    implements InvokeHandler,
                DomainOperations
 {
     static final String[] _ob_ids_ =
@@ -37,21 +49,21 @@ public abstract class DomainPOA
     }
 
     public Domain
-    _this(org.omg.CORBA.ORB orb)
+    _this(ORB orb)
     {
         return DomainHelper.narrow(super._this_object(orb));
     }
 
     public String[]
-    _all_interfaces(org.omg.PortableServer.POA poa, byte[] objectId)
+    _all_interfaces(POA poa, byte[] objectId)
     {
         return _ob_ids_;
     }
 
-    public org.omg.CORBA.portable.OutputStream
+    public OutputStream
     _invoke(String opName,
-            org.omg.CORBA.portable.InputStream in,
-            org.omg.CORBA.portable.ResponseHandler handler)
+            InputStream in,
+            ResponseHandler handler)
     {
         final String[] _ob_names =
         {
@@ -113,11 +125,11 @@ public abstract class DomainPOA
         throw new org.omg.CORBA.BAD_OPERATION();
     }
 
-    private org.omg.CORBA.portable.OutputStream
-    _OB_op_registerServer(org.omg.CORBA.portable.InputStream in,
-                          org.omg.CORBA.portable.ResponseHandler handler)
+    private OutputStream
+    _OB_op_registerServer(InputStream in,
+                          ResponseHandler handler)
     {
-        org.omg.CORBA.portable.OutputStream out = null;
+        OutputStream out = null;
         try
         {
             String _ob_a0 = in.read_string();
@@ -134,21 +146,21 @@ public abstract class DomainPOA
         return out;
     }
 
-    private org.omg.CORBA.portable.OutputStream
-    _OB_op_startup(org.omg.CORBA.portable.InputStream in,
-                   org.omg.CORBA.portable.ResponseHandler handler)
+    private OutputStream
+    _OB_op_startup(InputStream in,
+                   ResponseHandler handler)
     {
-        org.omg.CORBA.portable.OutputStream out = null;
+        OutputStream out = null;
         try
         {
             String _ob_a0 = in.read_string();
             String _ob_a1 = in.read_string();
-            org.omg.PortableInterceptor.ObjectReferenceTemplate _ob_a2 = org.omg.PortableInterceptor.ObjectReferenceTemplateHelper.read(in);
-            org.apache.yoko.orb.OAD.ProcessEndpointManagerHolder _ob_ah3 = new org.apache.yoko.orb.OAD.ProcessEndpointManagerHolder();
+            ObjectReferenceTemplate _ob_a2 = ObjectReferenceTemplateHelper.read(in);
+            ProcessEndpointManagerHolder _ob_ah3 = new ProcessEndpointManagerHolder();
             ActiveState _ob_r = startup(_ob_a0, _ob_a1, _ob_a2, _ob_ah3);
             out = handler.createReply();
             ActiveStateHelper.write(out, _ob_r);
-            org.apache.yoko.orb.OAD.ProcessEndpointManagerHelper.write(out, _ob_ah3.value);
+            ProcessEndpointManagerHelper.write(out, _ob_ah3.value);
         }
         catch(NoSuchServer _ob_ex)
         {
