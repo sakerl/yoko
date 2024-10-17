@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,13 @@
  */
 package org.apache.yoko.orb.csi.gssup;
 
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.Streamable;
+
 final public class GSSUPPolicyValueHolder
-        implements org.omg.CORBA.portable.Streamable
+        implements Streamable
 {
 
     public GSSUPPolicyValue value;
@@ -30,15 +35,15 @@ final public class GSSUPPolicyValueHolder
         value = initial;
     }
 
-    public org.omg.CORBA.TypeCode _type() {
+    public TypeCode _type() {
         return GSSUPPolicyValueHelper.type();
     }
 
-    public void _read(org.omg.CORBA.portable.InputStream _in) {
+    public void _read(InputStream _in) {
         value = GSSUPPolicyValueHelper.read(_in);
     }
 
-    public void _write(org.omg.CORBA.portable.OutputStream _out) {
+    public void _write(OutputStream _out) {
         GSSUPPolicyValueHelper.write(_out, value);
     }
 }
