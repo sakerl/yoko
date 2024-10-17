@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,20 @@
  */
 package org.apache.yoko.orb.csi.gssup;
 
+import org.omg.CORBA.portable.IDLEntity;
+import org.omg.Security.RequiresSupports;
+
 public final class GSSUPPolicyValue
-        implements org.omg.CORBA.portable.IDLEntity
+        implements IDLEntity
 {
 
     public GSSUPPolicyValue() {
     }
 
-    public org.omg.Security.RequiresSupports mode;
-    public java.lang.String domain;
+    public RequiresSupports mode;
+    public String domain;
 
-    public GSSUPPolicyValue(org.omg.Security.RequiresSupports mode, java.lang.String domain) {
+    public GSSUPPolicyValue(RequiresSupports mode, String domain) {
         this.mode = mode;
         this.domain = domain;
     }
