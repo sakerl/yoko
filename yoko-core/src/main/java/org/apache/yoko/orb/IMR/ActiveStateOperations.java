@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.IMR;
+
+import org.omg.PortableInterceptor.ObjectReferenceTemplate;
 
 //
 // IDL:orb.yoko.apache.org/IMR/ActiveState:1.0
@@ -55,9 +57,9 @@ public interface ActiveStateOperations
      *
      **/
 
-    org.omg.PortableInterceptor.ObjectReferenceTemplate
+    ObjectReferenceTemplate
     poa_create(POAStatus state,
-               org.omg.PortableInterceptor.ObjectReferenceTemplate poa_tmpl)
+               ObjectReferenceTemplate poa_tmpl)
         throws _NoSuchPOA;
 
     //
