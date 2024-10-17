@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,62 @@
  */
 package org.apache.yoko.orb.DynamicAny;
 
+import static org.omg.CORBA.TCKind._tk_Principal;
+import static org.omg.CORBA.TCKind._tk_TypeCode;
+import static org.omg.CORBA.TCKind._tk_abstract_interface;
+import static org.omg.CORBA.TCKind._tk_alias;
+import static org.omg.CORBA.TCKind._tk_any;
+import static org.omg.CORBA.TCKind._tk_array;
+import static org.omg.CORBA.TCKind._tk_boolean;
+import static org.omg.CORBA.TCKind._tk_char;
+import static org.omg.CORBA.TCKind._tk_double;
+import static org.omg.CORBA.TCKind._tk_enum;
+import static org.omg.CORBA.TCKind._tk_except;
+import static org.omg.CORBA.TCKind._tk_fixed;
+import static org.omg.CORBA.TCKind._tk_float;
+import static org.omg.CORBA.TCKind._tk_long;
+import static org.omg.CORBA.TCKind._tk_longdouble;
+import static org.omg.CORBA.TCKind._tk_longlong;
+import static org.omg.CORBA.TCKind._tk_native;
+import static org.omg.CORBA.TCKind._tk_null;
+import static org.omg.CORBA.TCKind._tk_objref;
+import static org.omg.CORBA.TCKind._tk_octet;
+import static org.omg.CORBA.TCKind._tk_sequence;
+import static org.omg.CORBA.TCKind._tk_short;
+import static org.omg.CORBA.TCKind._tk_string;
+import static org.omg.CORBA.TCKind._tk_struct;
+import static org.omg.CORBA.TCKind._tk_ulong;
+import static org.omg.CORBA.TCKind._tk_ulonglong;
+import static org.omg.CORBA.TCKind._tk_union;
+import static org.omg.CORBA.TCKind._tk_ushort;
+import static org.omg.CORBA.TCKind._tk_value;
+import static org.omg.CORBA.TCKind._tk_value_box;
+import static org.omg.CORBA.TCKind._tk_void;
+import static org.omg.CORBA.TCKind._tk_wchar;
+import static org.omg.CORBA.TCKind._tk_wstring;
+import static org.omg.CORBA_2_4.TCKind._tk_local_interface;
+
 import org.apache.yoko.orb.CORBA.InputStream;
 import org.apache.yoko.orb.CORBA.TypeCode;
+import org.apache.yoko.orb.OB.ORBInstance;
 import org.apache.yoko.util.Assert;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.AnySeqHelper;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.VM_CUSTOM;
+import org.omg.CORBA.TypeCodePackage.BadKind;
+import org.omg.DynamicAny.DynAny;
+import org.omg.DynamicAny.DynAnyFactory;
+import org.omg.DynamicAny.MustTruncate;
+import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
+import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
+import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 
-final public class DynAnyFactory_impl extends org.omg.CORBA.LocalObject
-        implements org.omg.DynamicAny.DynAnyFactory {
-    private org.apache.yoko.orb.OB.ORBInstance orbInstance_;
+final public class DynAnyFactory_impl extends LocalObject
+        implements DynAnyFactory {
+    private ORBInstance orbInstance_;
 
-    public DynAnyFactory_impl(org.apache.yoko.orb.OB.ORBInstance orbInstance) {
+    public DynAnyFactory_impl(ORBInstance orbInstance) {
         orbInstance_ = orbInstance;
     }
 
@@ -33,52 +80,52 @@ final public class DynAnyFactory_impl extends org.omg.CORBA.LocalObject
     // Standard IDL to Java Mapping
     // ------------------------------------------------------------------
 
-    public org.omg.DynamicAny.DynAny create_dyn_any(org.omg.CORBA.Any value)
-            throws org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode {
+    public DynAny create_dyn_any(Any value)
+            throws InconsistentTypeCode {
         DynValueReader dynValueReader = new DynValueReader(orbInstance_, this,
                 true);
 
         try {
-            org.omg.DynamicAny.DynAny p = prepare_dyn_any_from_type_code(value
+            DynAny p = prepare_dyn_any_from_type_code(value
                     .type(), dynValueReader);
             p.from_any(value);
             return p;
-        } catch (org.omg.DynamicAny.DynAnyPackage.TypeMismatch ex) {
-        } catch (org.omg.DynamicAny.DynAnyPackage.InvalidValue ex) {
+        } catch (TypeMismatch ex) {
+        } catch (InvalidValue ex) {
         }
 
-        throw new org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode();
+        throw new InconsistentTypeCode();
     }
 
-    public org.omg.DynamicAny.DynAny create_dyn_any_without_truncation(
-            org.omg.CORBA.Any value)
-            throws org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode,
-            org.omg.DynamicAny.MustTruncate {
+    public DynAny create_dyn_any_without_truncation(
+            Any value)
+            throws InconsistentTypeCode,
+            MustTruncate {
         DynValueReader dynValueReader = new DynValueReader(orbInstance_, this,
                 false);
 
         try {
-            org.omg.DynamicAny.DynAny p = prepare_dyn_any_from_type_code(value
+            DynAny p = prepare_dyn_any_from_type_code(value
                     .type(), dynValueReader);
 
             p.from_any(value);
 
             if (dynValueReader.mustTruncate)
-                throw new org.omg.DynamicAny.MustTruncate();
+                throw new MustTruncate();
 
             return p;
-        } catch (org.omg.DynamicAny.DynAnyPackage.TypeMismatch ex) {
-        } catch (org.omg.DynamicAny.DynAnyPackage.InvalidValue ex) {
+        } catch (TypeMismatch ex) {
+        } catch (InvalidValue ex) {
         }
 
-        throw new org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode();
+        throw new InconsistentTypeCode();
     }
 
-    public org.omg.DynamicAny.DynAny prepare_dyn_any_from_type_code(
+    public DynAny prepare_dyn_any_from_type_code(
             org.omg.CORBA.TypeCode tc,
-            org.apache.yoko.orb.DynamicAny.DynValueReader dvr)
-            throws org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode {
-        org.omg.DynamicAny.DynAny result = null;
+            DynValueReader dvr)
+            throws InconsistentTypeCode {
+        DynAny result = null;
 
         TypeCode type = null;
         try {
@@ -87,33 +134,33 @@ final public class DynAnyFactory_impl extends org.omg.CORBA.LocalObject
             type = TypeCode._OB_convertForeignTypeCode(tc);
         }
 
-        org.omg.CORBA.TypeCode origTC = org.apache.yoko.orb.CORBA.TypeCode
+        org.omg.CORBA.TypeCode origTC = TypeCode
                 ._OB_getOrigType(type);
         switch (origTC.kind().value()) {
-        case org.omg.CORBA.TCKind._tk_struct:
-        case org.omg.CORBA.TCKind._tk_except:
+        case _tk_struct:
+        case _tk_except:
             result = new DynStruct_impl(this, orbInstance_, type, dvr);
             break;
 
-        case org.omg.CORBA.TCKind._tk_union:
+        case _tk_union:
             result = new DynUnion_impl(this, orbInstance_, type, dvr);
             break;
 
-        case org.omg.CORBA.TCKind._tk_sequence:
+        case _tk_sequence:
             result = new DynSequence_impl(this, orbInstance_, type, dvr);
             break;
 
-        case org.omg.CORBA.TCKind._tk_array:
+        case _tk_array:
             result = new DynArray_impl(this, orbInstance_, type, dvr);
             break;
 
-        case org.omg.CORBA.TCKind._tk_value:
+        case _tk_value:
             try {
-                if (origTC.type_modifier() == org.omg.CORBA.VM_CUSTOM.value)
+                if (origTC.type_modifier() == VM_CUSTOM.value)
                     result = create_dyn_any_from_type_code(tc);
                 else
                     result = new DynValue_impl(this, orbInstance_, type, dvr);
-            } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {
+            } catch (BadKind ex) {
             }
             break;
 
@@ -124,10 +171,10 @@ final public class DynAnyFactory_impl extends org.omg.CORBA.LocalObject
         return result;
     }
 
-    public org.omg.DynamicAny.DynAny create_dyn_any_from_type_code(
+    public DynAny create_dyn_any_from_type_code(
             org.omg.CORBA.TypeCode tc)
-            throws org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode {
-        org.omg.DynamicAny.DynAny result = null;
+            throws InconsistentTypeCode {
+        DynAny result = null;
 
         TypeCode type = null;
         try {
@@ -136,78 +183,78 @@ final public class DynAnyFactory_impl extends org.omg.CORBA.LocalObject
             type = TypeCode._OB_convertForeignTypeCode(tc);
         }
 
-        org.omg.CORBA.TypeCode origTC = org.apache.yoko.orb.CORBA.TypeCode
+        org.omg.CORBA.TypeCode origTC = TypeCode
                 ._OB_getOrigType(type);
         switch (origTC.kind().value()) {
-        case org.omg.CORBA.TCKind._tk_null:
-        case org.omg.CORBA.TCKind._tk_void:
-        case org.omg.CORBA.TCKind._tk_short:
-        case org.omg.CORBA.TCKind._tk_long:
-        case org.omg.CORBA.TCKind._tk_ushort:
-        case org.omg.CORBA.TCKind._tk_ulong:
-        case org.omg.CORBA.TCKind._tk_float:
-        case org.omg.CORBA.TCKind._tk_double:
-        case org.omg.CORBA.TCKind._tk_boolean:
-        case org.omg.CORBA.TCKind._tk_char:
-        case org.omg.CORBA.TCKind._tk_octet:
-        case org.omg.CORBA.TCKind._tk_any:
-        case org.omg.CORBA.TCKind._tk_TypeCode:
-        case org.omg.CORBA.TCKind._tk_objref:
-        case org.omg.CORBA.TCKind._tk_string:
-        case org.omg.CORBA.TCKind._tk_longlong:
-        case org.omg.CORBA.TCKind._tk_ulonglong:
-        case org.omg.CORBA.TCKind._tk_wchar:
-        case org.omg.CORBA.TCKind._tk_wstring:
-        case org.omg.CORBA.TCKind._tk_abstract_interface:
-        case org.omg.CORBA_2_4.TCKind._tk_local_interface:
+        case _tk_null:
+        case _tk_void:
+        case _tk_short:
+        case _tk_long:
+        case _tk_ushort:
+        case _tk_ulong:
+        case _tk_float:
+        case _tk_double:
+        case _tk_boolean:
+        case _tk_char:
+        case _tk_octet:
+        case _tk_any:
+        case _tk_TypeCode:
+        case _tk_objref:
+        case _tk_string:
+        case _tk_longlong:
+        case _tk_ulonglong:
+        case _tk_wchar:
+        case _tk_wstring:
+        case _tk_abstract_interface:
+        case _tk_local_interface:
             result = new DynBasic_impl(this, orbInstance_, type);
             break;
 
-        case org.omg.CORBA.TCKind._tk_fixed:
+        case _tk_fixed:
             result = new DynFixed_impl(this, orbInstance_, type);
             break;
 
-        case org.omg.CORBA.TCKind._tk_enum:
+        case _tk_enum:
             result = new DynEnum_impl(this, orbInstance_, type);
             break;
 
-        case org.omg.CORBA.TCKind._tk_struct:
-        case org.omg.CORBA.TCKind._tk_except:
+        case _tk_struct:
+        case _tk_except:
             result = new DynStruct_impl(this, orbInstance_, type);
             break;
 
-        case org.omg.CORBA.TCKind._tk_union:
+        case _tk_union:
             result = new DynUnion_impl(this, orbInstance_, type);
             break;
 
-        case org.omg.CORBA.TCKind._tk_sequence:
+        case _tk_sequence:
             result = new DynSequence_impl(this, orbInstance_, type);
             break;
 
-        case org.omg.CORBA.TCKind._tk_array:
+        case _tk_array:
             result = new DynArray_impl(this, orbInstance_, type);
             break;
 
-        case org.omg.CORBA.TCKind._tk_value:
+        case _tk_value:
             try {
-                if (origTC.type_modifier() == org.omg.CORBA.VM_CUSTOM.value)
+                if (origTC.type_modifier() == VM_CUSTOM.value)
                     result = new DynBasic_impl(this, orbInstance_, type);
                 else
                     result = new DynValue_impl(this, orbInstance_, type);
-            } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {
+            } catch (BadKind ex) {
             }
             break;
 
-        case org.omg.CORBA.TCKind._tk_value_box:
+        case _tk_value_box:
             result = new DynValueBox_impl(this, orbInstance_, type);
             break;
 
-        case org.omg.CORBA.TCKind._tk_Principal:
-        case org.omg.CORBA.TCKind._tk_native:
-        case org.omg.CORBA.TCKind._tk_longdouble:
-            throw new org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode();
+        case _tk_Principal:
+        case _tk_native:
+        case _tk_longdouble:
+            throw new InconsistentTypeCode();
 
-        case org.omg.CORBA.TCKind._tk_alias:
+        case _tk_alias:
         default:
             throw Assert.fail("Unsupported type code");
         }
@@ -215,17 +262,17 @@ final public class DynAnyFactory_impl extends org.omg.CORBA.LocalObject
         return result;
     }
 
-    public org.omg.DynamicAny.DynAny[] create_multiple_dyn_anys(
+    public DynAny[] create_multiple_dyn_anys(
             org.omg.CORBA.Any[] values, boolean allow_truncate)
-            throws org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode,
-            org.omg.DynamicAny.MustTruncate {
+            throws InconsistentTypeCode,
+            MustTruncate {
         //
         // Put the sequence of Anys and marshal it. This ensures that
         // ValueType equality that "spans" dynAnys will be mapped by
         // indirections when marshalled.
         //
-        org.omg.CORBA.Any aSeq = orbInstance_.getORB().create_any();
-        org.omg.CORBA.AnySeqHelper.insert(aSeq, values);
+        Any aSeq = orbInstance_.getORB().create_any();
+        AnySeqHelper.insert(aSeq, values);
 
         org.apache.yoko.orb.CORBA.Any valSeq;
         valSeq = (org.apache.yoko.orb.CORBA.Any) aSeq;
@@ -241,7 +288,7 @@ final public class DynAnyFactory_impl extends org.omg.CORBA.LocalObject
         //
         // Create a sequence of Dynamic Anys
         //
-        org.omg.DynamicAny.DynAny result[] = new org.omg.DynamicAny.DynAny[values.length];
+        DynAny result[] = new DynAny[values.length];
 
         DynValueReader dynValueReader = new DynValueReader(orbInstance_, this,
                 allow_truncate);
@@ -268,12 +315,12 @@ final public class DynAnyFactory_impl extends org.omg.CORBA.LocalObject
         return result;
     }
 
-    public org.omg.CORBA.Any[] create_multiple_anys(
-            org.omg.DynamicAny.DynAny[] values) {
+    public Any[] create_multiple_anys(
+            DynAny[] values) {
         // TODO: DynValue equalities that "span" members of
         // the sequence of DynAnys are not maintained
 
-        org.omg.CORBA.Any[] result = new org.omg.CORBA.Any[values.length];
+        Any[] result = new Any[values.length];
 
         for (int i = 0; i < values.length; i++) {
             DynAny_impl impl = (DynAny_impl) values[i];
