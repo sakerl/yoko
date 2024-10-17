@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,47 @@
  */
 package org.apache.yoko.orb.DynamicAny;
 
+import static java.lang.Boolean.FALSE;
+import static org.omg.CORBA.TCKind._tk_Principal;
+import static org.omg.CORBA.TCKind._tk_TypeCode;
+import static org.omg.CORBA.TCKind._tk_abstract_interface;
+import static org.omg.CORBA.TCKind._tk_any;
+import static org.omg.CORBA.TCKind._tk_boolean;
+import static org.omg.CORBA.TCKind._tk_char;
+import static org.omg.CORBA.TCKind._tk_double;
+import static org.omg.CORBA.TCKind._tk_float;
+import static org.omg.CORBA.TCKind._tk_long;
+import static org.omg.CORBA.TCKind._tk_longlong;
+import static org.omg.CORBA.TCKind._tk_null;
+import static org.omg.CORBA.TCKind._tk_objref;
+import static org.omg.CORBA.TCKind._tk_octet;
+import static org.omg.CORBA.TCKind._tk_short;
+import static org.omg.CORBA.TCKind._tk_string;
+import static org.omg.CORBA.TCKind._tk_ulong;
+import static org.omg.CORBA.TCKind._tk_ulonglong;
+import static org.omg.CORBA.TCKind._tk_ushort;
+import static org.omg.CORBA.TCKind._tk_value;
+import static org.omg.CORBA.TCKind._tk_void;
+import static org.omg.CORBA.TCKind._tk_wchar;
+import static org.omg.CORBA.TCKind._tk_wstring;
+import static org.omg.CORBA.TCKind.tk_any;
+import static org.omg.CORBA.TCKind.tk_null;
+import static org.omg.CORBA_2_4.TCKind._tk_local_interface;
+
 import org.apache.yoko.orb.CORBA.Any;
 import org.apache.yoko.orb.CORBA.InputStream;
 import org.apache.yoko.orb.CORBA.OutputStream;
 import org.apache.yoko.orb.CORBA.TypeCode;
+import org.apache.yoko.orb.OB.ORBInstance;
+import org.apache.yoko.orb.OB.TypeCodeFactory;
 import org.apache.yoko.util.Assert;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
+import org.omg.CORBA.VM_CUSTOM;
+import org.omg.CORBA.TypeCodePackage.BadKind;
+import org.omg.DynamicAny.DynAny;
+import org.omg.DynamicAny.DynAnyFactory;
+import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
+import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 
 final class DynBasic_impl extends DynAny_impl {
     private Any any_;
@@ -29,92 +65,92 @@ final class DynBasic_impl extends DynAny_impl {
     //
     // This object needs a component when the type is tk_any
     //
-    org.omg.DynamicAny.DynAny comp_;
+    DynAny comp_;
 
-    DynBasic_impl(org.omg.DynamicAny.DynAnyFactory factory,
-            org.apache.yoko.orb.OB.ORBInstance orbInstance,
+    DynBasic_impl(DynAnyFactory factory,
+            ORBInstance orbInstance,
             org.omg.CORBA.TypeCode type) {
         super(factory, orbInstance, type);
 
         org.omg.CORBA.TypeCode origTC = TypeCode._OB_getOrigType(type);
         switch (origTC.kind().value()) {
-        case org.omg.CORBA.TCKind._tk_null:
-        case org.omg.CORBA.TCKind._tk_void:
+        case _tk_null:
+        case _tk_void:
             any_ = new Any(orbInstance_, type, null);
             break;
 
-        case org.omg.CORBA.TCKind._tk_short:
-        case org.omg.CORBA.TCKind._tk_ushort:
-        case org.omg.CORBA.TCKind._tk_long:
-        case org.omg.CORBA.TCKind._tk_ulong:
+        case _tk_short:
+        case _tk_ushort:
+        case _tk_long:
+        case _tk_ulong:
             any_ = new Any(orbInstance_, type, Integer.valueOf(0));
             break;
 
-        case org.omg.CORBA.TCKind._tk_longlong:
-        case org.omg.CORBA.TCKind._tk_ulonglong:
+        case _tk_longlong:
+        case _tk_ulonglong:
             any_ = new Any(orbInstance_, type, Long.valueOf(0L));
             break;
 
-        case org.omg.CORBA.TCKind._tk_float:
+        case _tk_float:
             any_ = new Any(orbInstance_, type, Float.valueOf(0F));
             break;
 
-        case org.omg.CORBA.TCKind._tk_double:
+        case _tk_double:
             any_ = new Any(orbInstance_, type, Double.valueOf(0D));
             break;
 
-        case org.omg.CORBA.TCKind._tk_boolean:
-            any_ = new Any(orbInstance_, type, Boolean.FALSE);
+        case _tk_boolean:
+            any_ = new Any(orbInstance_, type, FALSE);
             break;
 
-        case org.omg.CORBA.TCKind._tk_char:
-        case org.omg.CORBA.TCKind._tk_wchar:
+        case _tk_char:
+        case _tk_wchar:
             any_ = new Any(orbInstance_, type, Character.valueOf((char) 0));
             break;
 
-        case org.omg.CORBA.TCKind._tk_octet:
+        case _tk_octet:
             any_ = new Any(orbInstance_, type, Byte.valueOf((byte) 0));
             break;
 
-        case org.omg.CORBA.TCKind._tk_any:
+        case _tk_any:
             any_ = new Any(orbInstance_, type, new Any(orbInstance_));
             break;
 
-        case org.omg.CORBA.TCKind._tk_TypeCode: {
-            org.omg.CORBA.TypeCode nullTC = org.apache.yoko.orb.OB.TypeCodeFactory
-                    .createPrimitiveTC(org.omg.CORBA.TCKind.tk_null);
+        case _tk_TypeCode: {
+            org.omg.CORBA.TypeCode nullTC = TypeCodeFactory
+                    .createPrimitiveTC(tk_null);
             any_ = new Any(orbInstance_, type, nullTC);
             break;
         }
 
-        case org.omg.CORBA.TCKind._tk_objref:
-        case org.omg.CORBA_2_4.TCKind._tk_local_interface:
+        case _tk_objref:
+        case _tk_local_interface:
             any_ = new Any(orbInstance_, type, null);
             break;
 
-        case org.omg.CORBA.TCKind._tk_string:
-        case org.omg.CORBA.TCKind._tk_wstring:
+        case _tk_string:
+        case _tk_wstring:
             any_ = new Any(orbInstance_, type, new String(""));
             break;
 
-        case org.omg.CORBA.TCKind._tk_abstract_interface:
+        case _tk_abstract_interface:
             any_ = new Any(orbInstance_, type, null);
             break;
 
-        case org.omg.CORBA.TCKind._tk_value:
+        case _tk_value:
             //
             // Only custom valuetypes are supported by DynBasic_impl
             //
             try {
                 Assert
-                        .ensure(origTC.type_modifier() == org.omg.CORBA.VM_CUSTOM.value);
-            } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {
+                        .ensure(origTC.type_modifier() == VM_CUSTOM.value);
+            } catch (BadKind ex) {
                 throw Assert.fail(ex);
             }
             any_ = new Any(orbInstance_, type, null);
             break;
 
-        case org.omg.CORBA.TCKind._tk_Principal:
+        case _tk_Principal:
         default:
             throw Assert.fail("Unsupported type code");
         }
@@ -130,7 +166,7 @@ final class DynBasic_impl extends DynAny_impl {
         // then we release our component. It will be created again during
         // get_dyn_any().
         //
-        if (origType_.kind() == org.omg.CORBA.TCKind.tk_any) {
+        if (origType_.kind() == tk_any) {
             if (comp_ != null)
                 comp_ = null;
         }
@@ -142,16 +178,16 @@ final class DynBasic_impl extends DynAny_impl {
     // Standard IDL to Java Mapping
     // ------------------------------------------------------------------
 
-    public synchronized void assign(org.omg.DynamicAny.DynAny dyn_any)
-            throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch {
+    public synchronized void assign(DynAny dyn_any)
+            throws TypeMismatch {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         if (this == dyn_any)
             return;
 
         if (!dyn_any.type().equivalent(type_))
-            throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+            throw new TypeMismatch();
 
         any_ = (Any) dyn_any.to_any();
 
@@ -159,8 +195,8 @@ final class DynBasic_impl extends DynAny_impl {
     }
 
     public synchronized void from_any(org.omg.CORBA.Any value)
-            throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch,
-            org.omg.DynamicAny.DynAnyPackage.InvalidValue {
+            throws TypeMismatch,
+            InvalidValue {
         if (destroyed_)
             throw new org.omg.CORBA.OBJECT_NOT_EXIST();
 
@@ -171,35 +207,35 @@ final class DynBasic_impl extends DynAny_impl {
         try {
             any_ = new Any(value);
         } catch (NullPointerException ex) {
-            throw (org.omg.DynamicAny.DynAnyPackage.InvalidValue)new 
-                org.omg.DynamicAny.DynAnyPackage.InvalidValue().initCause(ex);
+            throw (InvalidValue)new 
+                InvalidValue().initCause(ex);
         }
 
         org.omg.CORBA.TypeCode tc = any_._OB_type();
         org.omg.CORBA.TypeCode origTC = TypeCode._OB_getOrigType(tc);
 
         if (!tc.equivalent(type_))
-            throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+            throw new TypeMismatch();
 
         //
         // Check for an invalid value
         //
         if (any_.value() == null) {
             switch (origTC.kind().value()) {
-            case org.omg.CORBA.TCKind._tk_null:
-            case org.omg.CORBA.TCKind._tk_void:
-            case org.omg.CORBA.TCKind._tk_TypeCode:
-            case org.omg.CORBA.TCKind._tk_objref:
-            case org.omg.CORBA.TCKind._tk_value:
-            case org.omg.CORBA.TCKind._tk_abstract_interface:
-            case org.omg.CORBA_2_4.TCKind._tk_local_interface:
+            case _tk_null:
+            case _tk_void:
+            case _tk_TypeCode:
+            case _tk_objref:
+            case _tk_value:
+            case _tk_abstract_interface:
+            case _tk_local_interface:
                 //
                 // Some types can legally have a null value
                 //
                 break;
 
             default:
-                throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+                throw new InvalidValue();
             }
         }
 
@@ -208,7 +244,7 @@ final class DynBasic_impl extends DynAny_impl {
 
     public synchronized org.omg.CORBA.Any to_any() {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         return new Any(any_);
     }
@@ -217,9 +253,9 @@ final class DynBasic_impl extends DynAny_impl {
         return to_any();
     }
 
-    public synchronized boolean equal(org.omg.DynamicAny.DynAny dyn_any) {
+    public synchronized boolean equal(DynAny dyn_any) {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         if (this == dyn_any)
             return true;
@@ -237,30 +273,30 @@ final class DynBasic_impl extends DynAny_impl {
         java.lang.Object v2 = ((DynBasic_impl) dyn_any).any_.value();
 
         switch (origType_.kind().value()) {
-        case org.omg.CORBA.TCKind._tk_null:
-        case org.omg.CORBA.TCKind._tk_void:
+        case _tk_null:
+        case _tk_void:
             return true;
 
-        case org.omg.CORBA.TCKind._tk_short:
-        case org.omg.CORBA.TCKind._tk_ushort:
-        case org.omg.CORBA.TCKind._tk_long:
-        case org.omg.CORBA.TCKind._tk_ulong:
-        case org.omg.CORBA.TCKind._tk_longlong:
-        case org.omg.CORBA.TCKind._tk_ulonglong:
-        case org.omg.CORBA.TCKind._tk_float:
-        case org.omg.CORBA.TCKind._tk_double:
-        case org.omg.CORBA.TCKind._tk_boolean:
-        case org.omg.CORBA.TCKind._tk_char:
-        case org.omg.CORBA.TCKind._tk_wchar:
-        case org.omg.CORBA.TCKind._tk_octet:
-        case org.omg.CORBA.TCKind._tk_string:
-        case org.omg.CORBA.TCKind._tk_wstring:
+        case _tk_short:
+        case _tk_ushort:
+        case _tk_long:
+        case _tk_ulong:
+        case _tk_longlong:
+        case _tk_ulonglong:
+        case _tk_float:
+        case _tk_double:
+        case _tk_boolean:
+        case _tk_char:
+        case _tk_wchar:
+        case _tk_octet:
+        case _tk_string:
+        case _tk_wstring:
             return v1.equals(v2);
 
-        case org.omg.CORBA.TCKind._tk_any:
+        case _tk_any:
             return ((org.omg.CORBA.Any) v1).equal((org.omg.CORBA.Any) v2);
 
-        case org.omg.CORBA.TCKind._tk_TypeCode:
+        case _tk_TypeCode:
             if (v1 == null && v2 == null)
                 return true;
             else if (v1 == null || v2 == null)
@@ -269,8 +305,8 @@ final class DynBasic_impl extends DynAny_impl {
                 return ((org.omg.CORBA.TypeCode) v1)
                         .equal((org.omg.CORBA.TypeCode) v2);
 
-        case org.omg.CORBA.TCKind._tk_objref:
-        case org.omg.CORBA_2_4.TCKind._tk_local_interface:
+        case _tk_objref:
+        case _tk_local_interface:
             if (v1 == null && v2 == null)
                 return true;
             else if (v1 == null || v2 == null)
@@ -279,7 +315,7 @@ final class DynBasic_impl extends DynAny_impl {
                 return ((org.omg.CORBA.Object) v1)
                         ._is_equivalent((org.omg.CORBA.Object) v2);
 
-        case org.omg.CORBA.TCKind._tk_value:
+        case _tk_value:
             if (v1 == v2)
                 return true;
             else if (v1 == null || v2 == null)
@@ -292,7 +328,7 @@ final class DynBasic_impl extends DynAny_impl {
                 throw Assert.fail("Unable to compare value types");
             }
 
-        case org.omg.CORBA.TCKind._tk_abstract_interface:
+        case _tk_abstract_interface:
             if (v1 == v2)
                 return true;
             else if (v1 == null || v2 == null)
@@ -309,15 +345,15 @@ final class DynBasic_impl extends DynAny_impl {
                 throw Assert.fail("Unable to compare abstract_interface types");
             }
 
-        case org.omg.CORBA.TCKind._tk_Principal:
+        case _tk_Principal:
         default:
             throw Assert.fail("Unsupported type code");
         }
     }
 
-    public synchronized org.omg.DynamicAny.DynAny copy() {
+    public synchronized DynAny copy() {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         DynBasic_impl result = new DynBasic_impl(factory_, orbInstance_, type_);
         result.any_ = new Any(any_);
@@ -340,12 +376,12 @@ final class DynBasic_impl extends DynAny_impl {
         return 0;
     }
 
-    public org.omg.DynamicAny.DynAny current_component()
-            throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch {
+    public DynAny current_component()
+            throws TypeMismatch {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
-        throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        throw new TypeMismatch();
     }
 
     // ------------------------------------------------------------------
@@ -372,7 +408,7 @@ final class DynBasic_impl extends DynAny_impl {
 
     synchronized Any _OB_currentAny() {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         return any_;
     }
@@ -381,8 +417,8 @@ final class DynBasic_impl extends DynAny_impl {
         return any_;
     }
 
-    synchronized org.omg.DynamicAny.DynAny _OB_getDynAny() {
-        if (origType_.kind() != org.omg.CORBA.TCKind.tk_any)
+    synchronized DynAny _OB_getDynAny() {
+        if (origType_.kind() != tk_any)
             return null;
 
         if (comp_ == null)
@@ -391,7 +427,7 @@ final class DynBasic_impl extends DynAny_impl {
         return comp_;
     }
 
-    synchronized boolean _OB_insertDynAny(org.omg.DynamicAny.DynAny p) {
+    synchronized boolean _OB_insertDynAny(DynAny p) {
         //
         // Do nothing if caller is passing our component
         //
@@ -399,11 +435,11 @@ final class DynBasic_impl extends DynAny_impl {
             return true;
 
         try {
-            checkValue(any_, org.omg.CORBA.TCKind.tk_any);
+            checkValue(any_, tk_any);
 
             DynAny_impl impl = (DynAny_impl) p;
             Any implAny = impl._OB_currentAny();
-            checkValue(implAny, org.omg.CORBA.TCKind.tk_any);
+            checkValue(implAny, tk_any);
             Any any = (Any) implAny.value();
 
             any_.replace(any_.type(), new Any(any));
@@ -412,8 +448,8 @@ final class DynBasic_impl extends DynAny_impl {
                 comp_ = null;
 
             return true;
-        } catch (org.omg.DynamicAny.DynAnyPackage.TypeMismatch ex) {
-        } catch (org.omg.DynamicAny.DynAnyPackage.InvalidValue ex) {
+        } catch (TypeMismatch ex) {
+        } catch (InvalidValue ex) {
         }
 
         return false;
