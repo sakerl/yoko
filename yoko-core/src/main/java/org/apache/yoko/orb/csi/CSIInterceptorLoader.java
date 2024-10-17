@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,11 @@
 package org.apache.yoko.orb.csi;
 
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
+import static java.util.logging.Level.SEVERE;
+
+import org.omg.CORBA.INITIALIZE;
+import org.omg.CORBA.LocalObject;
 import org.omg.IOP.Codec;
 import org.omg.IOP.CodecFactoryPackage.UnknownEncoding;
 import org.omg.IOP.ENCODING_CDR_ENCAPS;
@@ -27,6 +30,7 @@ import org.omg.IOP.Encoding;
 import org.omg.PortableInterceptor.ORBInitInfo;
 import org.omg.PortableInterceptor.ORBInitializer;
 import org.omg.PortableInterceptor.PolicyFactory;
+import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
 import org.omg.Security.*;
 
 import org.apache.yoko.orb.csi.gssup.SecGSSUPPolicy;
@@ -35,7 +39,7 @@ import org.apache.yoko.orb.csi.gssup.SecGSSUPPolicy;
 /**
  * @author Jeppe Sommer (jso@eos.dk)
  */
-public class CSIInterceptorLoader extends org.omg.CORBA.LocalObject implements
+public class CSIInterceptorLoader extends LocalObject implements
                                                                     ORBInitializer
 {
 
@@ -56,7 +60,7 @@ public class CSIInterceptorLoader extends org.omg.CORBA.LocalObject implements
                                          (byte) 2));
         }
         catch (UnknownEncoding ex) {
-            log.log(Level.SEVERE, "Could not get codec: ", ex);
+            log.log(SEVERE, "Could not get codec: ", ex);
             return;
         }
 
@@ -81,8 +85,8 @@ public class CSIInterceptorLoader extends org.omg.CORBA.LocalObject implements
             info.add_ior_interceptor(ior_interceptor);
 
         }
-        catch (org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName ex) {
-            throw (org.omg.CORBA.INITIALIZE)new org.omg.CORBA.INITIALIZE(ex.getMessage()).initCause(ex);
+        catch (DuplicateName ex) {
+            throw (INITIALIZE)new INITIALIZE(ex.getMessage()).initCause(ex);
         }
 
     }
