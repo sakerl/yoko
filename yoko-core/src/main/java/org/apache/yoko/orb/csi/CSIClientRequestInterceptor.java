@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,15 @@
  */
 package org.apache.yoko.orb.csi;
 
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
 import java.util.logging.Logger;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.UserException;
+import org.omg.CORBA.portable.ObjectImpl;
 import org.omg.CSI.*;
 import org.omg.CSIIOP.*;
 import org.omg.GSSUP.InitialContextToken;
@@ -51,8 +54,8 @@ public class CSIClientRequestInterceptor extends CSIInterceptorBase
     public void send_request(ClientRequestInfo ri) throws ForwardRequest {
         org.omg.CORBA.Object target = ri.effective_target();
 
-        if (target instanceof org.omg.CORBA.portable.ObjectImpl) {
-            boolean isLocal = ((org.omg.CORBA.portable.ObjectImpl) target)
+        if (target instanceof ObjectImpl) {
+            boolean isLocal = ((ObjectImpl) target)
                     ._is_local();
 
             // save value of isLocal
@@ -94,7 +97,7 @@ public class CSIClientRequestInterceptor extends CSIInterceptorBase
         }
         catch (UserException e) {
             MARSHAL me = new MARSHAL("cannot decode local security descriptor",
-                                     0, CompletionStatus.COMPLETED_NO);
+                                     0, COMPLETED_NO);
             me.initCause(e);
             throw me;
         }
