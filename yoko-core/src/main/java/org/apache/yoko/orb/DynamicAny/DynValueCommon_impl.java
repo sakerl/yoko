@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,18 @@
  */
 package org.apache.yoko.orb.DynamicAny;
 
-import org.apache.yoko.orb.CORBA.Any;
-import org.apache.yoko.orb.CORBA.InputStream;
-import org.apache.yoko.orb.CORBA.OutputStream;
-import org.apache.yoko.orb.CORBA.TypeCode;
+import org.apache.yoko.orb.OB.ORBInstance;
+import org.omg.CORBA.TypeCode;
+import org.omg.DynamicAny.DynAnyFactory;
+import org.omg.DynamicAny.DynValueCommon;
 
 abstract class DynValueCommon_impl extends DynAny_impl implements
-        org.omg.DynamicAny.DynValueCommon {
+        DynValueCommon {
     private boolean isNull_;
 
-    DynValueCommon_impl(org.omg.DynamicAny.DynAnyFactory factory,
-            org.apache.yoko.orb.OB.ORBInstance orbInstance,
-            org.omg.CORBA.TypeCode type) {
+    DynValueCommon_impl(DynAnyFactory factory,
+            ORBInstance orbInstance,
+            TypeCode type) {
         super(factory, orbInstance, type);
     }
 
