@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
 package org.apache.yoko.orb.csi;
 
 import java.util.logging.Logger;
+
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
 import java.util.logging.Level;
 
 import org.omg.CORBA.Any;
@@ -29,6 +32,7 @@ import org.omg.IOP.Codec;
 import org.omg.IOP.CodecPackage.InvalidTypeForEncoding;
 import org.omg.IOP.TaggedComponent;
 import org.omg.PortableInterceptor.IORInfo;
+import org.omg.PortableInterceptor.IORInterceptor;
 import org.omg.Security.DelegationDirective;
 import org.omg.Security.RequiresSupports;
 import org.omg.Security.SecDelegationDirectivePolicy;
@@ -43,7 +47,7 @@ import org.apache.yoko.orb.csi.gssup.SecGSSUPPolicy;
  * policy is set.
  */
 public class GSSUPIORInterceptor extends CSIInterceptorBase implements
-                                                            org.omg.PortableInterceptor.IORInterceptor
+                                                            IORInterceptor
 {
 
     private static final Logger log = Logger.getLogger(GSSUPIORInterceptor.class.getName());
@@ -182,7 +186,7 @@ public class GSSUPIORInterceptor extends CSIInterceptorBase implements
         }
         catch (InvalidTypeForEncoding e) {
             MARSHAL me = new MARSHAL("cannot encode security descriptor", 0,
-                                     CompletionStatus.COMPLETED_NO);
+                                     COMPLETED_NO);
             me.initCause(e);
             throw me;
         }
