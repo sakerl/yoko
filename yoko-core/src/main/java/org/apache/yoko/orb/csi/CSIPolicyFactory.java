@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,22 @@ import org.apache.yoko.orb.csi.gssup.GSSUPPolicyValue;
 import org.apache.yoko.orb.csi.gssup.GSSUPPolicyValueHelper;
 import org.apache.yoko.orb.csi.gssup.SecGSSUPPolicy;
 import org.omg.CORBA.Any;
+import org.omg.CORBA.BAD_POLICY;
 import org.omg.CORBA.LocalObject;
 import org.omg.CORBA.Policy;
+import org.omg.CORBA.PolicyError;
+import org.omg.PortableInterceptor.PolicyFactory;
 import org.omg.Security.*;
 import org.omg.SecurityLevel2.Credentials;
 import org.omg.SecurityLevel2.CredentialsListHelper;
 
 
 class CSIPolicyFactory extends LocalObject
-        implements org.omg.PortableInterceptor.PolicyFactory
+        implements PolicyFactory
 {
 
     public Policy create_policy(int type, Any value)
-            throws org.omg.CORBA.PolicyError
+            throws PolicyError
     {
         switch (type) {
             case SecMechanismsPolicy.value:
@@ -50,8 +53,8 @@ class CSIPolicyFactory extends LocalObject
                 return new GSSUPPolicy(value);
         }
 
-        throw new org.omg.CORBA.PolicyError
-                (org.omg.CORBA.BAD_POLICY.value);
+        throw new PolicyError
+                (BAD_POLICY.value);
     }
 
     static abstract class SecurityPolicy
