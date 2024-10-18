@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.DynamicAny;
+
+import static org.omg.CORBA.TCKind._tk_value;
+import static org.omg.CORBA.TCKind.tk_except;
 
 import org.apache.yoko.orb.CORBA.Any;
 import org.apache.yoko.orb.CORBA.InputStream;
@@ -83,7 +86,7 @@ final class DynStruct_impl extends DynAny_impl implements DynStruct {
                 org.omg.CORBA.TypeCode origTC = TypeCode
                         ._OB_getOrigType(memberType);
 
-                if ((origTC.kind().value() == TCKind._tk_value)
+                if ((origTC.kind().value() == _tk_value)
                         && (dynValueReader_ != null)) {
                     components_[i] = null;
                 } else {
@@ -453,7 +456,7 @@ final class DynStruct_impl extends DynAny_impl implements DynStruct {
 
     synchronized void _OB_marshal(OutputStream out,
             DynValueWriter dynValueWriter) {
-        if (origType_.kind() == TCKind.tk_except) {
+        if (origType_.kind() == tk_except) {
             try {
                 out.write_string(origType_.id());
             } catch (BadKind ex) {
@@ -468,7 +471,7 @@ final class DynStruct_impl extends DynAny_impl implements DynStruct {
     }
 
     synchronized void _OB_unmarshal(InputStream in) {
-        if (origType_.kind() == TCKind.tk_except) {
+        if (origType_.kind() == tk_except) {
             in.read_string();
         }
 
@@ -484,7 +487,7 @@ final class DynStruct_impl extends DynAny_impl implements DynStruct {
             org.omg.CORBA.TypeCode origTC = TypeCode
                     ._OB_getOrigType(memberType);
 
-            if ((origTC.kind().value() == TCKind._tk_value)
+            if ((origTC.kind().value() == _tk_value)
                     && (dynValueReader_ != null)) {
                 //
                 // Create DynValue components
