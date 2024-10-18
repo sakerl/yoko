@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,41 @@ import org.omg.DynamicAny.DynAnyFactory;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
+
+import static org.omg.CORBA.TCKind._tk_boolean;
+import static org.omg.CORBA.TCKind._tk_char;
+import static org.omg.CORBA.TCKind._tk_double;
+import static org.omg.CORBA.TCKind._tk_float;
+import static org.omg.CORBA.TCKind._tk_long;
+import static org.omg.CORBA.TCKind._tk_longlong;
+import static org.omg.CORBA.TCKind._tk_octet;
+import static org.omg.CORBA.TCKind._tk_short;
+import static org.omg.CORBA.TCKind._tk_string;
+import static org.omg.CORBA.TCKind._tk_ulong;
+import static org.omg.CORBA.TCKind._tk_ulonglong;
+import static org.omg.CORBA.TCKind._tk_ushort;
+import static org.omg.CORBA.TCKind._tk_wchar;
+import static org.omg.CORBA.TCKind._tk_wstring;
+import static org.omg.CORBA.TCKind.tk_TypeCode;
+import static org.omg.CORBA.TCKind.tk_any;
+import static org.omg.CORBA.TCKind.tk_array;
+import static org.omg.CORBA.TCKind.tk_boolean;
+import static org.omg.CORBA.TCKind.tk_char;
+import static org.omg.CORBA.TCKind.tk_double;
+import static org.omg.CORBA.TCKind.tk_float;
+import static org.omg.CORBA.TCKind.tk_long;
+import static org.omg.CORBA.TCKind.tk_longlong;
+import static org.omg.CORBA.TCKind.tk_objref;
+import static org.omg.CORBA.TCKind.tk_octet;
+import static org.omg.CORBA.TCKind.tk_short;
+import static org.omg.CORBA.TCKind.tk_string;
+import static org.omg.CORBA.TCKind.tk_ulong;
+import static org.omg.CORBA.TCKind.tk_ulonglong;
+import static org.omg.CORBA.TCKind.tk_ushort;
+import static org.omg.CORBA.TCKind.tk_value;
+import static org.omg.CORBA.TCKind.tk_value_box;
+import static org.omg.CORBA.TCKind.tk_wchar;
+import static org.omg.CORBA.TCKind.tk_wstring;
 
 import java.io.Serializable;
 
@@ -83,20 +118,20 @@ abstract class DynSeqBase_impl extends DynAny_impl {
             ignoreChild_ = false;
 
             switch (contentKind_.value()) {
-            case TCKind._tk_short:
-            case TCKind._tk_long:
-            case TCKind._tk_ushort:
-            case TCKind._tk_ulong:
-            case TCKind._tk_float:
-            case TCKind._tk_double:
-            case TCKind._tk_boolean:
-            case TCKind._tk_char:
-            case TCKind._tk_octet:
-            case TCKind._tk_string:
-            case TCKind._tk_longlong:
-            case TCKind._tk_ulonglong:
-            case TCKind._tk_wchar:
-            case TCKind._tk_wstring:
+            case _tk_short:
+            case _tk_long:
+            case _tk_ushort:
+            case _tk_ulong:
+            case _tk_float:
+            case _tk_double:
+            case _tk_boolean:
+            case _tk_char:
+            case _tk_octet:
+            case _tk_string:
+            case _tk_longlong:
+            case _tk_ulonglong:
+            case _tk_wchar:
+            case _tk_wstring:
                 primitive_ = true;
                 break;
 
@@ -109,7 +144,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
             // An array must be initialized to its proper length
             //
             max_ = origType_.length();
-            if (origType_.kind() == TCKind.tk_array) {
+            if (origType_.kind() == tk_array) {
                 resize(max_, true);
                 index_ = 0;
             }
@@ -172,65 +207,65 @@ abstract class DynSeqBase_impl extends DynAny_impl {
         Assert.ensure(index < length_ && primitive_);
 
         switch (contentKind_.value()) {
-        case TCKind._tk_short:
+        case _tk_short:
 
-        case TCKind._tk_ushort: {
+        case _tk_ushort: {
             short[] buf = (short[]) buf_;
             any.replace(contentType_, (int) buf[index]);
             break;
         }
 
-        case TCKind._tk_long:
+        case _tk_long:
 
-        case TCKind._tk_ulong: {
+        case _tk_ulong: {
             int[] buf = (int[]) buf_;
             any.replace(contentType_, buf[index]);
             break;
         }
 
-        case TCKind._tk_float: {
+        case _tk_float: {
             float[] buf = (float[]) buf_;
             any.replace(contentType_, buf[index]);
             break;
         }
 
-        case TCKind._tk_double: {
+        case _tk_double: {
             double[] buf = (double[]) buf_;
             any.replace(contentType_, buf[index]);
             break;
         }
 
-        case TCKind._tk_boolean: {
+        case _tk_boolean: {
             boolean[] buf = (boolean[]) buf_;
             any.replace(contentType_, buf[index]);
             break;
         }
 
-        case TCKind._tk_char:
+        case _tk_char:
 
-        case TCKind._tk_wchar: {
+        case _tk_wchar: {
             char[] buf = (char[]) buf_;
             any.replace(contentType_, buf[index]);
             break;
         }
 
-        case TCKind._tk_octet: {
+        case _tk_octet: {
             byte[] buf = (byte[]) buf_;
             any.replace(contentType_, buf[index]);
             break;
         }
 
-        case TCKind._tk_string:
+        case _tk_string:
 
-        case TCKind._tk_wstring: {
+        case _tk_wstring: {
             String[] buf = (String[]) buf_;
             any.replace(contentType_, buf[index]);
             break;
         }
 
-        case TCKind._tk_longlong:
+        case _tk_longlong:
 
-        case TCKind._tk_ulonglong: {
+        case _tk_ulonglong: {
             long[] buf = (long[]) buf_;
             any.replace(contentType_, buf[index]);
             break;
@@ -255,85 +290,85 @@ abstract class DynSeqBase_impl extends DynAny_impl {
             components_[index].from_any(any);
         else {
             switch (contentKind_.value()) {
-            case TCKind._tk_short: {
+            case _tk_short: {
                 short[] buf = (short[]) buf_;
                 buf[index] = any.extract_short();
                 break;
             }
 
-            case TCKind._tk_long: {
+            case _tk_long: {
                 int[] buf = (int[]) buf_;
                 buf[index] = any.extract_long();
                 break;
             }
 
-            case TCKind._tk_ushort: {
+            case _tk_ushort: {
                 short[] buf = (short[]) buf_;
                 buf[index] = any.extract_ushort();
                 break;
             }
 
-            case TCKind._tk_ulong: {
+            case _tk_ulong: {
                 int[] buf = (int[]) buf_;
                 buf[index] = any.extract_ulong();
                 break;
             }
 
-            case TCKind._tk_float: {
+            case _tk_float: {
                 float[] buf = (float[]) buf_;
                 buf[index] = any.extract_float();
                 break;
             }
 
-            case TCKind._tk_double: {
+            case _tk_double: {
                 double[] buf = (double[]) buf_;
                 buf[index] = any.extract_double();
                 break;
             }
 
-            case TCKind._tk_boolean: {
+            case _tk_boolean: {
                 boolean[] buf = (boolean[]) buf_;
                 buf[index] = any.extract_boolean();
                 break;
             }
 
-            case TCKind._tk_char: {
+            case _tk_char: {
                 char[] buf = (char[]) buf_;
                 buf[index] = any.extract_char();
                 break;
             }
 
-            case TCKind._tk_octet: {
+            case _tk_octet: {
                 byte[] buf = (byte[]) buf_;
                 buf[index] = any.extract_octet();
                 break;
             }
 
-            case TCKind._tk_string: {
+            case _tk_string: {
                 String[] buf = (String[]) buf_;
                 buf[index] = any.extract_string();
                 break;
             }
 
-            case TCKind._tk_longlong: {
+            case _tk_longlong: {
                 long[] buf = (long[]) buf_;
                 buf[index] = any.extract_longlong();
                 break;
             }
 
-            case TCKind._tk_ulonglong: {
+            case _tk_ulonglong: {
                 long[] buf = (long[]) buf_;
                 buf[index] = any.extract_ulonglong();
                 break;
             }
 
-            case TCKind._tk_wchar: {
+            case _tk_wchar: {
                 char[] buf = (char[]) buf_;
                 buf[index] = any.extract_wchar();
                 break;
             }
 
-            case TCKind._tk_wstring: {
+            case _tk_wstring: {
                 String[] buf = (String[]) buf_;
                 buf[index] = any.extract_wstring();
                 break;
@@ -353,85 +388,85 @@ abstract class DynSeqBase_impl extends DynAny_impl {
 
         if (primitive_) {
             switch (contentKind_.value()) {
-            case TCKind._tk_short: {
+            case _tk_short: {
                 short[] buf = (short[]) buf_;
                 buf[index] = p.get_short();
                 break;
             }
 
-            case TCKind._tk_long: {
+            case _tk_long: {
                 int[] buf = (int[]) buf_;
                 buf[index] = p.get_long();
                 break;
             }
 
-            case TCKind._tk_ushort: {
+            case _tk_ushort: {
                 short[] buf = (short[]) buf_;
                 buf[index] = p.get_ushort();
                 break;
             }
 
-            case TCKind._tk_ulong: {
+            case _tk_ulong: {
                 int[] buf = (int[]) buf_;
                 buf[index] = p.get_ulong();
                 break;
             }
 
-            case TCKind._tk_float: {
+            case _tk_float: {
                 float[] buf = (float[]) buf_;
                 buf[index] = p.get_float();
                 break;
             }
 
-            case TCKind._tk_double: {
+            case _tk_double: {
                 double[] buf = (double[]) buf_;
                 buf[index] = p.get_double();
                 break;
             }
 
-            case TCKind._tk_boolean: {
+            case _tk_boolean: {
                 boolean[] buf = (boolean[]) buf_;
                 buf[index] = p.get_boolean();
                 break;
             }
 
-            case TCKind._tk_char: {
+            case _tk_char: {
                 char[] buf = (char[]) buf_;
                 buf[index] = p.get_char();
                 break;
             }
 
-            case TCKind._tk_octet: {
+            case _tk_octet: {
                 byte[] buf = (byte[]) buf_;
                 buf[index] = p.get_octet();
                 break;
             }
 
-            case TCKind._tk_string: {
+            case _tk_string: {
                 String[] buf = (String[]) buf_;
                 buf[index] = p.get_string();
                 break;
             }
 
-            case TCKind._tk_longlong: {
+            case _tk_longlong: {
                 long[] buf = (long[]) buf_;
                 buf[index] = p.get_longlong();
                 break;
             }
 
-            case TCKind._tk_ulonglong: {
+            case _tk_ulonglong: {
                 long[] buf = (long[]) buf_;
                 buf[index] = p.get_ulonglong();
                 break;
             }
 
-            case TCKind._tk_wchar: {
+            case _tk_wchar: {
                 char[] buf = (char[]) buf_;
                 buf[index] = p.get_wchar();
                 break;
             }
 
-            case TCKind._tk_wstring: {
+            case _tk_wstring: {
                 String[] buf = (String[]) buf_;
                 buf[index] = p.get_wstring();
                 break;
@@ -475,8 +510,8 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     protected void resize(int len, boolean init) {
         if (primitive_ && len > length_) {
             switch (contentKind_.value()) {
-            case TCKind._tk_short:
-            case TCKind._tk_ushort: {
+            case _tk_short:
+            case _tk_ushort: {
                 short[] oldBuf = (short[]) buf_;
                 if (len > 0) {
                     short[] buf = new short[len];
@@ -488,8 +523,8 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_long:
-            case TCKind._tk_ulong: {
+            case _tk_long:
+            case _tk_ulong: {
                 int[] oldBuf = (int[]) buf_;
                 if (len > 0) {
                     int[] buf = new int[len];
@@ -501,7 +536,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_float: {
+            case _tk_float: {
                 float[] oldBuf = (float[]) buf_;
                 if (len > 0) {
                     float[] buf = new float[len];
@@ -513,7 +548,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_double: {
+            case _tk_double: {
                 double[] oldBuf = (double[]) buf_;
                 if (len > 0) {
                     double[] buf = new double[len];
@@ -525,7 +560,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_boolean: {
+            case _tk_boolean: {
                 boolean[] oldBuf = (boolean[]) buf_;
                 if (len > 0) {
                     boolean[] buf = new boolean[len];
@@ -537,8 +572,8 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_char:
-            case TCKind._tk_wchar: {
+            case _tk_char:
+            case _tk_wchar: {
                 char[] oldBuf = (char[]) buf_;
                 if (len > 0) {
                     char[] buf = new char[len];
@@ -550,7 +585,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_octet: {
+            case _tk_octet: {
                 byte[] oldBuf = (byte[]) buf_;
                 if (len > 0) {
                     byte[] buf = new byte[len];
@@ -562,8 +597,8 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_string:
-            case TCKind._tk_wstring: {
+            case _tk_string:
+            case _tk_wstring: {
                 String[] oldBuf = (String[]) buf_;
                 if (len > 0) {
                     String[] buf = new String[len];
@@ -583,8 +618,8 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_longlong:
-            case TCKind._tk_ulonglong: {
+            case _tk_longlong:
+            case _tk_ulonglong: {
                 long[] oldBuf = (long[]) buf_;
                 if (len > 0) {
                     long[] buf = new long[len];
@@ -773,8 +808,8 @@ abstract class DynSeqBase_impl extends DynAny_impl {
 
         if (primitive_) {
             switch (contentKind_.value()) {
-            case TCKind._tk_short:
-            case TCKind._tk_ushort: {
+            case _tk_short:
+            case _tk_ushort: {
                 short[] buf1 = (short[]) buf_;
                 short[] buf2 = (short[]) seq.buf_;
                 for (int i = 0; i < length_; i++)
@@ -783,8 +818,8 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_long:
-            case TCKind._tk_ulong: {
+            case _tk_long:
+            case _tk_ulong: {
                 int[] buf1 = (int[]) buf_;
                 int[] buf2 = (int[]) seq.buf_;
                 for (int i = 0; i < length_; i++)
@@ -793,7 +828,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_float: {
+            case _tk_float: {
                 float[] buf1 = (float[]) buf_;
                 float[] buf2 = (float[]) seq.buf_;
                 for (int i = 0; i < length_; i++)
@@ -802,7 +837,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_double: {
+            case _tk_double: {
                 double[] buf1 = (double[]) buf_;
                 double[] buf2 = (double[]) seq.buf_;
                 for (int i = 0; i < length_; i++)
@@ -811,7 +846,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_boolean: {
+            case _tk_boolean: {
                 boolean[] buf1 = (boolean[]) buf_;
                 boolean[] buf2 = (boolean[]) seq.buf_;
                 for (int i = 0; i < length_; i++)
@@ -820,8 +855,8 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_char:
-            case TCKind._tk_wchar: {
+            case _tk_char:
+            case _tk_wchar: {
                 char[] buf1 = (char[]) buf_;
                 char[] buf2 = (char[]) seq.buf_;
                 for (int i = 0; i < length_; i++)
@@ -830,7 +865,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_octet: {
+            case _tk_octet: {
                 byte[] buf1 = (byte[]) buf_;
                 byte[] buf2 = (byte[]) seq.buf_;
                 for (int i = 0; i < length_; i++)
@@ -839,8 +874,8 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_string:
-            case TCKind._tk_wstring: {
+            case _tk_string:
+            case _tk_wstring: {
                 String[] buf1 = (String[]) buf_;
                 String[] buf2 = (String[]) seq.buf_;
                 for (int i = 0; i < length_; i++)
@@ -849,8 +884,8 @@ abstract class DynSeqBase_impl extends DynAny_impl {
                 break;
             }
 
-            case TCKind._tk_longlong:
-            case TCKind._tk_ulonglong: {
+            case _tk_longlong:
+            case _tk_ulonglong: {
                 long[] buf1 = (long[]) buf_;
                 long[] buf2 = (long[]) seq.buf_;
                 for (int i = 0; i < length_; i++)
@@ -943,7 +978,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_boolean(boolean value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_boolean);
+        validate(tk_boolean);
 
         boolean[] buf = (boolean[]) buf_;
         buf[index_] = value;
@@ -954,7 +989,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_octet(byte value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_octet);
+        validate(tk_octet);
 
         byte[] buf = (byte[]) buf_;
         buf[index_] = value;
@@ -965,7 +1000,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_char(char value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_char);
+        validate(tk_char);
 
         char[] buf = (char[]) buf_;
         buf[index_] = value;
@@ -976,7 +1011,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_short(short value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_short);
+        validate(tk_short);
 
         short[] buf = (short[]) buf_;
         buf[index_] = value;
@@ -987,7 +1022,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_ushort(short value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_ushort);
+        validate(tk_ushort);
 
         short[] buf = (short[]) buf_;
         buf[index_] = value;
@@ -998,7 +1033,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_long(int value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_long);
+        validate(tk_long);
 
         int[] buf = (int[]) buf_;
         buf[index_] = value;
@@ -1009,7 +1044,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_ulong(int value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_ulong);
+        validate(tk_ulong);
 
         int[] buf = (int[]) buf_;
         buf[index_] = value;
@@ -1020,7 +1055,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_float(float value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_float);
+        validate(tk_float);
 
         float[] buf = (float[]) buf_;
         buf[index_] = value;
@@ -1031,7 +1066,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_double(double value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_double);
+        validate(tk_double);
 
         double[] buf = (double[]) buf_;
         buf[index_] = value;
@@ -1045,7 +1080,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
         if (value == null)
             throw new InvalidValue();
 
-        validate(TCKind.tk_string);
+        validate(tk_string);
 
         org.omg.CORBA.TypeCode origContent = TypeCode
                 ._OB_getOrigType(contentType_);
@@ -1070,7 +1105,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_reference(org.omg.CORBA.Object value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_objref);
+        validate(tk_objref);
 
         //
         // Delegate to component
@@ -1083,7 +1118,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_typecode(org.omg.CORBA.TypeCode value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_TypeCode);
+        validate(tk_TypeCode);
 
         //
         // Delegate to component
@@ -1096,7 +1131,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_longlong(long value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_longlong);
+        validate(tk_longlong);
 
         long[] buf = (long[]) buf_;
         buf[index_] = value;
@@ -1107,7 +1142,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_ulonglong(long value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_ulonglong);
+        validate(tk_ulonglong);
 
         long[] buf = (long[]) buf_;
         buf[index_] = value;
@@ -1118,7 +1153,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_wchar(char value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_wchar);
+        validate(tk_wchar);
 
         char[] buf = (char[]) buf_;
         buf[index_] = value;
@@ -1132,7 +1167,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
         if (value == null)
             throw new InvalidValue();
 
-        validate(TCKind.tk_wstring);
+        validate(tk_wstring);
 
         org.omg.CORBA.TypeCode origContent = TypeCode
                 ._OB_getOrigType(contentType_);
@@ -1157,7 +1192,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_any(org.omg.CORBA.Any value)
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_any);
+        validate(tk_any);
 
         //
         // Delegate to component
@@ -1170,7 +1205,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_dyn_any(DynAny value) throws TypeMismatch, InvalidValue {
         if (value == null) throw new TypeMismatch();
 
-        validate(TCKind.tk_any);
+        validate(tk_any);
 
         //
         // Delegate to component
@@ -1183,8 +1218,8 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized void insert_val(Serializable value)
             throws TypeMismatch,
             InvalidValue {
-        if (contentKind_ != TCKind.tk_value
-                && contentKind_ != TCKind.tk_value_box)
+        if (contentKind_ != tk_value
+                && contentKind_ != tk_value_box)
             throw new TypeMismatch();
 
         if (index_ < 0)
@@ -1201,7 +1236,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized boolean get_boolean()
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_boolean);
+        validate(tk_boolean);
 
         boolean[] buf = (boolean[]) buf_;
         return buf[index_];
@@ -1210,7 +1245,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized byte get_octet()
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_octet);
+        validate(tk_octet);
 
         byte[] buf = (byte[]) buf_;
         return buf[index_];
@@ -1219,7 +1254,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized char get_char()
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_char);
+        validate(tk_char);
 
         char[] buf = (char[]) buf_;
         return buf[index_];
@@ -1228,7 +1263,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized short get_short()
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_short);
+        validate(tk_short);
 
         short[] buf = (short[]) buf_;
         return buf[index_];
@@ -1237,7 +1272,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized short get_ushort()
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_ushort);
+        validate(tk_ushort);
 
         short[] buf = (short[]) buf_;
         return buf[index_];
@@ -1246,7 +1281,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized int get_long()
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_long);
+        validate(tk_long);
 
         int[] buf = (int[]) buf_;
         return buf[index_];
@@ -1255,7 +1290,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized int get_ulong()
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_ulong);
+        validate(tk_ulong);
 
         int[] buf = (int[]) buf_;
         return buf[index_];
@@ -1264,7 +1299,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized float get_float()
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_float);
+        validate(tk_float);
 
         float[] buf = (float[]) buf_;
         return buf[index_];
@@ -1273,7 +1308,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized double get_double()
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_double);
+        validate(tk_double);
 
         double[] buf = (double[]) buf_;
         return buf[index_];
@@ -1282,7 +1317,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized String get_string()
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_string);
+        validate(tk_string);
 
         String[] buf = (String[]) buf_;
         return buf[index_];
@@ -1302,7 +1337,7 @@ abstract class DynSeqBase_impl extends DynAny_impl {
     final public synchronized org.omg.CORBA.TypeCode get_typecode()
             throws TypeMismatch,
             InvalidValue {
-        validate(TCKind.tk_TypeCode);
+        validate(tk_TypeCode);
 
         //
         // Delegate to component
