@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,36 +17,50 @@
  */
 package org.apache.yoko.orb.DynamicAny;
 
+import static java.math.BigDecimal.ROUND_DOWN;
+
+import java.math.BigDecimal;
+
 import org.apache.yoko.orb.CORBA.Any;
 import org.apache.yoko.orb.CORBA.InputStream;
 import org.apache.yoko.orb.CORBA.OutputStream;
+import org.apache.yoko.orb.OB.ORBInstance;
 import org.apache.yoko.util.Assert;
+import org.omg.CORBA.BAD_OPERATION;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.TypeCodePackage.BadKind;
+import org.omg.DynamicAny.DynAny;
+import org.omg.DynamicAny.DynAnyFactory;
+import org.omg.DynamicAny.DynFixed;
+import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
+import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 
 final class DynFixed_impl extends DynAny_impl implements
-        org.omg.DynamicAny.DynFixed {
-    private java.math.BigDecimal value_;
+        DynFixed {
+    private BigDecimal value_;
 
-    DynFixed_impl(org.omg.DynamicAny.DynAnyFactory factory,
-            org.apache.yoko.orb.OB.ORBInstance orbInstance,
-            org.omg.CORBA.TypeCode type) {
+    DynFixed_impl(DynAnyFactory factory,
+            ORBInstance orbInstance,
+            TypeCode type) {
         super(factory, orbInstance, type);
-        value_ = new java.math.BigDecimal(0);
+        value_ = new BigDecimal(0);
     }
 
     // ------------------------------------------------------------------
     // Standard IDL to Java Mapping
     // ------------------------------------------------------------------
 
-    public synchronized void assign(org.omg.DynamicAny.DynAny dyn_any)
-            throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch {
+    public synchronized void assign(DynAny dyn_any)
+            throws TypeMismatch {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         if (this == dyn_any)
             return;
 
         if (!dyn_any.type().equivalent(type_))
-            throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+            throw new TypeMismatch();
 
         DynFixed_impl impl = (DynFixed_impl) dyn_any;
         value_ = impl.value_;
@@ -55,10 +69,10 @@ final class DynFixed_impl extends DynAny_impl implements
     }
 
     public synchronized void from_any(org.omg.CORBA.Any value)
-            throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch,
-            org.omg.DynamicAny.DynAnyPackage.InvalidValue {
+            throws TypeMismatch,
+            InvalidValue {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         //
         // Convert value to an ORBacus Any - the JDK implementation
@@ -71,25 +85,25 @@ final class DynFixed_impl extends DynAny_impl implements
             try {
                 val = new Any(value);
             } catch (NullPointerException e) {
-                throw (org.omg.DynamicAny.DynAnyPackage.InvalidValue)new 
-                    org.omg.DynamicAny.DynAnyPackage.InvalidValue().initCause(e);
+                throw (InvalidValue)new 
+                    InvalidValue().initCause(e);
             }
         }
 
         if (!val._OB_type().equivalent(type_))
-            throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+            throw new TypeMismatch();
 
         try {
             java.math.BigDecimal f = val.extract_fixed();
 
             if (f == null || f.scale() > origType_.fixed_scale())
-                throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+                throw new InvalidValue();
             value_ = f;
-        } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {
+        } catch (BadKind ex) {
             throw Assert.fail(ex);
-        } catch (org.omg.CORBA.BAD_OPERATION ex) {
-            throw (org.omg.DynamicAny.DynAnyPackage.InvalidValue)new 
-                org.omg.DynamicAny.DynAnyPackage.InvalidValue().initCause(ex);
+        } catch (BAD_OPERATION ex) {
+            throw (InvalidValue)new 
+                InvalidValue().initCause(ex);
         }
 
         notifyParent();
@@ -97,7 +111,7 @@ final class DynFixed_impl extends DynAny_impl implements
 
     public synchronized org.omg.CORBA.Any to_any() {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         return new Any(orbInstance_, type_, value_);
     }
@@ -106,9 +120,9 @@ final class DynFixed_impl extends DynAny_impl implements
         return to_any();
     }
 
-    public synchronized boolean equal(org.omg.DynamicAny.DynAny dyn_any) {
+    public synchronized boolean equal(DynAny dyn_any) {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         if (this == dyn_any)
             return true;
@@ -120,9 +134,9 @@ final class DynFixed_impl extends DynAny_impl implements
         return value_.equals(impl.value_);
     }
 
-    public synchronized org.omg.DynamicAny.DynAny copy() {
+    public synchronized DynAny copy() {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         DynFixed_impl result = new DynFixed_impl(factory_, orbInstance_, type_);
         result.value_ = value_;
@@ -145,12 +159,12 @@ final class DynFixed_impl extends DynAny_impl implements
         return 0;
     }
 
-    public org.omg.DynamicAny.DynAny current_component()
-            throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch {
+    public DynAny current_component()
+            throws TypeMismatch {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
-        throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        throw new TypeMismatch();
     }
 
     public synchronized String get_value() {
@@ -158,28 +172,28 @@ final class DynFixed_impl extends DynAny_impl implements
     }
 
     public synchronized boolean set_value(String val)
-            throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch,
-            org.omg.DynamicAny.DynAnyPackage.InvalidValue {
+            throws TypeMismatch,
+            InvalidValue {
         String s = val.trim().toLowerCase();
         if (s.endsWith("d"))
             s = s.substring(0, s.length() - 1);
         if (s.length() == 0)
-            throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+            throw new InvalidValue();
 
         java.math.BigDecimal f = null;
 
         try {
             f = new java.math.BigDecimal(s);
         } catch (NumberFormatException ex) {
-            throw (org.omg.DynamicAny.DynAnyPackage.TypeMismatch)new 
-                org.omg.DynamicAny.DynAnyPackage.TypeMismatch().initCause(ex);
+            throw (TypeMismatch)new 
+                TypeMismatch().initCause(ex);
         }
 
         int origDigits = 0, origScale = 0;
         try {
             origDigits = origType_.fixed_digits();
             origScale = origType_.fixed_scale();
-        } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {
+        } catch (BadKind ex) {
             throw Assert.fail(ex);
         }
 
@@ -194,7 +208,7 @@ final class DynFixed_impl extends DynAny_impl implements
         // representing the value (even with a loss of precision)
         //
         if ((fDigits - fScale) > (origDigits - origScale))
-            throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+            throw new InvalidValue();
 
         //
         // Return true if there was no loss of precision, otherwise
@@ -202,7 +216,7 @@ final class DynFixed_impl extends DynAny_impl implements
         //
         boolean result = true;
         if (fScale > origScale) {
-            value_ = f.setScale(origScale, java.math.BigDecimal.ROUND_DOWN);
+            value_ = f.setScale(origScale, ROUND_DOWN);
             result = false;
         } else
             value_ = f.setScale(origScale);
@@ -219,7 +233,7 @@ final class DynFixed_impl extends DynAny_impl implements
     synchronized void _OB_marshal(OutputStream out) {
         try {
             out.write_fixed(value_.movePointRight(origType_.fixed_scale()));
-        } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {
+        } catch (BadKind ex) {
             throw Assert.fail(ex);
         }
     }
@@ -232,7 +246,7 @@ final class DynFixed_impl extends DynAny_impl implements
     synchronized void _OB_unmarshal(InputStream in) {
         try {
             value_ = in.read_fixed().movePointLeft(origType_.fixed_scale());
-        } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {
+        } catch (BadKind ex) {
             throw Assert.fail(ex);
         }
 
@@ -241,7 +255,7 @@ final class DynFixed_impl extends DynAny_impl implements
 
     Any _OB_currentAny() {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         return null;
     }
