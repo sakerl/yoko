@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,9 @@ import org.omg.DynamicAny.DynAnyFactory;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
+
+import static org.apache.yoko.util.MinorCodes.MinorIncompatibleObjectType;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
 import java.io.Serializable;
 
@@ -472,9 +475,9 @@ abstract class DynAny_impl extends LocalObject implements
         //
         if (value instanceof CustomMarshal) {
             throw new BAD_PARAM(MinorCodes
-                .describeBadParam(MinorCodes.MinorIncompatibleObjectType),
-                MinorCodes.MinorIncompatibleObjectType,
-                CompletionStatus.COMPLETED_NO);
+                .describeBadParam(MinorIncompatibleObjectType),
+                MinorIncompatibleObjectType,
+                COMPLETED_NO);
         }
 
         DynAny comp = current_component();
