@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,23 @@ import org.apache.yoko.orb.CORBA.Any;
 import org.apache.yoko.orb.CORBA.InputStream;
 import org.apache.yoko.orb.CORBA.OutputStream;
 import org.apache.yoko.orb.CORBA.TypeCode;
+import org.apache.yoko.orb.OB.ORBInstance;
+import org.omg.DynamicAny.DynAny;
+import org.omg.DynamicAny.DynAnyFactory;
+import org.omg.DynamicAny.DynSequence;
+import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
+import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 
 final class DynSequence_impl extends DynSeqBase_impl implements
-        org.omg.DynamicAny.DynSequence {
-    DynSequence_impl(org.omg.DynamicAny.DynAnyFactory factory,
-            org.apache.yoko.orb.OB.ORBInstance orbInstance,
+        DynSequence {
+    DynSequence_impl(DynAnyFactory factory,
+            ORBInstance orbInstance,
             org.omg.CORBA.TypeCode type) {
         super(factory, orbInstance, type);
     }
 
-    DynSequence_impl(org.omg.DynamicAny.DynAnyFactory factory,
-            org.apache.yoko.orb.OB.ORBInstance orbInstance,
+    DynSequence_impl(DynAnyFactory factory,
+            ORBInstance orbInstance,
             org.omg.CORBA.TypeCode type, DynValueReader dynValueReader) {
         super(factory, orbInstance, type, dynValueReader);
     }
@@ -45,13 +51,13 @@ final class DynSequence_impl extends DynSeqBase_impl implements
     }
 
     public synchronized void set_length(int len)
-            throws org.omg.DynamicAny.DynAnyPackage.InvalidValue {
+            throws InvalidValue {
         //
         // If bounded sequence, ensure new length is not greater
         // than the bounds
         //
         if (max_ > 0 && len > max_)
-            throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+            throw new InvalidValue();
 
         resize(len, true);
 
@@ -63,13 +69,13 @@ final class DynSequence_impl extends DynSeqBase_impl implements
     }
 
     public synchronized void set_elements(org.omg.CORBA.Any[] value)
-            throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch,
-            org.omg.DynamicAny.DynAnyPackage.InvalidValue {
+            throws TypeMismatch,
+            InvalidValue {
         for (int i = 0; i < value.length; i++) {
             org.omg.CORBA.TypeCode tc = value[i].type();
             org.omg.CORBA.TypeCode origTC = TypeCode._OB_getOrigType(tc);
             if (origTC.kind() != contentKind_)
-                throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+                throw new TypeMismatch();
         }
 
         resize(value.length, false);
@@ -85,19 +91,19 @@ final class DynSequence_impl extends DynSeqBase_impl implements
         notifyParent();
     }
 
-    public synchronized org.omg.DynamicAny.DynAny[] get_elements_as_dyn_any() {
+    public synchronized DynAny[] get_elements_as_dyn_any() {
         return getElementsAsDynAny();
     }
 
     public synchronized void set_elements_as_dyn_any(
-            org.omg.DynamicAny.DynAny[] value)
-            throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch,
-            org.omg.DynamicAny.DynAnyPackage.InvalidValue {
+            DynAny[] value)
+            throws TypeMismatch,
+            InvalidValue {
         for (int i = 0; i < value.length; i++) {
             org.omg.CORBA.TypeCode tc = value[i].type();
             org.omg.CORBA.TypeCode origTC = TypeCode._OB_getOrigType(tc);
             if (origTC.kind() != contentKind_)
-                throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+                throw new TypeMismatch();
         }
 
         resize(value.length, false);
