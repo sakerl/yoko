@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.DynamicAny;
+
+import static org.omg.CORBA.TCKind._tk_boolean;
+import static org.omg.CORBA.TCKind._tk_char;
+import static org.omg.CORBA.TCKind._tk_enum;
+import static org.omg.CORBA.TCKind._tk_long;
+import static org.omg.CORBA.TCKind._tk_longlong;
+import static org.omg.CORBA.TCKind._tk_short;
+import static org.omg.CORBA.TCKind._tk_ulong;
+import static org.omg.CORBA.TCKind._tk_ulonglong;
+import static org.omg.CORBA.TCKind._tk_ushort;
+import static org.omg.CORBA.TCKind._tk_value;
+import static org.omg.CORBA.TCKind.tk_enum;
 
 import org.apache.yoko.orb.CORBA.Any;
 import org.apache.yoko.orb.CORBA.InputStream;
@@ -100,7 +112,7 @@ final class DynUnion_impl extends DynAny_impl implements DynUnion {
             if (dynValueReader_ != null) {
                 org.omg.CORBA.TypeCode origTC = TypeCode._OB_getOrigType(memberType);
 
-                if (origTC.kind().value() == TCKind._tk_value)
+                if (origTC.kind().value() == _tk_value)
                     member_ = null;
                 else
                     member_ = prepare(memberType, dynValueReader_, true);
@@ -147,7 +159,7 @@ final class DynUnion_impl extends DynAny_impl implements DynUnion {
         try {
             long discValue;
 
-            if (discriminator_kind() == TCKind.tk_enum) {
+            if (discriminator_kind() == tk_enum) {
                 DynEnum de = DynEnumHelper.narrow(disc_);
                 discValue = de.get_as_ulong();
             } else {
@@ -201,39 +213,39 @@ final class DynUnion_impl extends DynAny_impl implements DynUnion {
             // Insert the default discriminator value
             //
             switch (discriminator_kind().value()) {
-            case TCKind._tk_boolean:
+            case _tk_boolean:
                 disc_.insert_boolean(val == 1);
                 break;
 
-            case TCKind._tk_char:
+            case _tk_char:
                 disc_.insert_char((char) val);
                 break;
 
-            case TCKind._tk_short:
+            case _tk_short:
                 disc_.insert_short((short) val);
                 break;
 
-            case TCKind._tk_ushort:
+            case _tk_ushort:
                 disc_.insert_ushort((short) val);
                 break;
 
-            case TCKind._tk_long:
+            case _tk_long:
                 disc_.insert_long((int) val);
                 break;
 
-            case TCKind._tk_ulong:
+            case _tk_ulong:
                 disc_.insert_ulong((int) val);
                 break;
 
-            case TCKind._tk_longlong:
+            case _tk_longlong:
                 disc_.insert_longlong(val);
                 break;
 
-            case TCKind._tk_ulonglong:
+            case _tk_ulonglong:
                 disc_.insert_ulonglong(val);
                 break;
 
-            case TCKind._tk_enum: {
+            case _tk_enum: {
                 DynEnum e = DynEnumHelper.narrow(disc_);
                 e.set_as_ulong((int) val);
                 break;
@@ -251,39 +263,39 @@ final class DynUnion_impl extends DynAny_impl implements DynUnion {
         long result = 0;
 
         switch (discriminator_kind().value()) {
-        case TCKind._tk_boolean:
+        case _tk_boolean:
             result = any.extract_boolean() ? 1 : 0;
             break;
 
-        case TCKind._tk_char:
+        case _tk_char:
             result = any.extract_char();
             break;
 
-        case TCKind._tk_short:
+        case _tk_short:
             result = any.extract_short();
             break;
 
-        case TCKind._tk_ushort:
+        case _tk_ushort:
             result = any.extract_ushort();
             break;
 
-        case TCKind._tk_long:
+        case _tk_long:
             result = any.extract_long();
             break;
 
-        case TCKind._tk_ulong:
+        case _tk_ulong:
             result = any.extract_ulong();
             break;
 
-        case TCKind._tk_longlong:
+        case _tk_longlong:
             result = any.extract_longlong();
             break;
 
-        case TCKind._tk_ulonglong:
+        case _tk_ulonglong:
             result = any.extract_ulonglong();
             break;
 
-        case TCKind._tk_enum: {
+        case _tk_enum: {
             try {
                 Any a = (Any) any;
                 result = ((Integer) a.value()).longValue();
@@ -309,47 +321,47 @@ final class DynUnion_impl extends DynAny_impl implements DynUnion {
         long min = 0, max = 0;
 
         switch (discriminator_kind().value()) {
-        case TCKind._tk_boolean:
+        case _tk_boolean:
             min = 0;
             max = 1;
             break;
 
-        case TCKind._tk_char:
+        case _tk_char:
             min = 0;
             max = 255;
             break;
 
-        case TCKind._tk_short:
+        case _tk_short:
             min = -32768;
             max = 32767;
             break;
 
-        case TCKind._tk_ushort:
+        case _tk_ushort:
             min = 0;
             max = 65535;
             break;
 
-        case TCKind._tk_long:
+        case _tk_long:
             min = Integer.MIN_VALUE;
             max = Integer.MAX_VALUE;
             break;
 
-        case TCKind._tk_ulong:
+        case _tk_ulong:
             min = 0;
             max = Integer.MAX_VALUE;
             break;
 
-        case TCKind._tk_longlong:
+        case _tk_longlong:
             min = Long.MIN_VALUE;
             max = Long.MAX_VALUE;
             break;
 
-        case TCKind._tk_ulonglong:
+        case _tk_ulonglong:
             min = 0;
             max = Long.MAX_VALUE;
             break;
 
-        case TCKind._tk_enum: {
+        case _tk_enum: {
             try {
                 min = 0;
                 max = (origDiscTC_.member_count() - 1);
@@ -509,7 +521,7 @@ final class DynUnion_impl extends DynAny_impl implements DynUnion {
 
                 org.omg.CORBA.TypeCode origTC = TypeCode._OB_getOrigType(memberType);
 
-                if (origTC.kind().value() == TCKind._tk_value) {
+                if (origTC.kind().value() == _tk_value) {
                     Assert.ensure(result.member_ == null);
                     result.member_ = member_.copy();
                 } else {
@@ -702,7 +714,7 @@ final class DynUnion_impl extends DynAny_impl implements DynUnion {
         org.omg.CORBA.TypeCode origTC = TypeCode
                 ._OB_getOrigType(memberType);
 
-        if ((origTC.kind().value() == TCKind._tk_value)
+        if ((origTC.kind().value() == _tk_value)
                 && (dynValueReader_ != null)) {
             //
             // Create DynValue components
