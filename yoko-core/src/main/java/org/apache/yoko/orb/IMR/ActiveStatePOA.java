@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,23 @@
  */
 package org.apache.yoko.orb.IMR;
 
+import org.omg.CORBA.BAD_OPERATION;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.InvokeHandler;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.ResponseHandler;
+import org.omg.PortableInterceptor.ObjectReferenceTemplate;
+import org.omg.PortableInterceptor.ObjectReferenceTemplateHelper;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.Servant;
+
 //
 // IDL:orb.yoko.apache.org/IMR/ActiveState:1.0
 //
 public abstract class ActiveStatePOA
-    extends org.omg.PortableServer.Servant
-    implements org.omg.CORBA.portable.InvokeHandler,
+    extends Servant
+    implements InvokeHandler,
                ActiveStateOperations
 {
     static final String[] _ob_ids_ =
@@ -37,21 +48,21 @@ public abstract class ActiveStatePOA
     }
 
     public ActiveState
-    _this(org.omg.CORBA.ORB orb)
+    _this(ORB orb)
     {
         return ActiveStateHelper.narrow(super._this_object(orb));
     }
 
     public String[]
-    _all_interfaces(org.omg.PortableServer.POA poa, byte[] objectId)
+    _all_interfaces(POA poa, byte[] objectId)
     {
         return _ob_ids_;
     }
 
-    public org.omg.CORBA.portable.OutputStream
+    public OutputStream
     _invoke(String opName,
-            org.omg.CORBA.portable.InputStream in,
-            org.omg.CORBA.portable.ResponseHandler handler)
+            InputStream in,
+            ResponseHandler handler)
     {
         final String[] _ob_names =
         {
@@ -114,21 +125,21 @@ public abstract class ActiveStatePOA
             return _OB_op_set_status(in, handler);
         }
 
-        throw new org.omg.CORBA.BAD_OPERATION();
+        throw new BAD_OPERATION();
     }
 
-    private org.omg.CORBA.portable.OutputStream
-    _OB_op_poa_create(org.omg.CORBA.portable.InputStream in,
-                      org.omg.CORBA.portable.ResponseHandler handler)
+    private OutputStream
+    _OB_op_poa_create(InputStream in,
+                      ResponseHandler handler)
     {
-        org.omg.CORBA.portable.OutputStream out = null;
+        OutputStream out = null;
         try
         {
             POAStatus _ob_a0 = POAStatusHelper.read(in);
-            org.omg.PortableInterceptor.ObjectReferenceTemplate _ob_a1 = org.omg.PortableInterceptor.ObjectReferenceTemplateHelper.read(in);
-            org.omg.PortableInterceptor.ObjectReferenceTemplate _ob_r = poa_create(_ob_a0, _ob_a1);
+            ObjectReferenceTemplate _ob_a1 = ObjectReferenceTemplateHelper.read(in);
+            ObjectReferenceTemplate _ob_r = poa_create(_ob_a0, _ob_a1);
             out = handler.createReply();
-            org.omg.PortableInterceptor.ObjectReferenceTemplateHelper.write(out, _ob_r);
+            ObjectReferenceTemplateHelper.write(out, _ob_r);
         }
         catch(_NoSuchPOA _ob_ex)
         {
@@ -138,11 +149,11 @@ public abstract class ActiveStatePOA
         return out;
     }
 
-    private org.omg.CORBA.portable.OutputStream
-    _OB_op_poa_status_update(org.omg.CORBA.portable.InputStream in,
-                             org.omg.CORBA.portable.ResponseHandler handler)
+    private OutputStream
+    _OB_op_poa_status_update(InputStream in,
+                             ResponseHandler handler)
     {
-        org.omg.CORBA.portable.OutputStream out = null;
+        OutputStream out = null;
         String[][] _ob_a0 = POANameSeqHelper.read(in);
         POAStatus _ob_a1 = POAStatusHelper.read(in);
         poa_status_update(_ob_a0, _ob_a1);
@@ -150,11 +161,11 @@ public abstract class ActiveStatePOA
         return out;
     }
 
-    private org.omg.CORBA.portable.OutputStream
-    _OB_op_set_status(org.omg.CORBA.portable.InputStream in,
-                      org.omg.CORBA.portable.ResponseHandler handler)
+    private OutputStream
+    _OB_op_set_status(InputStream in,
+                      ResponseHandler handler)
     {
-        org.omg.CORBA.portable.OutputStream out = null;
+        OutputStream out = null;
         String _ob_a0 = in.read_string();
         ServerStatus _ob_a1 = ServerStatusHelper.read(in);
         set_status(_ob_a0, _ob_a1);
