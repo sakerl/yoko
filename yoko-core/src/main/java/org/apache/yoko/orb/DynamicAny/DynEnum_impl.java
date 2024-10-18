@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,25 @@ package org.apache.yoko.orb.DynamicAny;
 import org.apache.yoko.orb.CORBA.Any;
 import org.apache.yoko.orb.CORBA.InputStream;
 import org.apache.yoko.orb.CORBA.OutputStream;
+import org.apache.yoko.orb.OB.ORBInstance;
 import org.apache.yoko.util.Assert;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.TypeCodePackage.BadKind;
+import org.omg.CORBA.TypeCodePackage.Bounds;
+import org.omg.DynamicAny.DynAny;
+import org.omg.DynamicAny.DynAnyFactory;
+import org.omg.DynamicAny.DynEnum;
+import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
+import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 
 final class DynEnum_impl extends DynAny_impl implements
-        org.omg.DynamicAny.DynEnum {
+        DynEnum {
     private int value_;
 
-    DynEnum_impl(org.omg.DynamicAny.DynAnyFactory factory,
-            org.apache.yoko.orb.OB.ORBInstance orbInstance,
-            org.omg.CORBA.TypeCode type) {
+    DynEnum_impl(DynAnyFactory factory,
+            ORBInstance orbInstance,
+            TypeCode type) {
         super(factory, orbInstance, type);
         value_ = 0;
     }
@@ -37,28 +47,28 @@ final class DynEnum_impl extends DynAny_impl implements
     // Standard IDL to Java Mapping
     // ------------------------------------------------------------------
 
-    public synchronized void assign(org.omg.DynamicAny.DynAny dyn_any)
-            throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch {
+    public synchronized void assign(DynAny dyn_any)
+            throws TypeMismatch {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         if (this == dyn_any)
             return;
 
         if (!dyn_any.type().equivalent(type_))
-            throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+            throw new TypeMismatch();
 
-        org.omg.DynamicAny.DynEnum dyn_enum = (org.omg.DynamicAny.DynEnum) dyn_any;
+        DynEnum dyn_enum = (DynEnum) dyn_any;
         value_ = dyn_enum.get_as_ulong();
 
         notifyParent();
     }
 
     public synchronized void from_any(org.omg.CORBA.Any value)
-            throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch,
-            org.omg.DynamicAny.DynAnyPackage.InvalidValue {
+            throws TypeMismatch,
+            InvalidValue {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         Any val = null;
         try {
@@ -68,10 +78,10 @@ final class DynEnum_impl extends DynAny_impl implements
         }
 
         if (val.value() == null)
-            throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+            throw new InvalidValue();
 
         if (!val._OB_type().equivalent(type_))
-            throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+            throw new TypeMismatch();
 
         value_ = ((Integer) val.value()).intValue();
 
@@ -80,7 +90,7 @@ final class DynEnum_impl extends DynAny_impl implements
 
     public synchronized org.omg.CORBA.Any to_any() {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         return new Any(orbInstance_, type_, Integer.valueOf(value_));
     }
@@ -89,9 +99,9 @@ final class DynEnum_impl extends DynAny_impl implements
         return to_any();
     }
 
-    public synchronized boolean equal(org.omg.DynamicAny.DynAny dyn_any) {
+    public synchronized boolean equal(DynAny dyn_any) {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         if (this == dyn_any)
             return true;
@@ -99,13 +109,13 @@ final class DynEnum_impl extends DynAny_impl implements
         if (!dyn_any.type().equivalent(type_))
             return false;
 
-        org.omg.DynamicAny.DynEnum dyn_enum = (org.omg.DynamicAny.DynEnum) dyn_any;
+        DynEnum dyn_enum = (DynEnum) dyn_any;
         return (value_ == dyn_enum.get_as_ulong());
     }
 
-    public synchronized org.omg.DynamicAny.DynAny copy() {
+    public synchronized DynAny copy() {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         DynEnum_impl result = new DynEnum_impl(factory_, orbInstance_, type_);
         result.value_ = value_;
@@ -128,12 +138,12 @@ final class DynEnum_impl extends DynAny_impl implements
         return 0;
     }
 
-    public org.omg.DynamicAny.DynAny current_component()
-            throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch {
+    public DynAny current_component()
+            throws TypeMismatch {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
-        throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        throw new TypeMismatch();
     }
 
     public synchronized String get_as_string() {
@@ -141,9 +151,9 @@ final class DynEnum_impl extends DynAny_impl implements
 
         try {
             result = origType_.member_name(value_);
-        } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {
+        } catch (BadKind ex) {
             throw Assert.fail(ex);
-        } catch (org.omg.CORBA.TypeCodePackage.Bounds ex) {
+        } catch (Bounds ex) {
             throw Assert.fail(ex);
         }
 
@@ -151,7 +161,7 @@ final class DynEnum_impl extends DynAny_impl implements
     }
 
     public synchronized void set_as_string(String value)
-            throws org.omg.DynamicAny.DynAnyPackage.InvalidValue {
+            throws InvalidValue {
         try {
             int count = origType_.member_count();
             for (int i = 0; i < count; i++) {
@@ -162,10 +172,10 @@ final class DynEnum_impl extends DynAny_impl implements
                 }
             }
 
-            throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
-        } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {
+            throw new InvalidValue();
+        } catch (BadKind ex) {
             throw Assert.fail(ex);
-        } catch (org.omg.CORBA.TypeCodePackage.Bounds ex) {
+        } catch (Bounds ex) {
             throw Assert.fail(ex);
         }
     }
@@ -175,15 +185,15 @@ final class DynEnum_impl extends DynAny_impl implements
     }
 
     public synchronized void set_as_ulong(int value)
-            throws org.omg.DynamicAny.DynAnyPackage.InvalidValue {
+            throws InvalidValue {
         try {
             if (value < 0 || value >= origType_.member_count())
-                throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+                throw new InvalidValue();
 
             value_ = value;
 
             notifyParent();
-        } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {
+        } catch (BadKind ex) {
             throw Assert.fail(ex);
         }
     }
@@ -209,7 +219,7 @@ final class DynEnum_impl extends DynAny_impl implements
 
     synchronized Any _OB_currentAny() {
         if (destroyed_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST();
+            throw new OBJECT_NOT_EXIST();
 
         return null;
     }
