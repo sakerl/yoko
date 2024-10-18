@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,9 @@ import org.omg.DynamicAny.DynValue;
 import org.omg.DynamicAny.DynValueHelper;
 import org.omg.DynamicAny.NameDynAnyPair;
 import org.omg.DynamicAny.NameValuePair;
+
+import static org.omg.CORBA.TCKind._tk_value;
+import static org.omg.CORBA.TCKind.tk_value;
 
 import java.util.Vector;
 
@@ -90,7 +93,7 @@ final class DynValue_impl extends DynValueCommon_impl implements
             //
             Vector ids = new Vector();
             ids.addElement(origType_.id());
-            if (origType_.kind() == TCKind.tk_value) {
+            if (origType_.kind() == tk_value) {
                 short mod = origType_.type_modifier();
                 if (mod == VM_TRUNCATABLE.value) {
                     org.omg.CORBA.TypeCode baseType = origType_
@@ -156,7 +159,7 @@ final class DynValue_impl extends DynValueCommon_impl implements
                 org.omg.CORBA.TypeCode origTC = TypeCode
                         ._OB_getOrigType(types_[i]);
 
-                if ((origTC.kind().value() == TCKind._tk_value)
+                if ((origTC.kind().value() == _tk_value)
                         && (dynValueReader_ != null)) {
                     components_[i] = null;
                 } else {
@@ -559,7 +562,7 @@ final class DynValue_impl extends DynValueCommon_impl implements
             org.omg.CORBA.TypeCode origTC = TypeCode
                     ._OB_getOrigType(types_[i]);
 
-            if ((origTC.kind().value() == TCKind._tk_value)
+            if ((origTC.kind().value() == _tk_value)
                     && (dynValueReader_ != null)) {
                 Assert
                         .ensure(components_[i] == null);
