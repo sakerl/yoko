@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,38 +17,50 @@
  */
 package org.apache.yoko.orb.IMR;
 
-import org.apache.yoko.util.MinorCodes;
+import static org.apache.yoko.util.MinorCodes.MinorIncompatibleObjectType;
+import static org.apache.yoko.util.MinorCodes.MinorTypeMismatch;
+import static org.apache.yoko.util.MinorCodes.describeBadOperation;
+import static org.apache.yoko.util.MinorCodes.describeBadParam;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
+import org.omg.CORBA.Any;
+import org.omg.CORBA.BAD_OPERATION;
+import org.omg.CORBA.BAD_PARAM;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.ObjectImpl;
+import org.omg.CORBA.portable.OutputStream;
 
 //
 // IDL:orb.yoko.apache.org/IMR/ActiveState:1.0
 //
-final public class ActiveStateHelper
+public final class ActiveStateHelper
 {
     public static void
-    insert(org.omg.CORBA.Any any, ActiveState val)
+    insert(Any any, ActiveState val)
     {
         any.insert_Object(val, type());
     }
 
     public static ActiveState
-    extract(org.omg.CORBA.Any any)
+    extract(Any any)
     {
         if(any.type().equivalent(type()))
             return narrow(any.extract_Object());
-        throw new org.omg.CORBA.BAD_OPERATION(
-            MinorCodes
-                    .describeBadOperation(MinorCodes.MinorTypeMismatch),
-            MinorCodes.MinorTypeMismatch, org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+        throw new BAD_OPERATION(
+            describeBadOperation(MinorTypeMismatch),
+            MinorTypeMismatch, COMPLETED_NO);
     }
 
-    private static org.omg.CORBA.TypeCode typeCode_;
+    private static TypeCode typeCode_;
 
-    public static org.omg.CORBA.TypeCode
+    public static TypeCode
     type()
     {
         if(typeCode_ == null)
         {
-            org.omg.CORBA.ORB orb = org.omg.CORBA.ORB.init();
+            ORB orb = ORB.init();
             typeCode_ = orb.create_interface_tc(id(), "ActiveState");
         }
 
@@ -62,7 +74,7 @@ final public class ActiveStateHelper
     }
 
     public static ActiveState
-    read(org.omg.CORBA.portable.InputStream in)
+    read(InputStream in)
     {
         org.omg.CORBA.Object _ob_v = in.read_Object();
 
@@ -74,15 +86,15 @@ final public class ActiveStateHelper
         {
         }
 
-        org.omg.CORBA.portable.ObjectImpl _ob_impl;
-        _ob_impl = (org.omg.CORBA.portable.ObjectImpl)_ob_v;
+        ObjectImpl _ob_impl;
+        _ob_impl = (ObjectImpl)_ob_v;
         _ActiveStateStub _ob_stub = new _ActiveStateStub();
         _ob_stub._set_delegate(_ob_impl._get_delegate());
         return _ob_stub;
     }
 
     public static void
-    write(org.omg.CORBA.portable.OutputStream out, ActiveState val)
+    write(OutputStream out, ActiveState val)
     {
         out.write_Object(val);
     }
@@ -102,17 +114,16 @@ final public class ActiveStateHelper
 
             if(val._is_a(id()))
             {
-                org.omg.CORBA.portable.ObjectImpl _ob_impl;
+                ObjectImpl _ob_impl;
                 _ActiveStateStub _ob_stub = new _ActiveStateStub();
-                _ob_impl = (org.omg.CORBA.portable.ObjectImpl)val;
+                _ob_impl = (ObjectImpl)val;
                 _ob_stub._set_delegate(_ob_impl._get_delegate());
                 return _ob_stub;
             }
 
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                .describeBadParam(MinorCodes.MinorIncompatibleObjectType),
-                MinorCodes.MinorIncompatibleObjectType,
-                org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorIncompatibleObjectType),
+                MinorIncompatibleObjectType,
+                COMPLETED_NO);
         }
 
         return null;
@@ -131,9 +142,9 @@ final public class ActiveStateHelper
             {
             }
 
-            org.omg.CORBA.portable.ObjectImpl _ob_impl;
+            ObjectImpl _ob_impl;
             _ActiveStateStub _ob_stub = new _ActiveStateStub();
-            _ob_impl = (org.omg.CORBA.portable.ObjectImpl)val;
+            _ob_impl = (ObjectImpl)val;
             _ob_stub._set_delegate(_ob_impl._get_delegate());
             return _ob_stub;
         }
