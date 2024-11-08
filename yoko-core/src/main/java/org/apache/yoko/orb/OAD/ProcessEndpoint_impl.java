@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,26 +17,34 @@
  */
 package org.apache.yoko.orb.OAD;
 
+import static org.omg.CORBA.SetOverrideType.SET_OVERRIDE;
+
 import org.apache.yoko.orb.OAD.AlreadyLinked;
 import org.apache.yoko.orb.OAD.ProcessEndpoint;
 import org.apache.yoko.orb.OAD.ProcessEndpointManager;
 import org.apache.yoko.orb.OAD.ProcessEndpointManagerHelper;
 import org.apache.yoko.orb.OAD.ProcessEndpointPOA;
+import org.apache.yoko.orb.OB.ORBControl;
+import org.apache.yoko.orb.OB.RETRY_ALWAYS;
+import org.apache.yoko.orb.OB.RetryPolicy_impl;
+import org.omg.CORBA.Policy;
+import org.omg.CORBA.SystemException;
+import org.omg.PortableServer.POA;
 
 final public class ProcessEndpoint_impl extends ProcessEndpointPOA {
     private String name_;
 
     private String id_;
 
-    private org.omg.CORBA.Policy[] pl_;
+    private Policy[] pl_;
 
-    private org.omg.PortableServer.POA poa_;
+    private POA poa_;
 
-    private org.apache.yoko.orb.OB.ORBControl orbControl_;
+    private ORBControl orbControl_;
 
     public ProcessEndpoint_impl(String name, String id,
-            org.omg.PortableServer.POA poa,
-            org.apache.yoko.orb.OB.ORBControl orbControl) {
+            POA poa,
+            ORBControl orbControl) {
         name_ = name;
         id_ = id;
         poa_ = poa;
@@ -45,9 +53,9 @@ final public class ProcessEndpoint_impl extends ProcessEndpointPOA {
         //
         // Create a PolicyList for RETRY_ALWAYS
         //
-        pl_ = new org.omg.CORBA.Policy[1];
-        pl_[0] = new org.apache.yoko.orb.OB.RetryPolicy_impl(
-                org.apache.yoko.orb.OB.RETRY_ALWAYS.value, 0, 1, false);
+        pl_ = new Policy[1];
+        pl_[0] = new RetryPolicy_impl(
+                RETRY_ALWAYS.value, 0, 1, false);
     }
 
     public void reestablish_link(ProcessEndpointManager d) {
@@ -55,7 +63,7 @@ final public class ProcessEndpoint_impl extends ProcessEndpointPOA {
         // Set the retry policy on this object
         //
         org.omg.CORBA.Object obj = d._set_policy_override(pl_,
-                org.omg.CORBA.SetOverrideType.SET_OVERRIDE);
+                SET_OVERRIDE);
         ProcessEndpointManager manager = ProcessEndpointManagerHelper
                 .narrow(obj);
 
@@ -67,7 +75,7 @@ final public class ProcessEndpoint_impl extends ProcessEndpointPOA {
         try {
             manager.establish_link(name_, id_, 0xFFFFFFFF, cb);
         } catch (AlreadyLinked ex) {
-        } catch (org.omg.CORBA.SystemException ex) {
+        } catch (SystemException ex) {
             // logger.error("connect_server failed: " + ex);
         }
     }
@@ -76,7 +84,7 @@ final public class ProcessEndpoint_impl extends ProcessEndpointPOA {
         orbControl_.shutdownServer(false);
     }
 
-    public org.omg.PortableServer.POA _default_POA() {
+    public POA _default_POA() {
         return poa_;
     }
 }
