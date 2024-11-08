@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,18 @@
  */
 package org.apache.yoko.orb.OAD;
 
+import org.omg.CORBA.UNKNOWN;
+import org.omg.CORBA.portable.ApplicationException;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.ObjectImpl;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.RemarshalException;
+import org.omg.CORBA.portable.ServantObject;
+
 //
 // IDL:orb.yoko.apache.org/OAD/ProcessEndpoint:1.0
 //
-public class _ProcessEndpointStub extends org.omg.CORBA.portable.ObjectImpl
+public class _ProcessEndpointStub extends ObjectImpl
                                   implements ProcessEndpoint
 {
     private static final String[] _ob_ids_ =
@@ -34,7 +42,7 @@ public class _ProcessEndpointStub extends org.omg.CORBA.portable.ObjectImpl
         return _ob_ids_;
     }
 
-    final public static java.lang.Class _ob_opsClass = ProcessEndpointOperations.class;
+    final public static Class _ob_opsClass = ProcessEndpointOperations.class;
 
     //
     // IDL:orb.yoko.apache.org/OAD/ProcessEndpoint/reestablish_link:1.0
@@ -46,8 +54,8 @@ public class _ProcessEndpointStub extends org.omg.CORBA.portable.ObjectImpl
         {
             if(!this._is_local())
             {
-                org.omg.CORBA.portable.OutputStream out = null;
-                org.omg.CORBA.portable.InputStream in = null;
+                OutputStream out = null;
+                InputStream in = null;
                 try
                 {
                     out = _request("reestablish_link", false);
@@ -55,17 +63,17 @@ public class _ProcessEndpointStub extends org.omg.CORBA.portable.ObjectImpl
                     in = _invoke(out);
                     return;
                 }
-                catch(org.omg.CORBA.portable.RemarshalException _ob_ex)
+                catch(RemarshalException _ob_ex)
                 {
                     continue;
                 }
-                catch(org.omg.CORBA.portable.ApplicationException _ob_aex)
+                catch(ApplicationException _ob_aex)
                 {
                     final String _ob_id = _ob_aex.getId();
                     in = _ob_aex.getInputStream();
 
-                    throw (org.omg.CORBA.UNKNOWN)new 
-                        org.omg.CORBA.UNKNOWN("Unexpected User Exception: " + _ob_id).initCause(_ob_aex);
+                    throw (UNKNOWN)new 
+                        UNKNOWN("Unexpected User Exception: " + _ob_id).initCause(_ob_aex);
                 }
                 finally
                 {
@@ -74,7 +82,7 @@ public class _ProcessEndpointStub extends org.omg.CORBA.portable.ObjectImpl
             }
             else
             {
-                org.omg.CORBA.portable.ServantObject _ob_so = _servant_preinvoke("reestablish_link", _ob_opsClass);
+                ServantObject _ob_so = _servant_preinvoke("reestablish_link", _ob_opsClass);
                 if(_ob_so == null)
                     continue;
                 ProcessEndpointOperations _ob_self = (ProcessEndpointOperations)_ob_so.servant;
@@ -101,25 +109,25 @@ public class _ProcessEndpointStub extends org.omg.CORBA.portable.ObjectImpl
         {
             if(!this._is_local())
             {
-                org.omg.CORBA.portable.OutputStream out = null;
-                org.omg.CORBA.portable.InputStream in = null;
+                OutputStream out = null;
+                InputStream in = null;
                 try
                 {
                     out = _request("stop", true);
                     in = _invoke(out);
                     return;
                 }
-                catch(org.omg.CORBA.portable.RemarshalException _ob_ex)
+                catch(RemarshalException _ob_ex)
                 {
                     continue;
                 }
-                catch(org.omg.CORBA.portable.ApplicationException _ob_aex)
+                catch(ApplicationException _ob_aex)
                 {
                     final String _ob_id = _ob_aex.getId();
                     in = _ob_aex.getInputStream();
 
-                    throw (org.omg.CORBA.UNKNOWN)new 
-                        org.omg.CORBA.UNKNOWN("Unexpected User Exception: " + _ob_id).initCause(_ob_aex);
+                    throw (UNKNOWN)new 
+                        UNKNOWN("Unexpected User Exception: " + _ob_id).initCause(_ob_aex);
                 }
                 finally
                 {
@@ -128,7 +136,7 @@ public class _ProcessEndpointStub extends org.omg.CORBA.portable.ObjectImpl
             }
             else
             {
-                org.omg.CORBA.portable.ServantObject _ob_so = _servant_preinvoke("stop", _ob_opsClass);
+                ServantObject _ob_so = _servant_preinvoke("stop", _ob_opsClass);
                 if(_ob_so == null)
                     continue;
                 ProcessEndpointOperations _ob_self = (ProcessEndpointOperations)_ob_so.servant;
