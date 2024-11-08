@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,29 @@
  */
 package org.apache.yoko.orb.Messaging;
 
-final public class RequestEndTimePolicy_impl extends org.omg.CORBA.LocalObject
-        implements org.omg.Messaging.RequestEndTimePolicy {
-    private org.omg.TimeBase.UtcT value_;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.Policy;
+import org.omg.Messaging.REQUEST_END_TIME_POLICY_TYPE;
+import org.omg.Messaging.RequestEndTimePolicy;
+import org.omg.TimeBase.UtcT;
+
+final public class RequestEndTimePolicy_impl extends LocalObject
+        implements RequestEndTimePolicy {
+    private UtcT value_;
 
     // ------------------------------------------------------------------
     // Standard IDL to Java Mapping
     // ------------------------------------------------------------------
 
-    public org.omg.TimeBase.UtcT end_time() {
+    public UtcT end_time() {
         return value_;
     }
 
     public int policy_type() {
-        return org.omg.Messaging.REQUEST_END_TIME_POLICY_TYPE.value;
+        return REQUEST_END_TIME_POLICY_TYPE.value;
     }
 
-    public org.omg.CORBA.Policy copy() {
+    public Policy copy() {
         return this;
     }
 
@@ -45,7 +51,7 @@ final public class RequestEndTimePolicy_impl extends org.omg.CORBA.LocalObject
     // Application programs must not use these functions directly
     // ------------------------------------------------------------------
 
-    public RequestEndTimePolicy_impl(org.omg.TimeBase.UtcT value) {
+    public RequestEndTimePolicy_impl(UtcT value) {
         value_ = value;
     }
 }
