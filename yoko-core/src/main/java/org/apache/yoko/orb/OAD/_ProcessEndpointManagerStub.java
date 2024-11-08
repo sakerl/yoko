@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,19 @@
  */
 package org.apache.yoko.orb.OAD;
 
+import org.apache.yoko.orb.IMR.ProcessIDHelper;
+import org.omg.CORBA.UNKNOWN;
+import org.omg.CORBA.portable.ApplicationException;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.ObjectImpl;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.RemarshalException;
+import org.omg.CORBA.portable.ServantObject;
+
 //
 // IDL:orb.yoko.apache.org/OAD/ProcessEndpointManager:1.0
 //
-public class _ProcessEndpointManagerStub extends org.omg.CORBA.portable.ObjectImpl
+public class _ProcessEndpointManagerStub extends ObjectImpl
                                          implements ProcessEndpointManager
 {
     private static final String[] _ob_ids_ =
@@ -34,7 +43,7 @@ public class _ProcessEndpointManagerStub extends org.omg.CORBA.portable.ObjectIm
         return _ob_ids_;
     }
 
-    final public static java.lang.Class _ob_opsClass = ProcessEndpointManagerOperations.class;
+    final public static Class _ob_opsClass = ProcessEndpointManagerOperations.class;
 
     //
     // IDL:orb.yoko.apache.org/OAD/ProcessEndpointManager/establish_link:1.0
@@ -50,31 +59,31 @@ public class _ProcessEndpointManagerStub extends org.omg.CORBA.portable.ObjectIm
         {
             if(!this._is_local())
             {
-                org.omg.CORBA.portable.OutputStream out = null;
-                org.omg.CORBA.portable.InputStream in = null;
+                OutputStream out = null;
+                InputStream in = null;
                 try
                 {
                     out = _request("establish_link", true);
                     out.write_string(_ob_a0);
                     out.write_string(_ob_a1);
-                    org.apache.yoko.orb.IMR.ProcessIDHelper.write(out, _ob_a2);
+                    ProcessIDHelper.write(out, _ob_a2);
                     ProcessEndpointHelper.write(out, _ob_a3);
                     in = _invoke(out);
                     return;
                 }
-                catch(org.omg.CORBA.portable.RemarshalException _ob_ex)
+                catch(RemarshalException _ob_ex)
                 {
                     continue;
                 }
-                catch(org.omg.CORBA.portable.ApplicationException _ob_aex)
+                catch(ApplicationException _ob_aex)
                 {
                     final String _ob_id = _ob_aex.getId();
                     in = _ob_aex.getInputStream();
 
                     if(_ob_id.equals(AlreadyLinkedHelper.id()))
                         throw AlreadyLinkedHelper.read(in);
-                    throw (org.omg.CORBA.UNKNOWN)new 
-                        org.omg.CORBA.UNKNOWN("Unexpected User Exception: " + _ob_id).initCause(_ob_aex);
+                    throw (UNKNOWN)new 
+                        UNKNOWN("Unexpected User Exception: " + _ob_id).initCause(_ob_aex);
                 }
                 finally
                 {
@@ -83,7 +92,7 @@ public class _ProcessEndpointManagerStub extends org.omg.CORBA.portable.ObjectIm
             }
             else
             {
-                org.omg.CORBA.portable.ServantObject _ob_so = _servant_preinvoke("establish_link", _ob_opsClass);
+                ServantObject _ob_so = _servant_preinvoke("establish_link", _ob_opsClass);
                 if(_ob_so == null)
                     continue;
                 ProcessEndpointManagerOperations _ob_self = (ProcessEndpointManagerOperations)_ob_so.servant;
