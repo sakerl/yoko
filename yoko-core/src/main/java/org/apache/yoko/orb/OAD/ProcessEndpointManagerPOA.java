@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,22 @@
  */
 package org.apache.yoko.orb.OAD;
 
+import org.apache.yoko.orb.IMR.ProcessIDHelper;
+import org.omg.CORBA.BAD_OPERATION;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.InvokeHandler;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.ResponseHandler;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.Servant;
+
 //
 // IDL:orb.yoko.apache.org/OAD/ProcessEndpointManager:1.0
 //
 public abstract class ProcessEndpointManagerPOA
-    extends org.omg.PortableServer.Servant
-    implements org.omg.CORBA.portable.InvokeHandler,
+    extends Servant
+    implements InvokeHandler,
                ProcessEndpointManagerOperations
 {
     static final String[] _ob_ids_ =
@@ -37,21 +47,21 @@ public abstract class ProcessEndpointManagerPOA
     }
 
     public ProcessEndpointManager
-    _this(org.omg.CORBA.ORB orb)
+    _this(ORB orb)
     {
         return ProcessEndpointManagerHelper.narrow(super._this_object(orb));
     }
 
     public String[]
-    _all_interfaces(org.omg.PortableServer.POA poa, byte[] objectId)
+    _all_interfaces(POA poa, byte[] objectId)
     {
         return _ob_ids_;
     }
 
-    public org.omg.CORBA.portable.OutputStream
+    public OutputStream
     _invoke(String opName,
-            org.omg.CORBA.portable.InputStream in,
-            org.omg.CORBA.portable.ResponseHandler handler)
+            InputStream in,
+            ResponseHandler handler)
     {
         final String[] _ob_names =
         {
@@ -106,19 +116,19 @@ public abstract class ProcessEndpointManagerPOA
             return _OB_op_establish_link(in, handler);
         }
 
-        throw new org.omg.CORBA.BAD_OPERATION();
+        throw new BAD_OPERATION();
     }
 
-    private org.omg.CORBA.portable.OutputStream
-    _OB_op_establish_link(org.omg.CORBA.portable.InputStream in,
-                          org.omg.CORBA.portable.ResponseHandler handler)
+    private OutputStream
+    _OB_op_establish_link(InputStream in,
+                          ResponseHandler handler)
     {
-        org.omg.CORBA.portable.OutputStream out = null;
+        OutputStream out = null;
         try
         {
             String _ob_a0 = in.read_string();
             String _ob_a1 = in.read_string();
-            int _ob_a2 = org.apache.yoko.orb.IMR.ProcessIDHelper.read(in);
+            int _ob_a2 = ProcessIDHelper.read(in);
             ProcessEndpoint _ob_a3 = ProcessEndpointHelper.read(in);
             establish_link(_ob_a0, _ob_a1, _ob_a2, _ob_a3);
             out = handler.createReply();
