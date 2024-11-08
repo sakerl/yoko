@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,13 @@
  */
 package org.apache.yoko.orb.Messaging;
 
-final public class SyncScopePolicy_impl extends org.omg.CORBA.LocalObject
-        implements org.omg.Messaging.SyncScopePolicy {
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.Policy;
+import org.omg.Messaging.SYNC_SCOPE_POLICY_TYPE;
+import org.omg.Messaging.SyncScopePolicy;
+
+final public class SyncScopePolicy_impl extends LocalObject
+        implements SyncScopePolicy {
     private short value_;
 
     // ------------------------------------------------------------------
@@ -30,10 +35,10 @@ final public class SyncScopePolicy_impl extends org.omg.CORBA.LocalObject
     }
 
     public int policy_type() {
-        return org.omg.Messaging.SYNC_SCOPE_POLICY_TYPE.value;
+        return SYNC_SCOPE_POLICY_TYPE.value;
     }
 
-    public org.omg.CORBA.Policy copy() {
+    public Policy copy() {
         return this;
     }
 
