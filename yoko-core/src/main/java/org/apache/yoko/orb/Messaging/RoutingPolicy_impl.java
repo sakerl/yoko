@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,29 @@
  */
 package org.apache.yoko.orb.Messaging;
 
-final public class RoutingPolicy_impl extends org.omg.CORBA.LocalObject
-        implements org.omg.Messaging.RoutingPolicy {
-    private org.omg.Messaging.RoutingTypeRange value_;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.Policy;
+import org.omg.Messaging.ROUTING_POLICY_TYPE;
+import org.omg.Messaging.RoutingPolicy;
+import org.omg.Messaging.RoutingTypeRange;
+
+final public class RoutingPolicy_impl extends LocalObject
+        implements RoutingPolicy {
+    private RoutingTypeRange value_;
 
     // ------------------------------------------------------------------
     // Standard IDL to Java Mapping
     // ------------------------------------------------------------------
 
-    public org.omg.Messaging.RoutingTypeRange routing_range() {
+    public RoutingTypeRange routing_range() {
         return value_;
     }
 
     public int policy_type() {
-        return org.omg.Messaging.ROUTING_POLICY_TYPE.value;
+        return ROUTING_POLICY_TYPE.value;
     }
 
-    public org.omg.CORBA.Policy copy() {
+    public Policy copy() {
         return this;
     }
 
@@ -45,7 +51,7 @@ final public class RoutingPolicy_impl extends org.omg.CORBA.LocalObject
     // Application programs must not use these functions directly
     // ------------------------------------------------------------------
 
-    public RoutingPolicy_impl(org.omg.Messaging.RoutingTypeRange value) {
+    public RoutingPolicy_impl(RoutingTypeRange value) {
         value_ = value;
     }
 }
