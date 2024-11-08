@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,14 @@
  */
 package org.apache.yoko.orb.Messaging;
 
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.Policy;
+import org.omg.Messaging.RELATIVE_RT_TIMEOUT_POLICY_TYPE;
+import org.omg.Messaging.RelativeRoundtripTimeoutPolicy;
+
 final public class RelativeRoundtripTimeoutPolicy_impl extends
-        org.omg.CORBA.LocalObject implements
-        org.omg.Messaging.RelativeRoundtripTimeoutPolicy {
+        LocalObject implements
+        RelativeRoundtripTimeoutPolicy {
     private long value_;
 
     // ------------------------------------------------------------------
@@ -31,10 +36,10 @@ final public class RelativeRoundtripTimeoutPolicy_impl extends
     }
 
     public int policy_type() {
-        return org.omg.Messaging.RELATIVE_RT_TIMEOUT_POLICY_TYPE.value;
+        return RELATIVE_RT_TIMEOUT_POLICY_TYPE.value;
     }
 
-    public org.omg.CORBA.Policy copy() {
+    public Policy copy() {
         return this;
     }
 
