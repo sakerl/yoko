@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  */
 package org.apache.yoko.orb.OAD;
 
+import org.omg.CORBA.Object;
+import org.omg.CORBA.portable.IDLEntity;
+
 //
 // IDL:orb.yoko.apache.org/OAD/ProcessEndpoint:1.0
 //
@@ -28,7 +31,7 @@ package org.apache.yoko.orb.OAD;
  **/
 
 public interface ProcessEndpoint extends ProcessEndpointOperations,
-                                         org.omg.CORBA.Object,
-                                         org.omg.CORBA.portable.IDLEntity
+                                         Object,
+                                         IDLEntity
 {
 }
