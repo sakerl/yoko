@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,26 @@
  */
 package org.apache.yoko.orb.OAD;
 
+import static org.apache.yoko.util.MinorCodes.MinorTypeMismatch;
+import static org.apache.yoko.util.MinorCodes.describeBadOperation;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
 import org.apache.yoko.util.MinorCodes;
+import org.omg.CORBA.BAD_OPERATION;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.InvokeHandler;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.ResponseHandler;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.Servant;
 
 //
 // IDL:orb.yoko.apache.org/OAD/ProcessEndpoint:1.0
 //
 public abstract class ProcessEndpointPOA
-    extends org.omg.PortableServer.Servant
-    implements org.omg.CORBA.portable.InvokeHandler,
+    extends Servant
+    implements InvokeHandler,
                ProcessEndpointOperations
 {
     static final String[] _ob_ids_ =
@@ -39,21 +51,21 @@ public abstract class ProcessEndpointPOA
     }
 
     public ProcessEndpoint
-    _this(org.omg.CORBA.ORB orb)
+    _this(ORB orb)
     {
         return ProcessEndpointHelper.narrow(super._this_object(orb));
     }
 
     public String[]
-    _all_interfaces(org.omg.PortableServer.POA poa, byte[] objectId)
+    _all_interfaces(POA poa, byte[] objectId)
     {
         return _ob_ids_;
     }
 
-    public org.omg.CORBA.portable.OutputStream
+    public OutputStream
     _invoke(String opName,
-            org.omg.CORBA.portable.InputStream in,
-            org.omg.CORBA.portable.ResponseHandler handler)
+            InputStream in,
+            ResponseHandler handler)
     {
         final String[] _ob_names =
         {
@@ -112,28 +124,27 @@ public abstract class ProcessEndpointPOA
             return _OB_op_stop(in, handler);
         }
 
-        throw new org.omg.CORBA.BAD_OPERATION(
-            MinorCodes
-                    .describeBadOperation(MinorCodes.MinorTypeMismatch),
-            MinorCodes.MinorTypeMismatch, org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+        throw new BAD_OPERATION(
+            describeBadOperation(MinorTypeMismatch),
+            MinorTypeMismatch, COMPLETED_NO);
     }
 
-    private org.omg.CORBA.portable.OutputStream
-    _OB_op_reestablish_link(org.omg.CORBA.portable.InputStream in,
-                            org.omg.CORBA.portable.ResponseHandler handler)
+    private OutputStream
+    _OB_op_reestablish_link(InputStream in,
+                            ResponseHandler handler)
     {
-        org.omg.CORBA.portable.OutputStream out = null;
+        OutputStream out = null;
         ProcessEndpointManager _ob_a0 = ProcessEndpointManagerHelper.read(in);
         reestablish_link(_ob_a0);
         out = handler.createReply();
         return out;
     }
 
-    private org.omg.CORBA.portable.OutputStream
-    _OB_op_stop(org.omg.CORBA.portable.InputStream in,
-                org.omg.CORBA.portable.ResponseHandler handler)
+    private OutputStream
+    _OB_op_stop(InputStream in,
+                ResponseHandler handler)
     {
-        org.omg.CORBA.portable.OutputStream out = null;
+        OutputStream out = null;
         stop();
         out = handler.createReply();
         return out;
