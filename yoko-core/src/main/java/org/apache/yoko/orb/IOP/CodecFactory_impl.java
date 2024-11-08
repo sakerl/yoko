@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,26 +17,33 @@
  */
 package org.apache.yoko.orb.IOP;
 
+import org.apache.yoko.orb.OB.ORBInstance;
 import org.apache.yoko.util.Assert;
+import org.omg.CORBA.LocalObject;
+import org.omg.IOP.Codec;
+import org.omg.IOP.CodecFactory;
+import org.omg.IOP.ENCODING_CDR_ENCAPS;
+import org.omg.IOP.Encoding;
+import org.omg.IOP.CodecFactoryPackage.UnknownEncoding;
 
-final public class CodecFactory_impl extends org.omg.CORBA.LocalObject
-        implements org.omg.IOP.CodecFactory {
-    private org.omg.IOP.Codec cdrCodec_; // Cached CDR Codec
+final public class CodecFactory_impl extends LocalObject
+        implements CodecFactory {
+    private Codec cdrCodec_; // Cached CDR Codec
 
-    private org.apache.yoko.orb.OB.ORBInstance orbInstance_; // The
+    private ORBInstance orbInstance_; // The
                                                                 // ORBInstance
 
     // ----------------------------------------------------------------------
     // CodecFactory_impl public member implementation
     // ----------------------------------------------------------------------
 
-    public org.omg.IOP.Codec create_codec(org.omg.IOP.Encoding encoding)
-            throws org.omg.IOP.CodecFactoryPackage.UnknownEncoding {
+    public Codec create_codec(Encoding encoding)
+            throws UnknownEncoding {
         Assert.ensure(orbInstance_ != null);
 
         // TODO: check major/minor version
-        if (encoding.format != org.omg.IOP.ENCODING_CDR_ENCAPS.value)
-            throw new org.omg.IOP.CodecFactoryPackage.UnknownEncoding();
+        if (encoding.format != ENCODING_CDR_ENCAPS.value)
+            throw new UnknownEncoding();
 
         synchronized (this) {
             if (cdrCodec_ == null)
@@ -52,7 +59,7 @@ final public class CodecFactory_impl extends org.omg.CORBA.LocalObject
     // ------------------------------------------------------------------
 
     public void _OB_setORBInstance(
-            org.apache.yoko.orb.OB.ORBInstance orbInstance) {
+            ORBInstance orbInstance) {
         orbInstance_ = orbInstance;
     }
 }
