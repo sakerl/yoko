@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.IOP;
-import org.apache.yoko.orb.CORBA.Any;
 import org.apache.yoko.orb.CORBA.InputStream;
 import org.apache.yoko.orb.CORBA.OutputStream;
 import org.apache.yoko.orb.OB.ORBInstance;
+import org.omg.CORBA.Any;
 import org.omg.CORBA.LocalObject;
 import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.TypeCode;
@@ -30,7 +30,7 @@ import org.omg.IOP.CodecPackage.TypeMismatch;
 final class CDRCodec extends LocalObject implements Codec {
     private ORBInstance orbInstance_;
 
-    public byte[] encode(org.omg.CORBA.Any data) {
+    public byte[] encode(Any data) {
         try (OutputStream out = new OutputStream()) {
             out._OB_ORBInstance(orbInstance_);
             out._OB_writeEndian();
@@ -39,7 +39,7 @@ final class CDRCodec extends LocalObject implements Codec {
         }
     }
 
-    public org.omg.CORBA.Any decode(byte[] data) throws FormatMismatch {
+    public Any decode(byte[] data) throws FormatMismatch {
         try {
             InputStream in = new InputStream(data);
             in._OB_ORBInstance(orbInstance_);
@@ -51,7 +51,7 @@ final class CDRCodec extends LocalObject implements Codec {
         }
     }
 
-    public byte[] encode_value(org.omg.CORBA.Any data) {
+    public byte[] encode_value(Any data) {
         try (OutputStream out = new OutputStream()) {
             out._OB_ORBInstance(orbInstance_);
             out._OB_writeEndian();
@@ -60,7 +60,7 @@ final class CDRCodec extends LocalObject implements Codec {
         }
     }
 
-    public org.omg.CORBA.Any decode_value(byte[] data, TypeCode tc) throws FormatMismatch, TypeMismatch {
+    public Any decode_value(byte[] data, TypeCode tc) throws FormatMismatch, TypeMismatch {
         if (tc == null) throw new TypeMismatch();
 
         try {
@@ -68,7 +68,7 @@ final class CDRCodec extends LocalObject implements Codec {
             in._OB_ORBInstance(orbInstance_);
             in._OB_readEndian();
 
-            Any any = new Any(orbInstance_, tc, null);
+            Any any = new org.apache.yoko.orb.CORBA.Any(orbInstance_, tc, null);
             any.read_value(in, tc);
 
             return any;
