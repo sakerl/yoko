@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,19 @@
  */
 package org.apache.yoko.orb.OAD;
 
+import static org.apache.yoko.util.MinorCodes.MinorReadIDMismatch;
+import static org.apache.yoko.util.MinorCodes.MinorTypeMismatch;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
 import org.apache.yoko.util.MinorCodes;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.BAD_OPERATION;
+import org.omg.CORBA.MARSHAL;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.StructMember;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
 
 //
 // IDL:orb.yoko.apache.org/OAD/AlreadyLinked:1.0
@@ -25,34 +37,34 @@ import org.apache.yoko.util.MinorCodes;
 final public class AlreadyLinkedHelper
 {
     public static void
-    insert(org.omg.CORBA.Any any, AlreadyLinked val)
+    insert(Any any, AlreadyLinked val)
     {
-        org.omg.CORBA.portable.OutputStream out = any.create_output_stream();
+        OutputStream out = any.create_output_stream();
         write(out, val);
         any.read_value(out.create_input_stream(), type());
     }
 
     public static AlreadyLinked
-    extract(org.omg.CORBA.Any any)
+    extract(Any any)
     {
         if(any.type().equivalent(type()))
             return read(any.create_input_stream());
         else
-            throw new org.omg.CORBA.BAD_OPERATION(
+            throw new BAD_OPERATION(
                 MinorCodes
-                        .describeBadOperation(MinorCodes.MinorTypeMismatch),
-                MinorCodes.MinorTypeMismatch, org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                        .describeBadOperation(MinorTypeMismatch),
+                MinorTypeMismatch, COMPLETED_NO);
     }
 
-    private static org.omg.CORBA.TypeCode typeCode_;
+    private static TypeCode typeCode_;
 
-    public static org.omg.CORBA.TypeCode
+    public static TypeCode
     type()
     {
         if(typeCode_ == null)
         {
-            org.omg.CORBA.ORB orb = org.omg.CORBA.ORB.init();
-            org.omg.CORBA.StructMember[] members = new org.omg.CORBA.StructMember[0];
+            ORB orb = ORB.init();
+            StructMember[] members = new StructMember[0];
 
             typeCode_ = orb.create_exception_tc(id(), "AlreadyLinked", members);
         }
@@ -67,14 +79,14 @@ final public class AlreadyLinkedHelper
     }
 
     public static AlreadyLinked
-    read(org.omg.CORBA.portable.InputStream in)
+    read(InputStream in)
     {
         if(!id().equals(in.read_string())) {
-            throw new org.omg.CORBA.MARSHAL(
+            throw new MARSHAL(
                 MinorCodes
-                    .describeMarshal(MinorCodes.MinorReadIDMismatch),
-                MinorCodes.MinorReadIDMismatch,
-                org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                    .describeMarshal(MinorReadIDMismatch),
+                MinorReadIDMismatch,
+                COMPLETED_NO);
         }
 
         AlreadyLinked _ob_v = new AlreadyLinked();
@@ -82,7 +94,7 @@ final public class AlreadyLinkedHelper
     }
 
     public static void
-    write(org.omg.CORBA.portable.OutputStream out, AlreadyLinked val)
+    write(OutputStream out, AlreadyLinked val)
     {
         out.write_string(id());
     }
