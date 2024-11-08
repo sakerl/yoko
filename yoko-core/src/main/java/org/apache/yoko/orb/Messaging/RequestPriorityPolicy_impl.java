@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,29 @@
  */
 package org.apache.yoko.orb.Messaging;
 
-final public class RequestPriorityPolicy_impl extends org.omg.CORBA.LocalObject
-        implements org.omg.Messaging.RequestPriorityPolicy {
-    private org.omg.Messaging.PriorityRange value_;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.Policy;
+import org.omg.Messaging.PriorityRange;
+import org.omg.Messaging.REQUEST_PRIORITY_POLICY_TYPE;
+import org.omg.Messaging.RequestPriorityPolicy;
+
+final public class RequestPriorityPolicy_impl extends LocalObject
+        implements RequestPriorityPolicy {
+    private PriorityRange value_;
 
     // ------------------------------------------------------------------
     // Standard IDL to Java Mapping
     // ------------------------------------------------------------------
 
-    public org.omg.Messaging.PriorityRange priority_range() {
+    public PriorityRange priority_range() {
         return value_;
     }
 
     public int policy_type() {
-        return org.omg.Messaging.REQUEST_PRIORITY_POLICY_TYPE.value;
+        return REQUEST_PRIORITY_POLICY_TYPE.value;
     }
 
-    public org.omg.CORBA.Policy copy() {
+    public Policy copy() {
         return this;
     }
 
@@ -45,7 +51,7 @@ final public class RequestPriorityPolicy_impl extends org.omg.CORBA.LocalObject
     // Application programs must not use these functions directly
     // ------------------------------------------------------------------
 
-    public RequestPriorityPolicy_impl(org.omg.Messaging.PriorityRange value) {
+    public RequestPriorityPolicy_impl(PriorityRange value) {
         value_ = value;
     }
 }
