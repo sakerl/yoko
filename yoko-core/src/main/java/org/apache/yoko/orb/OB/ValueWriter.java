@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,9 @@ import java.util.Hashtable;
 import java.util.IdentityHashMap;
 
 import static java.security.AccessController.doPrivileged;
+import static javax.rmi.CORBA.Util.createValueHandler;
+import static javax.rmi.CORBA.Util.getCodebase;
+import static org.apache.yoko.orb.CORBA.TypeCode._OB_getOrigType;
 import static org.apache.yoko.util.MinorCodes.MinorNoValueFactory;
 import static org.apache.yoko.util.MinorCodes.describeMarshal;
 import static org.apache.yoko.util.PrivilegedActions.GET_CONTEXT_CLASS_LOADER;
@@ -50,7 +53,7 @@ import static org.apache.yoko.util.PrivilegedActions.getNoArgConstructor;
 import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 import static org.omg.CORBA.TCKind._tk_string;
 
-final public class ValueWriter {
+public final class ValueWriter {
 
     /** The OutputStream */
     private final OutputStream out_;
@@ -193,7 +196,7 @@ final public class ValueWriter {
         //
         if (helperClass == null && type != null) {
             try {
-                TypeCode origType = org.apache.yoko.orb.CORBA.TypeCode._OB_getOrigType(type);
+                TypeCode origType = _OB_getOrigType(type);
                 String id = origType.id();
                 helperClass = RepIds.query(id).suffix("Helper").toClass();
             } catch (BadKind ex) {
@@ -401,7 +404,7 @@ final public class ValueWriter {
 
         // get hold of the value handler
         if (valueHandler == null) {
-            valueHandler = javax.rmi.CORBA.Util.createValueHandler ();
+            valueHandler = createValueHandler();
         }
 
         //
@@ -452,7 +455,7 @@ final public class ValueWriter {
         //
         int tag = 0x7fffff02;
 
-        String codebase = javax.rmi.CORBA.Util.getCodebase (clz);
+        String codebase = getCodebase(clz);
         if (codebase != null && codebase.length () != 0)
             tag |= 1;
 
@@ -460,22 +463,22 @@ final public class ValueWriter {
         // Determine the repository ID
         //
         String[] ids = new String[1];
-        ids[0] = valueHandler.getRMIRepositoryID (clz);
+        ids[0] = valueHandler.getRMIRepositoryID(clz);
 
         //
         // Determine if chunked encoding is needed.
         //
         boolean isChunked = valueHandler.isCustomMarshaled(clz);
 
-        int pos = beginValue (tag, ids, codebase, isChunked);
+        int pos = beginValue(tag, ids, codebase, isChunked);
         instanceTable_.put (value, pos);
         // if this was replace via writeReplace, record the original 
         // value in the indirection table too. 
         if (originalValue != null) {
-            instanceTable_.put (originalValue, pos);
+            instanceTable_.put(originalValue, pos);
         }
-        valueHandler.writeValue (out_, value);
-        endValue ();
+        valueHandler.writeValue(out_, value);
+        endValue();
     }
 
     public void writeValueBox(Serializable value,
