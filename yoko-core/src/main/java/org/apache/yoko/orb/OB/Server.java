@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
  */
 package org.apache.yoko.orb.OB;
 
-abstract public class Server {
+public abstract class Server {
     //
     // The concurrency model for this Server
     //
-    final public static int Blocking = 0;
+    public static final int Blocking = 0;
 
-    final public static int Threaded = 2;
+    public static final int Threaded = 2;
 
     protected int concModel_ = Blocking;
 
