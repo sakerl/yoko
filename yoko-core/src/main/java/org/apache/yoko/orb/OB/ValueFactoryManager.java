@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import java.util.Hashtable;
 import java.util.logging.Logger;
 
 import static java.security.AccessController.doPrivileged;
+import static java.util.logging.Logger.getLogger;
 import static org.apache.yoko.util.MinorCodes.MinorORBDestroyed;
 import static org.apache.yoko.util.MinorCodes.MinorValueFactoryError;
 import static org.apache.yoko.util.MinorCodes.describeBadParam;
@@ -41,7 +42,7 @@ import static org.apache.yoko.util.PrivilegedActions.getNoArgConstructor;
 import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
 public final class ValueFactoryManager {
-    static final Logger logger = Logger.getLogger(ValueFactoryManager.class.getName());
+    static final Logger logger = getLogger(ValueFactoryManager.class.getName());
     //
     // The set of registered valuetype factories
     //
