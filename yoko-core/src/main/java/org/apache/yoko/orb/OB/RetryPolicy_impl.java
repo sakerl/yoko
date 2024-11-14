@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.orb.OB.RETRY_POLICY_ID;
-import org.apache.yoko.orb.OB.RetryPolicy;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.Policy;
 
-final public class RetryPolicy_impl extends org.omg.CORBA.LocalObject implements
+final public class RetryPolicy_impl extends LocalObject implements
         RetryPolicy {
     private short mode_;
 
@@ -54,7 +54,7 @@ final public class RetryPolicy_impl extends org.omg.CORBA.LocalObject implements
         return RETRY_POLICY_ID.value;
     }
 
-    public org.omg.CORBA.Policy copy() {
+    public Policy copy() {
         return this;
     }
 
