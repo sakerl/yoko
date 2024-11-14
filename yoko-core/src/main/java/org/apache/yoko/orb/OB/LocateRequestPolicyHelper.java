@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,44 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.util.MinorCodes;
+import static org.apache.yoko.util.MinorCodes.MinorIncompatibleObjectType;
+import static org.apache.yoko.util.MinorCodes.MinorReadUnsupported;
+import static org.apache.yoko.util.MinorCodes.MinorTypeMismatch;
+import static org.apache.yoko.util.MinorCodes.MinorWriteUnsupported;
+import static org.apache.yoko.util.MinorCodes.describeBadOperation;
+import static org.apache.yoko.util.MinorCodes.describeBadParam;
+import static org.apache.yoko.util.MinorCodes.describeMarshal;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
+import org.omg.CORBA.Any;
+import org.omg.CORBA.BAD_OPERATION;
+import org.omg.CORBA.BAD_PARAM;
+import org.omg.CORBA.MARSHAL;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
 
 //
 // IDL:orb.yoko.apache.org/OB/LocateRequestPolicy:1.0
 //
-final public class LocateRequestPolicyHelper
+public final class LocateRequestPolicyHelper
 {
     public static void
-    insert(org.omg.CORBA.Any any, LocateRequestPolicy val)
+    insert(Any any, LocateRequestPolicy val)
     {
         any.insert_Object(val, type());
     }
 
     public static LocateRequestPolicy
-    extract(org.omg.CORBA.Any any)
+    extract(Any any)
     {
         if(any.type().equivalent(type()))
             return narrow(any.extract_Object());
 
 
-        throw new org.omg.CORBA.BAD_OPERATION(
-            MinorCodes
-                    .describeBadOperation(MinorCodes.MinorTypeMismatch),
-            MinorCodes.MinorTypeMismatch, org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+        throw new BAD_OPERATION(
+            describeBadOperation(MinorTypeMismatch),
+            MinorTypeMismatch, COMPLETED_NO);
     }
 
     private static org.omg.CORBA.TypeCode typeCode_;
@@ -50,7 +64,7 @@ final public class LocateRequestPolicyHelper
     {
         if(typeCode_ == null)
         {
-            org.omg.CORBA.ORB orb = org.omg.CORBA.ORB.init();
+            ORB orb = ORB.init();
             typeCode_ = ((org.omg.CORBA_2_4.ORB)orb).create_local_interface_tc(id(), "LocateRequestPolicy");
         }
 
@@ -64,23 +78,21 @@ final public class LocateRequestPolicyHelper
     }
 
     public static LocateRequestPolicy
-    read(org.omg.CORBA.portable.InputStream in)
+    read(InputStream in)
     {
-        throw new org.omg.CORBA.MARSHAL(
-                MinorCodes
-                        .describeMarshal(MinorCodes.MinorReadUnsupported),
-                MinorCodes.MinorReadUnsupported,
-                org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+        throw new MARSHAL(
+                describeMarshal(MinorReadUnsupported),
+                MinorReadUnsupported,
+                COMPLETED_NO);
     }
 
     public static void
-    write(org.omg.CORBA.portable.OutputStream out, LocateRequestPolicy val)
+    write(OutputStream out, LocateRequestPolicy val)
     {
-        throw new org.omg.CORBA.MARSHAL(
-                MinorCodes
-                        .describeMarshal(MinorCodes.MinorWriteUnsupported),
-                MinorCodes.MinorWriteUnsupported,
-                org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+        throw new MARSHAL(
+                describeMarshal(MinorWriteUnsupported),
+                MinorWriteUnsupported,
+                COMPLETED_NO);
     }
 
     public static LocateRequestPolicy
@@ -94,9 +106,8 @@ final public class LocateRequestPolicyHelper
         {
         }
 
-        throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-            .describeBadParam(MinorCodes.MinorIncompatibleObjectType),
-            MinorCodes.MinorIncompatibleObjectType,
-            org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+        throw new BAD_PARAM(describeBadParam(MinorIncompatibleObjectType),
+            MinorIncompatibleObjectType,
+            COMPLETED_NO);
     }
 }
