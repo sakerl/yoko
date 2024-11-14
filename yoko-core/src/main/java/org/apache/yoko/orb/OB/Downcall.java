@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.logging.Level;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.apache.yoko.util.MinorCodes.MinorUnknownUserException;
+import static org.apache.yoko.util.MinorCodes.describeUnknown;
 import static org.apache.yoko.util.ObjectFormatter.format;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_MAYBE;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_YES;
 
 public class Downcall {
     /** The ORBInstance object */
@@ -369,10 +374,9 @@ public class Downcall {
         //
         try (AutoLock lock = stateLock.getReadLock()) {
             if (state == State.USER_EXCEPTION && ex_ == null && exId_ == null)
-                setSystemException(new UNKNOWN(MinorCodes
-                        .describeUnknown(MinorCodes.MinorUnknownUserException),
-                        MinorCodes.MinorUnknownUserException,
-                        CompletionStatus.COMPLETED_YES));
+                setSystemException(new UNKNOWN(describeUnknown(MinorUnknownUserException),
+                        MinorUnknownUserException,
+                        COMPLETED_YES));
             checkForException();
         }
     }
@@ -558,10 +562,10 @@ public class Downcall {
                     } else {
                         State oldState = state;
 
-                        stateWaitCondition.await(t, TimeUnit.MILLISECONDS);
+                        stateWaitCondition.await(t, MILLISECONDS);
 
                         if (state == oldState) {
-                            throw new NO_RESPONSE("Timeout during receive", 0, CompletionStatus.COMPLETED_MAYBE);
+                            throw new NO_RESPONSE("Timeout during receive", 0, COMPLETED_MAYBE);
                         }
                     }
                 } catch (InterruptedException ex) {
