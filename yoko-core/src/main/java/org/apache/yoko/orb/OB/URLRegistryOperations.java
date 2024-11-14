@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.OB;
+
+import org.apache.yoko.orb.OB.URLRegistryPackage.SchemeAlreadyExists;
 
 //
 // IDL:orb.yoko.apache.org/OB/URLRegistry:1.0
@@ -39,14 +41,14 @@ public interface URLRegistryOperations
      *
      * @param scheme The new scheme.
      *
-     * @exception org.apache.yoko.orb.OB.URLRegistryPackage.SchemeAlreadyExists Another scheme already exists with
+     * @exception SchemeAlreadyExists Another scheme already exists with
      * the same name.
      *
      **/
 
     void
     add_scheme(URLScheme scheme)
-        throws org.apache.yoko.orb.OB.URLRegistryPackage.SchemeAlreadyExists;
+        throws SchemeAlreadyExists;
 
     //
     // IDL:orb.yoko.apache.org/OB/URLRegistry/find_scheme:1.0
