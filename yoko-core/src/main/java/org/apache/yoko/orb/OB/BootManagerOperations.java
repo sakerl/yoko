@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.OB;
+
+import org.apache.yoko.orb.OB.BootManagerPackage.AlreadyExists;
+import org.apache.yoko.orb.OB.BootManagerPackage.NotFound;
 
 //
 // IDL:orb.yoko.apache.org/OB/BootManager:1.0
@@ -46,7 +49,7 @@ public interface BootManagerOperations
     void
     add_binding(byte[] oid,
                 org.omg.CORBA.Object obj)
-        throws org.apache.yoko.orb.OB.BootManagerPackage.AlreadyExists;
+        throws AlreadyExists;
 
     //
     // IDL:orb.yoko.apache.org/OB/BootManager/remove_binding:1.0
@@ -63,7 +66,7 @@ public interface BootManagerOperations
 
     void
     remove_binding(byte[] oid)
-        throws org.apache.yoko.orb.OB.BootManagerPackage.NotFound;
+        throws NotFound;
 
     //
     // IDL:orb.yoko.apache.org/OB/BootManager/set_locator:1.0
