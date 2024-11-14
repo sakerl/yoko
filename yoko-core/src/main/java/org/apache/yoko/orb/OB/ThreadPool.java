@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,14 @@
  */
 package org.apache.yoko.orb.OB;
 
+import java.util.Vector;
+
+import org.omg.CORBA.OBJ_ADAPTER;
+
 final class ThreadPool {
     private boolean destroy_ = false; // True if destroy was called
 
-    private java.util.Vector requests_ = new java.util.Vector();
+    private Vector requests_ = new Vector();
 
     private ThreadGroup group_; // Thread group for the threads in the pool
 
@@ -100,7 +104,7 @@ final class ThreadPool {
         // OBJ_ADAPTER error
         //
         if (destroy_)
-            throw new org.omg.CORBA.OBJ_ADAPTER("Thread pool is destroyed");
+            throw new OBJ_ADAPTER("Thread pool is destroyed");
 
         requests_.addElement(request);
         notify();
