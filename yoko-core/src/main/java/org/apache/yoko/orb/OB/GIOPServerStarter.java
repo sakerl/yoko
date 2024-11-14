@@ -18,7 +18,10 @@
 package org.apache.yoko.orb.OB;
 
 import org.apache.yoko.orb.OCI.Acceptor;
+import org.apache.yoko.orb.OCI.ConnectorInfo;
+import org.apache.yoko.orb.OCI.Transport;
 import org.apache.yoko.util.Assert;
+import org.omg.CORBA.SystemException;
 
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -37,7 +40,7 @@ abstract class GIOPServerStarter {
 
     protected final OAInterface oaInterface_; // The OA interface
 
-    protected final Vector connections_ = new java.util.Vector(); // Workers
+    protected final Vector connections_ = new Vector(); // Workers
 
     enum ServerState {
         ACTIVE,
@@ -85,7 +88,7 @@ abstract class GIOPServerStarter {
     // ----------------------------------------------------------------------
 
     GIOPServerStarter(ORBInstance orbInstance,
-            org.apache.yoko.orb.OCI.Acceptor acceptor, OAInterface oaInterface) {
+            Acceptor acceptor, OAInterface oaInterface) {
         orbInstance_ = orbInstance;
         acceptor_ = acceptor;
         oaInterface_ = oaInterface;
@@ -97,7 +100,7 @@ abstract class GIOPServerStarter {
 
             // Start listening
             acceptor_.listen();
-        } catch (org.omg.CORBA.SystemException ex) {
+        } catch (SystemException ex) {
             acceptor_.close();
             serverState = CLOSED;
             throw ex;
@@ -108,7 +111,7 @@ abstract class GIOPServerStarter {
     // GIOPServerStarter for an inbound connection transport
     // which matches the specific connection information.
     // It returns null if not found.
-    public synchronized GIOPConnection getMatchingConnection(org.apache.yoko.orb.OCI.ConnectorInfo connInfo) {
+    public synchronized GIOPConnection getMatchingConnection(ConnectorInfo connInfo) {
         // reap the workers first since we don't want to return a destroyed transport
         reapWorkers();
 
@@ -120,7 +123,7 @@ abstract class GIOPServerStarter {
             if (worker.isOutbound())
                 continue;
 
-            org.apache.yoko.orb.OCI.Transport transport = worker.transport();
+            Transport transport = worker.transport();
 
             if (transport != null && transport.get_info().endpoint_alias_match(connInfo))
                 return worker;
