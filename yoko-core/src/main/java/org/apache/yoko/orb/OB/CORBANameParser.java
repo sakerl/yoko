@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.OB;
+
+import java.util.Vector;
 
 //
 // This class parses the fields of an CORBANAME stringified name. Pass
@@ -78,7 +80,7 @@ public class CORBANameParser {
     }
 
     private void parse() {
-        java.util.Vector vec = new java.util.Vector();
+        Vector vec = new Vector();
         while (!atEnd() && valid_) {
             String id = next();
             String kind;
