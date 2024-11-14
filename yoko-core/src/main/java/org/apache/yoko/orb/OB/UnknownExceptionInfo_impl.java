@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,20 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.orb.OB.UnknownExceptionInfo;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class UnknownExceptionInfo_impl extends org.omg.CORBA.LocalObject
+import org.apache.yoko.orb.OCI.TransportInfo;
+import org.omg.CORBA.LocalObject;
+
+public class UnknownExceptionInfo_impl extends LocalObject
         implements UnknownExceptionInfo {
     private String operation_;
 
     private boolean responseExpected_;
 
-    private org.apache.yoko.orb.OCI.TransportInfo transportInfo_;
+    private TransportInfo transportInfo_;
 
     private RuntimeException ex_;
 
@@ -39,7 +40,7 @@ public class UnknownExceptionInfo_impl extends org.omg.CORBA.LocalObject
 
     public UnknownExceptionInfo_impl(String operation,
             boolean responseExpected,
-            org.apache.yoko.orb.OCI.TransportInfo transportInfo,
+            TransportInfo transportInfo,
             RuntimeException ex) {
         operation_ = operation;
         responseExpected_ = responseExpected;
@@ -59,7 +60,7 @@ public class UnknownExceptionInfo_impl extends org.omg.CORBA.LocalObject
         return responseExpected_;
     }
 
-    public org.apache.yoko.orb.OCI.TransportInfo transport_info() {
+    public TransportInfo transport_info() {
         return transportInfo_;
     }
 
