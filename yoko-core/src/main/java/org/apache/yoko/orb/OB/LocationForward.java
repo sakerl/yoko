@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,14 @@
  */
 package org.apache.yoko.orb.OB;
 
+import org.omg.IOP.IOR;
+
 final public class LocationForward extends Exception {
-    public org.omg.IOP.IOR ior; // Forwarded IOR
+    public IOR ior; // Forwarded IOR
 
     public boolean perm; // Is this a LOCATION_FORWARD_PERM?
 
-    public LocationForward(org.omg.IOP.IOR i, boolean p) {
+    public LocationForward(IOR i, boolean p) {
         ior = i;
         perm = p;
     }
