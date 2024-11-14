@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,14 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.io.Buffer;
+import static java.util.logging.Logger.getLogger;
+import static org.apache.yoko.io.Buffer.createWriteBuffer;
+import static org.apache.yoko.orb.OB.SendingContextRuntimes.SENDING_CONTEXT_RUNTIME;
+import static org.apache.yoko.orb.OCI.GiopVersion.GIOP1_2;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.yoko.orb.CORBA.InputStream;
 import org.apache.yoko.orb.CORBA.OutputStream;
 import org.apache.yoko.orb.IOP.ServiceContexts;
@@ -40,13 +47,8 @@ import org.omg.IOP.ServiceContext;
 import org.omg.IOP.UnknownExceptionInfo;
 import org.omg.PortableServer.Servant;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.apache.yoko.orb.OCI.GiopVersion.GIOP1_2;
-
 public class Upcall {
-    private static final Logger logger = Logger.getLogger(Upcall.class.getName());
+    private static final Logger logger = getLogger(Upcall.class.getName());
     private final ORBInstance orbInstance_;
 
     // Upcall delegates to UpcallReturn upon return from the upcall.
@@ -153,7 +155,7 @@ public class Upcall {
 
     public void createOutputStream(int offset) {
         final GiopVersion giopVersion = GiopVersion.get(profileInfo_.major, profileInfo_.minor);
-        out_ = new OutputStream(Buffer.createWriteBuffer(offset).padAll(), in_._OB_codeConverters(), giopVersion);
+        out_ = new OutputStream(createWriteBuffer(offset).padAll(), in_._OB_codeConverters(), giopVersion);
     }
 
     public InputStream preUnmarshal() {
@@ -178,7 +180,7 @@ public class Upcall {
 
     // initialize internal service contexts
     private void initServiceContexts() {
-        if (codeBaseSC_ == null) codeBaseSC_ = SendingContextRuntimes.SENDING_CONTEXT_RUNTIME;
+        if (codeBaseSC_ == null) codeBaseSC_ = SENDING_CONTEXT_RUNTIME;
         // NOTE: We don't initialize the INVOCATION_POLICIES service context
         // here because the list of policies can change from one invocation to
         // the next. Instead, we need to get the policies and build the
