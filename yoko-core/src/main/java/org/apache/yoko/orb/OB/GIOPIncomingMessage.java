@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,25 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.orb.CORBA.InputStream;
-import org.apache.yoko.orb.IOP.ServiceContexts;
+import static org.apache.yoko.io.AlignmentBoundary.EIGHT_BYTE_BOUNDARY;
+import static org.apache.yoko.io.AlignmentBoundary.FOUR_BYTE_BOUNDARY;
+import static org.apache.yoko.util.MinorCodes.MinorFragment;
+import static org.apache.yoko.util.MinorCodes.MinorMessageSizeLimit;
+import static org.apache.yoko.util.MinorCodes.MinorNoGIOP;
+import static org.apache.yoko.util.MinorCodes.MinorUnknownMessage;
+import static org.apache.yoko.util.MinorCodes.MinorVersion;
+import static org.apache.yoko.util.MinorCodes.describeCommFailure;
+import static org.apache.yoko.util.MinorCodes.describeImpLimit;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_MAYBE;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.apache.yoko.io.ReadBuffer;
 import org.apache.yoko.io.WriteBuffer;
+import org.apache.yoko.orb.CORBA.InputStream;
+import org.apache.yoko.orb.IOP.ServiceContexts;
 import org.apache.yoko.util.Assert;
 import org.omg.CORBA.BooleanHolder;
 import org.omg.CORBA.COMM_FAILURE;
@@ -39,23 +54,7 @@ import org.omg.GIOP.Version;
 import org.omg.IOP.ServiceContext;
 import org.omg.IOP.TaggedProfileHelper;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import static org.apache.yoko.util.Assert.ensure;
-import static org.apache.yoko.util.MinorCodes.MinorFragment;
-import static org.apache.yoko.util.MinorCodes.MinorMessageSizeLimit;
-import static org.apache.yoko.util.MinorCodes.MinorNoGIOP;
-import static org.apache.yoko.util.MinorCodes.MinorUnknownMessage;
-import static org.apache.yoko.util.MinorCodes.MinorVersion;
-import static org.apache.yoko.util.MinorCodes.describeCommFailure;
-import static org.apache.yoko.util.MinorCodes.describeImpLimit;
-import static org.apache.yoko.io.AlignmentBoundary.EIGHT_BYTE_BOUNDARY;
-import static org.apache.yoko.io.AlignmentBoundary.FOUR_BYTE_BOUNDARY;
-import static org.omg.CORBA.CompletionStatus.COMPLETED_MAYBE;
-import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
-
-final public class GIOPIncomingMessage {
+public final class GIOPIncomingMessage {
     private ORBInstance orbInstance_;
 
     private InputStream in_;
@@ -65,7 +64,7 @@ final public class GIOPIncomingMessage {
     //
     // Message header
     //
-    private org.omg.GIOP.Version version_ = new org.omg.GIOP.Version();
+    private Version version_ = new Version();
 
     private boolean littleEndian;
 
@@ -171,7 +170,7 @@ final public class GIOPIncomingMessage {
         lastFragment_ = null;
     }
 
-    org.omg.GIOP.Version version() {
+    Version version() {
         return version_;
     }
 
