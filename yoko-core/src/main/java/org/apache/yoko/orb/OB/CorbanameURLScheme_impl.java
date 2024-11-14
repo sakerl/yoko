@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,39 @@
  */
 package org.apache.yoko.orb.OB;
 
+import static org.apache.yoko.orb.OB.TypeCodeFactory.createPrimitiveTC;
+import static org.apache.yoko.orb.OB.TypeCodeFactory.createSequenceTC;
+import static org.apache.yoko.orb.OB.TypeCodeFactory.createStringTC;
+import static org.apache.yoko.orb.OB.TypeCodeFactory.createStructTC;
+import static org.apache.yoko.orb.OB.URLUtil.unescapeURL;
+import static org.apache.yoko.util.MinorCodes.MinorBadAddress;
+import static org.apache.yoko.util.MinorCodes.MinorBadSchemeSpecificPart;
 import static org.apache.yoko.util.MinorCodes.MinorOther;
+import static org.apache.yoko.util.MinorCodes.describeBadParam;
 import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+import static org.omg.CORBA.TCKind.tk_objref;
 
 import org.apache.yoko.util.Assert;
-import org.apache.yoko.util.MinorCodes;
+import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_PARAM;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.Request;
+import org.omg.CORBA.StructMember;
+import org.omg.CORBA.SystemException;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.UserException;
+import org.omg.DynamicAny.DynAny;
+import org.omg.DynamicAny.DynAnyFactory;
+import org.omg.DynamicAny.DynAnyFactoryHelper;
+import org.omg.DynamicAny.DynSequence;
+import org.omg.DynamicAny.DynSequenceHelper;
+import org.omg.DynamicAny.DynStruct;
+import org.omg.DynamicAny.DynStructHelper;
 
-public class CorbanameURLScheme_impl extends org.omg.CORBA.LocalObject
+public class CorbanameURLScheme_impl extends LocalObject
         implements URLScheme {
-    private org.omg.CORBA.ORB orb_;
+    private ORB orb_;
 
     private CorbalocURLScheme corbaloc_;
 
@@ -34,7 +57,7 @@ public class CorbanameURLScheme_impl extends org.omg.CORBA.LocalObject
     // CorbanameURLScheme_impl constructor
     // ------------------------------------------------------------------
 
-    public CorbanameURLScheme_impl(org.omg.CORBA.ORB orb, URLRegistry registry) {
+    public CorbanameURLScheme_impl(ORB orb, URLRegistry registry) {
         orb_ = orb;
         URLScheme scheme = registry.find_scheme("corbaloc");
         Assert.ensure(scheme != null);
@@ -81,10 +104,9 @@ public class CorbanameURLScheme_impl extends org.omg.CORBA.LocalObject
         int addrEnd;
 
         if (addrStart == slash)
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorBadAddress)
-                    + ": no protocol address", MinorCodes.MinorBadAddress,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorBadAddress)
+                    + ": no protocol address", MinorBadAddress,
+                    COMPLETED_NO);
 
         if (slash == -1 && fragmentStart == -1)
             addrEnd = url.length() - 1;
@@ -122,57 +144,55 @@ public class CorbanameURLScheme_impl extends org.omg.CORBA.LocalObject
             //
             // Create typecodes for Name and NameComponent
             //
-            org.omg.CORBA.StructMember[] contents = new org.omg.CORBA.StructMember[2];
-            contents[0] = new org.omg.CORBA.StructMember();
+            StructMember[] contents = new StructMember[2];
+            contents[0] = new StructMember();
             contents[0].name = "id";
-            contents[0].type = TypeCodeFactory.createStringTC(0);
-            contents[1] = new org.omg.CORBA.StructMember();
+            contents[0].type = createStringTC(0);
+            contents[1] = new StructMember();
             contents[1].name = "kind";
-            contents[1].type = TypeCodeFactory.createStringTC(0);
-            org.omg.CORBA.TypeCode tcNameComponent = TypeCodeFactory
-                    .createStructTC("IDL:omg.org/CosNaming/NameComponent:1.0",
+            contents[1].type = createStringTC(0);
+            TypeCode tcNameComponent = createStructTC("IDL:omg.org/CosNaming/NameComponent:1.0",
                             "NameComponent", contents);
 
-            org.omg.CORBA.TypeCode tcName = TypeCodeFactory.createSequenceTC(0,
+            TypeCode tcName = createSequenceTC(0,
                     tcNameComponent);
 
             //
             // Parse path (remove URL escapes first) and create
             // NameComponent sequence
             //
-            String fragment = URLUtil.unescapeURL(url
+            String fragment = unescapeURL(url
                     .substring(fragmentStart + 1));
             CORBANameParser parser = new CORBANameParser(fragment);
             if (!parser.isValid())
-                throw new org.omg.CORBA.BAD_PARAM(
-                        MinorCodes
-                                .describeBadParam(MinorCodes.MinorBadSchemeSpecificPart)
+                throw new BAD_PARAM(
+                        describeBadParam(MinorBadSchemeSpecificPart)
                                 + ": invalid stringified name \"" + fragment + "\"",
-                        MinorCodes.MinorBadSchemeSpecificPart,
-                        org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                        MinorBadSchemeSpecificPart,
+                        COMPLETED_NO);
 
             String[] content = parser.getContents();
             Assert.ensure((content.length % 2) == 0);
 
             org.omg.CORBA.Object factoryObj = orb_
                     .resolve_initial_references("DynAnyFactory");
-            org.omg.DynamicAny.DynAnyFactory dynAnyFactory = org.omg.DynamicAny.DynAnyFactoryHelper
+            DynAnyFactory dynAnyFactory = DynAnyFactoryHelper
                     .narrow(factoryObj);
 
-            org.omg.CORBA.Any[] as = new org.omg.CORBA.Any[content.length / 2];
+            Any[] as = new Any[content.length / 2];
             for (int i = 0; i < content.length; i += 2) {
                 //
                 // Create the DynStruct containing the id and kind fields
                 //
-                org.omg.DynamicAny.DynAny dynAny = dynAnyFactory
+                DynAny dynAny = dynAnyFactory
                         .create_dyn_any_from_type_code(tcNameComponent);
-                org.omg.DynamicAny.DynStruct name = org.omg.DynamicAny.DynStructHelper
+                DynStruct name = DynStructHelper
                         .narrow(dynAny);
                 name.insert_string(content[i]);
                 name.next();
                 name.insert_string(content[i + 1]);
 
-                org.omg.CORBA.Any nany = name.to_any();
+                Any nany = name.to_any();
                 name.destroy();
 
                 as[i / 2] = nany;
@@ -181,28 +201,27 @@ public class CorbanameURLScheme_impl extends org.omg.CORBA.LocalObject
             //
             // Create the Name
             //
-            org.omg.DynamicAny.DynAny dynAny = dynAnyFactory
+            DynAny dynAny = dynAnyFactory
                     .create_dyn_any_from_type_code(tcName);
-            org.omg.DynamicAny.DynSequence seq = org.omg.DynamicAny.DynSequenceHelper
+            DynSequence seq = DynSequenceHelper
                     .narrow(dynAny);
             seq.set_length(as.length);
             seq.set_elements(as);
-            org.omg.CORBA.Any any = seq.to_any();
+            Any any = seq.to_any();
             seq.destroy();
 
             //
             // Create the DII request
             //
-            org.omg.CORBA.Request request = nc._request("resolve");
+            Request request = nc._request("resolve");
 
             //
             // Copy in the arguments
             //
-            org.omg.CORBA.Any arg = request.add_in_arg();
+            Any arg = request.add_in_arg();
             arg.read_value(any.create_input_stream(), any.type());
 
-            request.set_return_type(TypeCodeFactory
-                    .createPrimitiveTC(org.omg.CORBA.TCKind.tk_objref));
+            request.set_return_type(createPrimitiveTC(tk_objref));
 
             //
             // Invoke the request
@@ -216,15 +235,15 @@ public class CorbanameURLScheme_impl extends org.omg.CORBA.LocalObject
             if (failureCause == null)
                 return request.return_value().extract_Object();
             
-        } catch (org.omg.CORBA.SystemException ex) {
+        } catch (SystemException ex) {
             failureCause = ex;
             // Fall through
-        } catch (org.omg.CORBA.UserException ex) {
+        } catch (UserException ex) {
             failureCause = ex;
             // Fall through
         }
 
-        final BAD_PARAM bp = new BAD_PARAM(MinorCodes.describeBadParam(MinorOther)
+        final BAD_PARAM bp = new BAD_PARAM(describeBadParam(MinorOther)
                 + ": corbaname evaluation error:" + failureCause.getMessage(), MinorOther,
                 COMPLETED_NO);
         throw (BAD_PARAM)bp.initCause(failureCause);
