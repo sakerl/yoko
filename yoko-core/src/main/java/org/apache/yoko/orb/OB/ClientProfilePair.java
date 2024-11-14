@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@
  */
 package org.apache.yoko.orb.OB;
 
+import org.apache.yoko.orb.OCI.ProfileInfo;
+
 //
 // A client/profile pair
 //
 public final class ClientProfilePair {
     public Client client;
 
-    public org.apache.yoko.orb.OCI.ProfileInfo profile;
+    public ProfileInfo profile;
 }
