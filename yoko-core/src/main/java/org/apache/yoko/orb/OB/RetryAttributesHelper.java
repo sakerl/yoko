@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,59 +17,71 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.util.MinorCodes;
+import static org.apache.yoko.util.MinorCodes.MinorTypeMismatch;
+import static org.apache.yoko.util.MinorCodes.describeBadOperation;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+import static org.omg.CORBA.TCKind.tk_boolean;
+import static org.omg.CORBA.TCKind.tk_short;
+import static org.omg.CORBA.TCKind.tk_ulong;
+
+import org.omg.CORBA.Any;
+import org.omg.CORBA.BAD_OPERATION;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.StructMember;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
 
 //
 // IDL:orb.yoko.apache.org/OB/RetryAttributes:1.0
 //
-final public class RetryAttributesHelper
+public final class RetryAttributesHelper
 {
     public static void
-    insert(org.omg.CORBA.Any any, RetryAttributes val)
+    insert(Any any, RetryAttributes val)
     {
-        org.omg.CORBA.portable.OutputStream out = any.create_output_stream();
+        OutputStream out = any.create_output_stream();
         write(out, val);
         any.read_value(out.create_input_stream(), type());
     }
 
     public static RetryAttributes
-    extract(org.omg.CORBA.Any any)
+    extract(Any any)
     {
         if(any.type().equivalent(type()))
             return read(any.create_input_stream());
         else
 
-            throw new org.omg.CORBA.BAD_OPERATION(
-                MinorCodes
-                        .describeBadOperation(MinorCodes.MinorTypeMismatch),
-                MinorCodes.MinorTypeMismatch, org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_OPERATION(
+                describeBadOperation(MinorTypeMismatch),
+                MinorTypeMismatch, COMPLETED_NO);
     }
 
-    private static org.omg.CORBA.TypeCode typeCode_;
+    private static TypeCode typeCode_;
 
-    public static org.omg.CORBA.TypeCode
+    public static TypeCode
     type()
     {
         if(typeCode_ == null)
         {
-            org.omg.CORBA.ORB orb = org.omg.CORBA.ORB.init();
-            org.omg.CORBA.StructMember[] members = new org.omg.CORBA.StructMember[4];
+            ORB orb = ORB.init();
+            StructMember[] members = new StructMember[4];
 
-            members[0] = new org.omg.CORBA.StructMember();
+            members[0] = new StructMember();
             members[0].name = "mode";
-            members[0].type = orb.get_primitive_tc(org.omg.CORBA.TCKind.tk_short);
+            members[0].type = orb.get_primitive_tc(tk_short);
 
-            members[1] = new org.omg.CORBA.StructMember();
+            members[1] = new StructMember();
             members[1].name = "interval";
-            members[1].type = orb.get_primitive_tc(org.omg.CORBA.TCKind.tk_ulong);
+            members[1].type = orb.get_primitive_tc(tk_ulong);
 
-            members[2] = new org.omg.CORBA.StructMember();
+            members[2] = new StructMember();
             members[2].name = "max";
-            members[2].type = orb.get_primitive_tc(org.omg.CORBA.TCKind.tk_ulong);
+            members[2].type = orb.get_primitive_tc(tk_ulong);
 
-            members[3] = new org.omg.CORBA.StructMember();
+            members[3] = new StructMember();
             members[3].name = "remote";
-            members[3].type = orb.get_primitive_tc(org.omg.CORBA.TCKind.tk_boolean);
+            members[3].type = orb.get_primitive_tc(tk_boolean);
 
             typeCode_ = orb.create_struct_tc(id(), "RetryAttributes", members);
         }
@@ -84,7 +96,7 @@ final public class RetryAttributesHelper
     }
 
     public static RetryAttributes
-    read(org.omg.CORBA.portable.InputStream in)
+    read(InputStream in)
     {
         RetryAttributes _ob_v = new RetryAttributes();
         _ob_v.mode = in.read_short();
@@ -95,7 +107,7 @@ final public class RetryAttributesHelper
     }
 
     public static void
-    write(org.omg.CORBA.portable.OutputStream out, RetryAttributes val)
+    write(OutputStream out, RetryAttributes val)
     {
         out.write_short(val.mode);
         out.write_ulong(val.interval);
