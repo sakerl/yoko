@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ import static org.apache.yoko.orb.OB.Connection.State.STALE;
 import static org.apache.yoko.orb.OCI.GiopVersion.GIOP1_0;
 import static org.apache.yoko.orb.OCI.SendReceiveMode.ReceiveOnly;
 import static org.apache.yoko.orb.OCI.SendReceiveMode.SendOnly;
+import static org.apache.yoko.orb.exceptions.Transients.FORCED_SHUTDOWN;
 import static org.apache.yoko.util.MinorCodes.MinorSend;
 import static org.apache.yoko.util.MinorCodes.MinorThreadLimit;
 import static org.apache.yoko.util.MinorCodes.describeCommFailure;
@@ -167,7 +168,7 @@ final class GIOPConnectionThreaded extends GIOPConnection {
         // with continuing to receive messages until the peer
         // closes. Instead, we just close the connection, meaning that we
         // can't be 100% sure that the peer gets the last message.
-        processException(CLOSED, Transients.FORCED_SHUTDOWN.create(), false);
+        processException(CLOSED, FORCED_SHUTDOWN.create(), false);
         arrive();
 
     }
@@ -288,7 +289,7 @@ final class GIOPConnectionThreaded extends GIOPConnection {
             // open under certain circumstances. For example, the receiver
             // thread may not have terminated yet or the receive thread might
             // set the state to GIOPState::Error before termination.
-            processException(CLOSED, Transients.FORCED_SHUTDOWN.create(), false);
+            processException(CLOSED, FORCED_SHUTDOWN.create(), false);
         } finally {
             if (receiverLock.isWriteLockedByCurrentThread()) {
                 receiverLock.writeLock().unlock();
