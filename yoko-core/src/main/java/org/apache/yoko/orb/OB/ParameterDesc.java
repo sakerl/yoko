@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,18 @@
  */
 package org.apache.yoko.orb.OB;
 
-final public class ParameterDesc {
-    public org.omg.CORBA.portable.Streamable param; // The parameter
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.portable.Streamable;
 
-    public org.omg.CORBA.TypeCode tc; // The typecode of the parameter
+public final class ParameterDesc {
+    public Streamable param; // The parameter
+
+    public TypeCode tc; // The typecode of the parameter
 
     public int mode; // CORBA::ParameterMode
 
-    public ParameterDesc(org.omg.CORBA.portable.Streamable param,
-            org.omg.CORBA.TypeCode tc, int mode) {
+    public ParameterDesc(Streamable param,
+            TypeCode tc, int mode) {
         this.param = param;
         this.tc = tc;
         this.mode = mode;
