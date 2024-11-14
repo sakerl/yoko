@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,21 @@
  */
 package org.apache.yoko.orb.OB;
 
+import static java.lang.System.currentTimeMillis;
+import static org.apache.yoko.orb.OB.OrbAsyncHandler.State.OAH_STATE_ACTIVE;
+import static org.apache.yoko.orb.OB.OrbAsyncHandler.State.OAH_STATE_DORMANT;
+import static org.apache.yoko.orb.OB.OrbAsyncHandler.State.OAH_STATE_SHUTDOWN;
+
+import java.util.LinkedList;
+import java.util.ListIterator;
+
+import org.apache.yoko.orb.OBMessaging.Poller_impl;
+import org.apache.yoko.orb.OBMessaging.ReplyHandler_impl;
 import org.apache.yoko.util.Assert;
+import org.omg.CORBA.REBIND;
+import org.omg.Messaging.NO_RECONNECT;
+import org.omg.Messaging.ReplyHandler;
+import org.omg.TimeBase.UtcT;
 
 public class OrbAsyncHandler {
     //
@@ -32,7 +46,7 @@ public class OrbAsyncHandler {
         //
         // The poller used to retrieve the event response
         // 
-        public org.apache.yoko.orb.OBMessaging.Poller_impl poller;
+        public Poller_impl poller;
 
         //
         // The downcall sent/received
@@ -43,7 +57,7 @@ public class OrbAsyncHandler {
         // Servant onto which to invoke a response when received
         // (poller || reply) == 0
         // 
-        public org.omg.Messaging.ReplyHandler reply;
+        public ReplyHandler reply;
     }
 
     //
@@ -138,7 +152,7 @@ public class OrbAsyncHandler {
                         // if we have a RequestStartTime policy set, put the
                         // message back into the uncompletedMsgList
                         //
-                        org.omg.TimeBase.UtcT requestStartTime = msg.downcall
+                        UtcT requestStartTime = msg.downcall
                                 .policies().requestStartTime;
                         if (TimeHelper.notEqual(requestStartTime, TimeHelper
                                 .utcMin())
@@ -167,18 +181,18 @@ public class OrbAsyncHandler {
 
                         try {
                             msg.downcall.request();
-                        } catch (org.apache.yoko.orb.OB.LocationForward ex) {
+                        } catch (LocationForward ex) {
                             //
                             // TODO: A REBIND can also be thrown if the policy
                             // has a value of NO_REBIND and returned IORs
                             // policy requirements are incompatible with
                             // effective policies currently in use.
                             //
-                            if (msg.downcall.policies().rebindMode == org.omg.Messaging.NO_RECONNECT.value) {
+                            if (msg.downcall.policies().rebindMode == NO_RECONNECT.value) {
                                 msg.downcall
-                                        .setSystemException(new org.omg.CORBA.REBIND());
+                                        .setSystemException(new REBIND());
                             }
-                        } catch (org.apache.yoko.orb.OB.FailureException ex) {
+                        } catch (FailureException ex) {
                             //
                             // handle failure exception
                             //
@@ -191,7 +205,7 @@ public class OrbAsyncHandler {
                     // come into effect yet, add this message to the
                     // delayedMsgList
                     //
-                    org.omg.TimeBase.UtcT replyStartTime = msg.downcall
+                    UtcT replyStartTime = msg.downcall
                             .policies().replyStartTime;
                     if (TimeHelper
                             .notEqual(replyStartTime, TimeHelper.utcMin())
@@ -208,7 +222,7 @@ public class OrbAsyncHandler {
                     // check to see if the ReplyEndTime policy prevents us
                     // from delivering the reply
                     //
-                    org.omg.TimeBase.UtcT replyEndTime = msg.downcall
+                    UtcT replyEndTime = msg.downcall
                             .policies().replyEndTime;
                     if (TimeHelper.notEqual(replyEndTime, TimeHelper.utcMin())
                             && TimeHelper.lessThan(replyEndTime, TimeHelper
@@ -220,7 +234,7 @@ public class OrbAsyncHandler {
                     // if there is a reply handler to invoke, do it now
                     //
                     if (msg.reply != null) {
-                        org.apache.yoko.orb.OBMessaging.ReplyHandler_impl reply = (org.apache.yoko.orb.OBMessaging.ReplyHandler_impl) msg.reply;
+                        ReplyHandler_impl reply = (ReplyHandler_impl) msg.reply;
                         reply._OB_invoke(msg.downcall);
                         continue;
                     }
@@ -234,10 +248,10 @@ public class OrbAsyncHandler {
                     //
                     // check the poller for its reply handler
                     //
-                    org.omg.Messaging.ReplyHandler msgReply = msg.poller
+                    ReplyHandler msgReply = msg.poller
                             .associated_handler();
                     if (msgReply != null) {
-                        org.apache.yoko.orb.OBMessaging.ReplyHandler_impl reply = (org.apache.yoko.orb.OBMessaging.ReplyHandler_impl) msgReply;
+                        ReplyHandler_impl reply = (ReplyHandler_impl) msgReply;
                         reply._OB_invoke(msg.downcall);
                         continue;
                     }
@@ -277,22 +291,22 @@ public class OrbAsyncHandler {
     //
     // the group of unsent messages
     // 
-    protected java.util.LinkedList uncompletedMsgList_ = null;
+    protected LinkedList uncompletedMsgList_ = null;
 
     //
     // the group of completed messages
     //
-    protected java.util.LinkedList completedMsgList_ = null;
+    protected LinkedList completedMsgList_ = null;
 
     //
     // the send monitor
     //
-    protected java.lang.Object sendMonitor_ = null;
+    protected Object sendMonitor_ = null;
 
     //
     // the receive monitor
     //
-    protected java.lang.Object recvMonitor_ = null;
+    protected Object recvMonitor_ = null;
 
     //
     // The worker threads
@@ -307,7 +321,7 @@ public class OrbAsyncHandler {
     //
     // the current state of the handler
     //
-    protected int state_ = State.OAH_STATE_DORMANT;
+    protected int state_ = OAH_STATE_DORMANT;
 
     //
     // constructor
@@ -325,26 +339,26 @@ public class OrbAsyncHandler {
         //
         // make sure we're not in the shutdown state
         // 
-        Assert.ensure(state_ != State.OAH_STATE_SHUTDOWN);
+        Assert.ensure(state_ != OAH_STATE_SHUTDOWN);
 
         //
         // no need to activate more than once...
         //
-        if (state_ == State.OAH_STATE_ACTIVE)
+        if (state_ == OAH_STATE_ACTIVE)
             return;
 
         //
         // now put this handler into the activated state
         //
-        state_ = State.OAH_STATE_ACTIVE;
+        state_ = OAH_STATE_ACTIVE;
 
         //
         // create the necessary message lists and monitors
         //
-        uncompletedMsgList_ = new java.util.LinkedList();
-        completedMsgList_ = new java.util.LinkedList();
-        sendMonitor_ = new java.lang.Object();
-        recvMonitor_ = new java.lang.Object();
+        uncompletedMsgList_ = new LinkedList();
+        completedMsgList_ = new LinkedList();
+        sendMonitor_ = new Object();
+        recvMonitor_ = new Object();
 
         //
         // create the worker thread now
@@ -364,22 +378,22 @@ public class OrbAsyncHandler {
         //
         // no need to shutdown more than once
         //
-        if (state_ == State.OAH_STATE_SHUTDOWN)
+        if (state_ == OAH_STATE_SHUTDOWN)
             return;
 
         //
         // if we're in the DORMANT state, then we haven't been
         // initialized yet so there is no need to perform a cleanup
         //
-        if (state_ == State.OAH_STATE_DORMANT) {
-            state_ = State.OAH_STATE_SHUTDOWN;
+        if (state_ == OAH_STATE_DORMANT) {
+            state_ = OAH_STATE_SHUTDOWN;
             return;
         }
 
         //
         // go into the shutdown state
         //
-        state_ = State.OAH_STATE_SHUTDOWN;
+        state_ = OAH_STATE_SHUTDOWN;
 
         //
         // stop the worker from processing
@@ -419,7 +433,7 @@ public class OrbAsyncHandler {
     // add a polled request to the queued list
     //
     public void addMessage(Downcall down,
-            org.apache.yoko.orb.OBMessaging.Poller_impl poller) {
+            Poller_impl poller) {
         Assert.ensure(down != null);
         Assert.ensure(poller != null);
 
@@ -450,7 +464,7 @@ public class OrbAsyncHandler {
     //
     // add a reply handled request to the queued list
     //
-    public void addMessage(Downcall down, org.omg.Messaging.ReplyHandler reply) {
+    public void addMessage(Downcall down, ReplyHandler reply) {
         Assert.ensure(down != null);
         Assert.ensure(reply != null);
 
@@ -481,7 +495,7 @@ public class OrbAsyncHandler {
     //
     // poll if a message has completed
     //
-    public boolean is_ready(org.apache.yoko.orb.OBMessaging.Poller_impl poller,
+    public boolean is_ready(Poller_impl poller,
             int timeout) {
         Assert.ensure(poller != null);
 
@@ -499,7 +513,7 @@ public class OrbAsyncHandler {
             // check the list to see if any messages match our poller
             //
             synchronized (recvMonitor_) {
-                java.util.ListIterator i = completedMsgList_.listIterator(0);
+                ListIterator i = completedMsgList_.listIterator(0);
 
                 while (i.hasNext()) {
                     AsyncMessage msg = (AsyncMessage) i.next();
@@ -510,7 +524,7 @@ public class OrbAsyncHandler {
                         // Otherwise, indicate to the client that the reply
                         // is ready.
                         //
-                        org.omg.TimeBase.UtcT replyEndTime = msg.downcall
+                        UtcT replyEndTime = msg.downcall
                                 .policies().replyEndTime;
                         if (TimeHelper.notEqual(replyEndTime, TimeHelper
                                 .utcMin())
@@ -555,7 +569,7 @@ public class OrbAsyncHandler {
                 //
                 // get the ending time
                 //
-                long end_time = System.currentTimeMillis();
+                long end_time = currentTimeMillis();
 
                 //
                 // calculate the difference in milliseconds and subtract
@@ -597,14 +611,14 @@ public class OrbAsyncHandler {
     // get a response
     //
     public Downcall poll_response(
-            org.apache.yoko.orb.OBMessaging.Poller_impl poller) {
+            Poller_impl poller) {
         Assert.ensure(poller != null);
 
         synchronized (recvMonitor_) {
             //
             // search the list for a matching message
             //
-            java.util.ListIterator iter = completedMsgList_.listIterator(0);
+            ListIterator iter = completedMsgList_.listIterator(0);
 
             while (iter.hasNext()) {
                 AsyncMessage msg = (AsyncMessage) iter.next();
