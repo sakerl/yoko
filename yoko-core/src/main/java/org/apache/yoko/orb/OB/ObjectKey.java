@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,15 @@
  */
 package org.apache.yoko.orb.OB;
 
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.logging.Logger.getLogger;
 import static org.apache.yoko.util.Hex.formatHexPara;
 
-final public class ObjectKey {
-    static final Logger logger = Logger.getLogger(ObjectKey.class.getName());
+public final class ObjectKey {
+    static final Logger logger = getLogger(ObjectKey.class.getName());
     
     public static byte[] CreateObjectKey(ObjectKeyData id) {
         byte[] key;
@@ -179,7 +181,7 @@ final public class ObjectKey {
             }
 
             boolean first = true;
-            java.util.Vector poaId = new java.util.Vector();
+            Vector poaId = new Vector();
             while (data < end) {
                 //
                 // Remember the start of the POA name
