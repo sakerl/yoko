@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
  */
 package org.apache.yoko.orb.OB;
 
+import org.omg.CORBA.portable.IDLEntity;
+
 //
 // IDL:orb.yoko.apache.org/OB/RetryAttributes:1.0
 //
@@ -26,7 +28,7 @@ package org.apache.yoko.orb.OB;
  *
  **/
 
-final public class RetryAttributes implements org.omg.CORBA.portable.IDLEntity
+public final class RetryAttributes implements IDLEntity
 {
     private static final String _ob_id = "IDL:orb.yoko.apache.org/OB/RetryAttributes:1.0";
 
