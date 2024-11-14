@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,12 @@ package org.apache.yoko.orb.OB;
 
 import java.util.Hashtable;
 
+import org.apache.yoko.orb.CORBA.TypeCode;
+
 public final class TypeCodeCache {
     private Hashtable cache_; // The type code cache hashtable
 
-    static private TypeCodeCache instance_ = null; // Singleton instance
+    private static TypeCodeCache instance_ = null; // Singleton instance
 
     private static final Object instanceMutex_ = new Object();
 
@@ -43,12 +45,12 @@ public final class TypeCodeCache {
         return instance_;
     }
 
-    synchronized public org.apache.yoko.orb.CORBA.TypeCode get(String id) {
-        return (org.apache.yoko.orb.CORBA.TypeCode) cache_.get(id);
+    synchronized public TypeCode get(String id) {
+        return (TypeCode) cache_.get(id);
     }
 
     synchronized public void put(String id,
-            org.apache.yoko.orb.CORBA.TypeCode tc) {
+            TypeCode tc) {
         if (cache_.containsKey(id))
             return;
 
