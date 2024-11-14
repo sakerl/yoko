@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,29 @@
  */
 package org.apache.yoko.orb.OB;
 
+import static org.apache.yoko.io.AlignmentBoundary.EIGHT_BYTE_BOUNDARY;
+import static org.apache.yoko.io.Buffer.createWriteBuffer;
+import static org.apache.yoko.logging.VerboseLogging.RETRY_LOG;
+import static org.apache.yoko.orb.OCI.GiopVersion.GIOP1_2;
+import static org.apache.yoko.orb.exceptions.Transients.NO_USABLE_PROFILE_IN_IOR;
+import static org.apache.yoko.util.MinorCodes.MinorShutdownCalled;
+import static org.apache.yoko.util.MinorCodes.describeBadInvOrder;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.yoko.io.Buffer;
+import org.apache.yoko.io.ReadBuffer;
+import org.apache.yoko.io.WriteBuffer;
 import org.apache.yoko.orb.CORBA.InputStream;
 import org.apache.yoko.orb.CORBA.OutputStreamHolder;
 import org.apache.yoko.orb.IOP.ServiceContexts;
-import org.apache.yoko.io.Buffer;
 import org.apache.yoko.orb.OCI.ConnectorInfo;
 import org.apache.yoko.orb.OCI.ProfileInfo;
 import org.apache.yoko.orb.OCI.ProfileInfoHolder;
-import org.apache.yoko.io.ReadBuffer;
 import org.apache.yoko.orb.OCI.TransportInfo;
-import org.apache.yoko.io.WriteBuffer;
-import org.apache.yoko.orb.exceptions.Transients;
 import org.apache.yoko.util.Assert;
 import org.apache.yoko.util.MinorCodes;
 import org.omg.CORBA.BAD_INV_ORDER;
@@ -52,6 +64,7 @@ import org.omg.GIOP.MessageHeader_1_2Helper;
 import org.omg.GIOP.MsgType_1_1;
 import org.omg.GIOP.RequestHeader_1_2;
 import org.omg.GIOP.RequestHeader_1_2Helper;
+import org.omg.GIOP.Version;
 import org.omg.IOP.INVOCATION_POLICIES;
 import org.omg.IOP.IOR;
 import org.omg.IOP.ServiceContext;
@@ -69,15 +82,6 @@ import org.omg.Messaging.PolicyValue;
 import org.omg.Messaging.PolicyValueSeqHelper;
 import org.omg.Messaging.PolicyValueSeqHolder;
 import org.omg.Messaging.ReplyHandler;
-
-import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.apache.yoko.io.AlignmentBoundary.EIGHT_BYTE_BOUNDARY;
-import static org.apache.yoko.orb.OCI.GiopVersion.GIOP1_2;
-import static org.apache.yoko.logging.VerboseLogging.RETRY_LOG;
-import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
 //
 // DowncallStub is equivalent to the C++ class OB::MarshalStubImpl
@@ -139,10 +143,10 @@ public final class DowncallStub {
         //
         if (clientProfilePairs_.isEmpty()) {
             RETRY_LOG.fine("No profiles available");
-            throw new FailureException(Transients.NO_USABLE_PROFILE_IN_IOR.create());
+            throw new FailureException(NO_USABLE_PROFILE_IN_IOR.create());
         }
 
-        ClientProfilePair clientProfilePair = (ClientProfilePair) clientProfilePairs_.elementAt(0);
+        ClientProfilePair clientProfilePair = clientProfilePairs_.elementAt(0);
         profileInfo.value = clientProfilePair.profile;
         return clientProfilePair.client;
     }
@@ -358,9 +362,9 @@ public final class DowncallStub {
         //
         if (clientManager == null)
             throw new BAD_INV_ORDER(
-                    MinorCodes.describeBadInvOrder(
-                            MinorCodes.MinorShutdownCalled),
-                            MinorCodes.MinorShutdownCalled,
+                    describeBadInvOrder(
+                            MinorShutdownCalled),
+                            MinorShutdownCalled,
                             COMPLETED_NO);
 
         for (ClientProfilePair pair : clientProfilePairs_) {
@@ -545,7 +549,7 @@ public final class DowncallStub {
                                                    OutputStreamHolder out,
                                                    ProfileInfoHolder info) throws FailureException {
         // Create buffer to contain our marshalable data
-        WriteBuffer writeBuffer = Buffer.createWriteBuffer(12).padAll();
+        WriteBuffer writeBuffer = createWriteBuffer(12).padAll();
 
         // Obtain information regarding our target
         Client client = getClientProfilePair(info);
@@ -746,7 +750,7 @@ public final class DowncallStub {
         // XXX
         //
         payload.service_contexts = scl;
-        payload.giop_version = new org.omg.GIOP.Version();
+        payload.giop_version = new Version();
         payload.giop_version.major = info.value.major;
         payload.giop_version.minor = info.value.minor;
         payload.response_flags = 1;
@@ -880,7 +884,7 @@ public final class DowncallStub {
         // Create payload (RequestMessage) for this request
         //
         RequestMessage requestMessage = new RequestMessage();
-        requestMessage.giop_version = new org.omg.GIOP.Version();
+        requestMessage.giop_version = new Version();
         requestMessage.giop_version.major = info.major;
         requestMessage.giop_version.minor = info.minor;
 
