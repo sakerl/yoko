@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.orb.OB.TIMEOUT_POLICY_ID;
-import org.apache.yoko.orb.OB.TimeoutPolicy;
+import org.omg.CORBA.IMP_LIMIT;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.Policy;
 
-final public class TimeoutPolicy_impl extends org.omg.CORBA.LocalObject
+public final class TimeoutPolicy_impl extends LocalObject
         implements TimeoutPolicy {
     private int value_;
 
@@ -36,7 +37,7 @@ final public class TimeoutPolicy_impl extends org.omg.CORBA.LocalObject
         return TIMEOUT_POLICY_ID.value;
     }
 
-    public org.omg.CORBA.Policy copy() {
+    public Policy copy() {
         return this;
     }
 
@@ -50,7 +51,7 @@ final public class TimeoutPolicy_impl extends org.omg.CORBA.LocalObject
 
     public TimeoutPolicy_impl(int t) {
         if (t < 0)
-            throw new org.omg.CORBA.IMP_LIMIT("Invalid value for "
+            throw new IMP_LIMIT("Invalid value for "
                     + "TimeoutPolicy");
         value_ = t;
     }
