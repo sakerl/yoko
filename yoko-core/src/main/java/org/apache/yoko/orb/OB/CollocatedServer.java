@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,15 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.logging.Logger;
 
+import static org.apache.yoko.orb.OB.OAInterface.OBJECT_FORWARD;
+import static org.apache.yoko.orb.OB.OAInterface.OBJECT_FORWARD_PERM;
+import static org.apache.yoko.orb.OB.OAInterface.OBJECT_HERE;
+import static org.apache.yoko.orb.OB.OAInterface.UNKNOWN_OBJECT;
 import static org.apache.yoko.orb.OB.SendingContextRuntimes.LOCAL_CODE_BASE;
+import static org.apache.yoko.util.MinorCodes.MinorORBDestroyed;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
-final public class CollocatedServer extends Server implements UpcallReturn {
+public final class CollocatedServer extends Server implements UpcallReturn {
     private static final Logger logger = Logger.getLogger(CollocatedServer.class.getName());
     //
     // The next request ID and the corresponding mutex
@@ -113,8 +119,8 @@ final public class CollocatedServer extends Server implements UpcallReturn {
             Assert.ensure(down != null);
             Assert.ensure(down.pending());
             down.setFailureException(new INITIALIZE(
-                    "ORB has been destroyed", MinorCodes.MinorORBDestroyed,
-                    CompletionStatus.COMPLETED_NO));
+                    "ORB has been destroyed", MinorORBDestroyed,
+                    COMPLETED_NO));
         }
         callMap_.clear();
 
@@ -184,7 +190,7 @@ final public class CollocatedServer extends Server implements UpcallReturn {
             if (destroy_) {
                 down.setFailureException(new TRANSIENT(
                         "Collocated server has already been destroyed", 0,
-                        CompletionStatus.COMPLETED_NO));
+                        COMPLETED_NO));
                 return true;
             }
 
@@ -203,20 +209,20 @@ final public class CollocatedServer extends Server implements UpcallReturn {
             if (op.charAt(0) == '_' && op.equals("_locate")) {
                 IORHolder ior = new IORHolder();
                 switch (oaInterface_.findByKey(profileInfo.key, ior)) {
-                case OAInterface.UNKNOWN_OBJECT:
+                case UNKNOWN_OBJECT:
                     down.setSystemException(new OBJECT_NOT_EXIST());
                     break;
 
-                case OAInterface.OBJECT_HERE:
+                case OBJECT_HERE:
                     InputStream in = new InputStream(out.getBufferReader());
                     down.setNoException(in);
                     break;
 
-                case OAInterface.OBJECT_FORWARD:
+                case OBJECT_FORWARD:
                     down.setLocationForward(ior.value, false);
                     break;
 
-                case OAInterface.OBJECT_FORWARD_PERM:
+                case OBJECT_FORWARD_PERM:
                     down.setLocationForward(ior.value, true);
                     break;
 
