@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import org.omg.IOP.ServiceContext;
 import org.omg.IOP.TaggedProfile;
 import org.omg.IOP.TaggedProfileHelper;
 
-final public class GIOPOutgoingMessage {
+public final class GIOPOutgoingMessage {
     private static int maxMessageSize_ = 0; // TODO: pick a default
 
     private ORBInstance orbInstance_;
