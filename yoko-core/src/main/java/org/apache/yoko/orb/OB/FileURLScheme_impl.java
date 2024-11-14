@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,20 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.util.MinorCodes;
+import static org.apache.yoko.orb.OB.URLUtil.unescapeURL;
+import static org.apache.yoko.util.MinorCodes.MinorBadSchemeSpecificPart;
+import static org.apache.yoko.util.MinorCodes.describeBadParam;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
-public class FileURLScheme_impl extends org.omg.CORBA.LocalObject implements
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.omg.CORBA.BAD_PARAM;
+import org.omg.CORBA.LocalObject;
+
+public class FileURLScheme_impl extends LocalObject implements
         URLScheme {
     private boolean relative_;
 
@@ -60,32 +71,30 @@ public class FileURLScheme_impl extends org.omg.CORBA.LocalObject implements
                 break;
 
         if (startIdx >= len)
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorBadSchemeSpecificPart)
+            throw new BAD_PARAM(describeBadParam(MinorBadSchemeSpecificPart)
                     + ": no file name specified",
-                    MinorCodes.MinorBadSchemeSpecificPart,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                    MinorBadSchemeSpecificPart,
+                    COMPLETED_NO);
 
         String fileName;
         if (relative_)
             fileName = "";
         else
             fileName = "/";
-        fileName += URLUtil.unescapeURL(url.substring(startIdx));
+        fileName += unescapeURL(url.substring(startIdx));
 
         try {
-            java.io.FileInputStream file = new java.io.FileInputStream(fileName);
-            java.io.BufferedReader in = new java.io.BufferedReader(
-                    new java.io.InputStreamReader(file));
+            java.io.FileInputStream file = new FileInputStream(fileName);
+            java.io.BufferedReader in = new BufferedReader(
+                    new InputStreamReader(file));
             String ref = in.readLine();
             file.close();
 
             return registry_.parse_url(ref);
-        } catch (java.io.IOException ex) {
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorBadSchemeSpecificPart)
-                    + ": file error", MinorCodes.MinorBadSchemeSpecificPart,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+        } catch (IOException ex) {
+            throw new BAD_PARAM(describeBadParam(MinorBadSchemeSpecificPart)
+                    + ": file error", MinorBadSchemeSpecificPart,
+                    COMPLETED_NO);
         }
     }
 
