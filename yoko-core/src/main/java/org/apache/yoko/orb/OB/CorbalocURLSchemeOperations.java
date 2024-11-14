@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.OB;
+
+import org.apache.yoko.orb.OB.CorbalocURLSchemePackage.ProtocolAlreadyExists;
 
 //
 // IDL:orb.yoko.apache.org/OB/CorbalocURLScheme:1.0
@@ -47,7 +49,7 @@ public interface CorbalocURLSchemeOperations extends URLSchemeOperations
 
     void
     add_protocol(CorbalocProtocol protocol)
-        throws org.apache.yoko.orb.OB.CorbalocURLSchemePackage.ProtocolAlreadyExists;
+        throws ProtocolAlreadyExists;
 
     //
     // IDL:orb.yoko.apache.org/OB/CorbalocURLScheme/find_protocol:1.0
