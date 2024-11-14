@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,21 @@
 package org.apache.yoko.orb.OB;
 
 import org.apache.yoko.orb.OB.GIOPServerStarter.ServerState;
+import org.apache.yoko.orb.OCI.Acceptor;
 import org.apache.yoko.util.Assert;
+
+import static java.util.logging.Logger.getLogger;
+import static org.apache.yoko.util.Assert.ensure;
 
 import java.util.logging.Logger;
 
 final class GIOPServer extends Server {
-    static final Logger logger = Logger.getLogger(GIOPServer.class.getName());
+    static final Logger logger = getLogger(GIOPServer.class.getName());
     protected ORBInstance orbInstance_; // The ORB Instance
 
     protected boolean destroy_; // True if destroy() was called
 
-    protected org.apache.yoko.orb.OCI.Acceptor acceptor_; // The acceptor
+    protected Acceptor acceptor_; // The acceptor
 
     protected OAInterface oaInterface_; // The object adapter interface
 
@@ -39,8 +43,8 @@ final class GIOPServer extends Server {
     // ----------------------------------------------------------------------
 
     protected void finalize() throws Throwable {
-        Assert.ensure(destroy_);
-        Assert.ensure(starter_ == null);
+        ensure(destroy_);
+        ensure(starter_ == null);
 
         super.finalize();
     }
@@ -50,7 +54,7 @@ final class GIOPServer extends Server {
     // ----------------------------------------------------------------------
 
     GIOPServer(ORBInstance orbInstance,
-            org.apache.yoko.orb.OCI.Acceptor acceptor, OAInterface oaInterface,
+            Acceptor acceptor, OAInterface oaInterface,
             int concModel) {
         super(concModel);
         orbInstance_ = orbInstance;
