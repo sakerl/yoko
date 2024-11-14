@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,14 @@
  */
 package org.apache.yoko.orb.OB;
 
+import org.omg.CORBA.UserException;
+
 //
 // IDL:orb.yoko.apache.org/OB/InvalidThreadPool:1.0
 //
 /***/
 
-final public class InvalidThreadPool extends org.omg.CORBA.UserException
+public final class InvalidThreadPool extends UserException
 {
     private static final String _ob_id = "IDL:orb.yoko.apache.org/OB/InvalidThreadPool:1.0";
 
