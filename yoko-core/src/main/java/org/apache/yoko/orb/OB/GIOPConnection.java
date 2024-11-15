@@ -47,6 +47,7 @@ import org.omg.GIOP.LocateStatusType_1_2Holder;
 import org.omg.GIOP.ReplyStatusType_1_2;
 import org.omg.GIOP.ReplyStatusType_1_2Holder;
 import org.omg.GIOP.TargetAddressHolder;
+import org.omg.GIOP.Version;
 import org.omg.IOP.CodeSets;
 import org.omg.IOP.IOR;
 import org.omg.IOP.IORHelper;
@@ -69,6 +70,10 @@ import static org.apache.yoko.orb.OB.Connection.State.CLOSED;
 import static org.apache.yoko.orb.OB.Connection.State.CLOSING;
 import static org.apache.yoko.orb.OB.Connection.State.ERROR;
 import static org.apache.yoko.orb.OB.Connection.State.HOLDING;
+import static org.apache.yoko.orb.OB.OAInterface.OBJECT_HERE;
+import static org.apache.yoko.orb.OB.Util.getSendingContextRuntime;
+import static org.apache.yoko.orb.exceptions.Transients.CLOSE_CONNECTION;
+import static org.apache.yoko.util.Assert.ensure;
 import static org.apache.yoko.util.MinorCodes.MinorMessageError;
 import static org.apache.yoko.util.MinorCodes.MinorNotSupportedByLocalObject;
 import static org.apache.yoko.util.MinorCodes.MinorUnknownMessage;
@@ -131,7 +136,7 @@ abstract class GIOPConnection extends Connection implements DowncallEmitter, Upc
     private CodeConverters codeConverters_ = null;
 
     /** maximum GIOP version encountered during message transactions */
-    final org.omg.GIOP.Version giopVersion_ = new org.omg.GIOP.Version((byte) 0, (byte) 0);
+    final Version giopVersion_ = new Version((byte) 0, (byte) 0);
 
     /** ACM timeout variables */
     int shutdownTimeout_ = 2;
@@ -186,12 +191,12 @@ abstract class GIOPConnection extends Connection implements DowncallEmitter, Upc
         // make sure we're allowed to do server processing as well as
         // being bidir enabled. A server's OAInterface should not
         // change whereas a bidir client would need to change regularly
-        Assert.ensure(isOutbound());
-        Assert.ensure(isServerEnabled());
-        Assert.ensure(orbInstance_ != null);
+        ensure(isOutbound());
+        ensure(isServerEnabled());
+        ensure(orbInstance_ != null);
 
         POAManagerFactory poamanFactory = orbInstance_.getPOAManagerFactory();
-        Assert.ensure(poamanFactory != null);
+        ensure(poamanFactory != null);
 
         POAManager[] poaManagers = poamanFactory.list();
 
@@ -202,7 +207,7 @@ abstract class GIOPConnection extends Connection implements DowncallEmitter, Upc
                 OAInterface oaImpl = poamanImpl._OB_getOAInterface();
 
                 IORHolder refIOR = new IORHolder();
-                if (oaImpl.findByKey(pi.key, refIOR) == OAInterface.OBJECT_HERE) {
+                if (oaImpl.findByKey(pi.key, refIOR) == OBJECT_HERE) {
                     oaInterface_ = oaImpl;
                     return true;
                 }
@@ -436,13 +441,13 @@ abstract class GIOPConnection extends Connection implements DowncallEmitter, Upc
     }
 
     private void assignSendingContextRuntime(InputStream in, ServiceContexts contexts) {
-        if (serverRuntime_ == null) serverRuntime_ = Util.getSendingContextRuntime(orbInstance_, contexts);
+        if (serverRuntime_ == null) serverRuntime_ = getSendingContextRuntime(orbInstance_, contexts);
         in.__setSendingContextRuntime(serverRuntime_);
     }
 
     /** process a LocateRequest message */
     private synchronized void processLocateRequest(GIOPIncomingMessage msg) {
-        if (isServerEnabled() == false) {
+        if (!isServerEnabled()) {
             processException(ERROR, new COMM_FAILURE(describeCommFailure(MinorWrongMessage), MinorWrongMessage, COMPLETED_MAYBE), false);
             return;
         }
@@ -602,7 +607,7 @@ abstract class GIOPConnection extends Connection implements DowncallEmitter, Upc
             // status of COMPLETED_NO. This is done by calling
             // exception() with the notCompleted parameter set to
             // true.
-            processException(CLOSED, Transients.CLOSE_CONNECTION.create(), true);
+            processException(CLOSED, CLOSE_CONNECTION.create(), true);
         } else {
             setState(CLOSED);
         }
