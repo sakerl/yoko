@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.OB;
+
+import org.omg.IOP.TaggedProfile;
 
 //
 // IDL:orb.yoko.apache.org/OB/CorbalocProtocol:1.0
@@ -68,7 +70,7 @@ public interface CorbalocProtocolOperations
      *
      **/
 
-    org.omg.IOP.TaggedProfile
+    TaggedProfile
     parse_address(String addr,
                   byte[] key);
 
