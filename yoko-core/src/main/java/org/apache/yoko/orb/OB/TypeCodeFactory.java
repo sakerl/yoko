@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,76 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.orb.CORBA.Any;
+import static java.lang.Character.isLetter;
+import static java.lang.Character.isLetterOrDigit;
+import static org.apache.yoko.orb.CORBA.TypeCode._OB_convertForeignTypeCode;
+import static org.apache.yoko.orb.CORBA.TypeCode._OB_embedRecTC;
+import static org.apache.yoko.orb.CORBA.TypeCode._OB_getOrigType;
+import static org.apache.yoko.util.MinorCodes.MinorDuplicateLabel;
+import static org.apache.yoko.util.MinorCodes.MinorIncompatibleLabelType;
+import static org.apache.yoko.util.MinorCodes.MinorInvalidDiscriminatorType;
+import static org.apache.yoko.util.MinorCodes.MinorInvalidId;
+import static org.apache.yoko.util.MinorCodes.MinorInvalidMemberName;
+import static org.apache.yoko.util.MinorCodes.MinorInvalidMemberType;
+import static org.apache.yoko.util.MinorCodes.MinorInvalidName;
+import static org.apache.yoko.util.MinorCodes.describeBadParam;
+import static org.apache.yoko.util.MinorCodes.describeBadTypecode;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+import static org.omg.CORBA.TCKind._tk_Principal;
+import static org.omg.CORBA.TCKind._tk_TypeCode;
+import static org.omg.CORBA.TCKind._tk_any;
+import static org.omg.CORBA.TCKind._tk_boolean;
+import static org.omg.CORBA.TCKind._tk_char;
+import static org.omg.CORBA.TCKind._tk_double;
+import static org.omg.CORBA.TCKind._tk_enum;
+import static org.omg.CORBA.TCKind._tk_fixed;
+import static org.omg.CORBA.TCKind._tk_float;
+import static org.omg.CORBA.TCKind._tk_long;
+import static org.omg.CORBA.TCKind._tk_longdouble;
+import static org.omg.CORBA.TCKind._tk_longlong;
+import static org.omg.CORBA.TCKind._tk_null;
+import static org.omg.CORBA.TCKind._tk_objref;
+import static org.omg.CORBA.TCKind._tk_octet;
+import static org.omg.CORBA.TCKind._tk_short;
+import static org.omg.CORBA.TCKind._tk_string;
+import static org.omg.CORBA.TCKind._tk_ulong;
+import static org.omg.CORBA.TCKind._tk_ulonglong;
+import static org.omg.CORBA.TCKind._tk_ushort;
+import static org.omg.CORBA.TCKind._tk_value;
+import static org.omg.CORBA.TCKind._tk_void;
+import static org.omg.CORBA.TCKind._tk_wchar;
+import static org.omg.CORBA.TCKind._tk_wstring;
+import static org.omg.CORBA.TCKind.tk_abstract_interface;
+import static org.omg.CORBA.TCKind.tk_alias;
+import static org.omg.CORBA.TCKind.tk_array;
+import static org.omg.CORBA.TCKind.tk_enum;
+import static org.omg.CORBA.TCKind.tk_except;
+import static org.omg.CORBA.TCKind.tk_fixed;
+import static org.omg.CORBA.TCKind.tk_native;
+import static org.omg.CORBA.TCKind.tk_null;
+import static org.omg.CORBA.TCKind.tk_objref;
+import static org.omg.CORBA.TCKind.tk_octet;
+import static org.omg.CORBA.TCKind.tk_sequence;
+import static org.omg.CORBA.TCKind.tk_string;
+import static org.omg.CORBA.TCKind.tk_struct;
+import static org.omg.CORBA.TCKind.tk_union;
+import static org.omg.CORBA.TCKind.tk_value;
+import static org.omg.CORBA.TCKind.tk_value_box;
+import static org.omg.CORBA.TCKind.tk_void;
+import static org.omg.CORBA.TCKind.tk_wstring;
+import static org.omg.CORBA_2_4.TCKind.tk_local_interface;
+
 import org.apache.yoko.orb.CORBA.TypeCode;
 import org.apache.yoko.util.Assert;
-import org.apache.yoko.util.MinorCodes;
+import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.BAD_TYPECODE;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.NO_IMPLEMENT;
 import org.omg.CORBA.StructMember;
+import org.omg.CORBA.TCKind;
 import org.omg.CORBA.UnionMember;
 import org.omg.CORBA.VM_ABSTRACT;
 import org.omg.CORBA.ValueMember;
-import org.omg.CORBA_2_4.TCKind;
 
 public final class TypeCodeFactory {
     //
@@ -68,11 +125,11 @@ public final class TypeCodeFactory {
         // Check for a valid IDL name
         //
         if (name.length() > 0) {
-            if (!Character.isLetter(name.charAt(0)))
+            if (!isLetter(name.charAt(0)))
                 return false;
             for (int i = 1; i < name.length(); i++) {
                 char ch = name.charAt(i);
-                if (!Character.isLetterOrDigit(ch) && ch != '_')
+                if (!isLetterOrDigit(ch) && ch != '_')
                     return false;
             }
         }
@@ -85,11 +142,11 @@ public final class TypeCodeFactory {
         // Check for an illegal content or member type
         //
         try {
-            org.omg.CORBA.TypeCode origType = TypeCode._OB_getOrigType(type);
-            org.omg.CORBA.TCKind kind = origType.kind();
-            if (kind == org.omg.CORBA.TCKind.tk_null
-                    || kind == org.omg.CORBA.TCKind.tk_void
-                    || kind == org.omg.CORBA.TCKind.tk_except)
+            org.omg.CORBA.TypeCode origType = _OB_getOrigType(type);
+            TCKind kind = origType.kind();
+            if (kind == tk_null
+                    || kind == tk_void
+                    || kind == tk_except)
                 return false;
         } catch (BAD_TYPECODE ex) {
             // TypeCode may be recursive
@@ -98,37 +155,37 @@ public final class TypeCodeFactory {
         return true;
     }
 
-    private static boolean compareLabels(org.omg.CORBA.TCKind kind,
-            org.omg.CORBA.Any a1, org.omg.CORBA.Any a2) {
+    private static boolean compareLabels(TCKind kind,
+            Any a1, Any a2) {
         switch (kind.value()) {
-        case org.omg.CORBA.TCKind._tk_short:
+        case _tk_short:
             return a1.extract_short() == a2.extract_short();
 
-        case org.omg.CORBA.TCKind._tk_ushort:
+        case _tk_ushort:
             return a1.extract_ushort() == a2.extract_ushort();
 
-        case org.omg.CORBA.TCKind._tk_long:
+        case _tk_long:
             return a1.extract_long() == a2.extract_long();
 
-        case org.omg.CORBA.TCKind._tk_ulong:
+        case _tk_ulong:
             return a1.extract_ulong() == a2.extract_ulong();
 
-        case org.omg.CORBA.TCKind._tk_longlong:
+        case _tk_longlong:
             return a1.extract_longlong() == a2.extract_longlong();
 
-        case org.omg.CORBA.TCKind._tk_ulonglong:
+        case _tk_ulonglong:
             return a1.extract_ulonglong() == a2.extract_ulonglong();
 
-        case org.omg.CORBA.TCKind._tk_char:
+        case _tk_char:
             return a1.extract_char() == a2.extract_char();
 
-        case org.omg.CORBA.TCKind._tk_boolean:
+        case _tk_boolean:
             return a1.extract_boolean() == a2.extract_boolean();
 
-        case org.omg.CORBA.TCKind._tk_wchar:
+        case _tk_wchar:
             return a1.extract_wchar() == a2.extract_wchar();
 
-        case org.omg.CORBA.TCKind._tk_enum:
+        case _tk_enum:
             return a1.create_input_stream().read_ulong() == a2
                     .create_input_stream().read_ulong();
 
@@ -142,7 +199,7 @@ public final class TypeCodeFactory {
     // ----------------------------------------------------------------------
 
     public static org.omg.CORBA.TypeCode createPrimitiveTC(
-            org.omg.CORBA.TCKind kind) {
+            TCKind kind) {
         Assert.ensure(kind.value() < primitives_.length);
 
         if (primitives_[kind.value()] != null)
@@ -151,27 +208,27 @@ public final class TypeCodeFactory {
         org.omg.CORBA.TypeCode tc;
 
         switch (kind.value()) {
-        case org.omg.CORBA.TCKind._tk_null:
-        case org.omg.CORBA.TCKind._tk_void:
-        case org.omg.CORBA.TCKind._tk_short:
-        case org.omg.CORBA.TCKind._tk_long:
-        case org.omg.CORBA.TCKind._tk_ushort:
-        case org.omg.CORBA.TCKind._tk_ulong:
-        case org.omg.CORBA.TCKind._tk_float:
-        case org.omg.CORBA.TCKind._tk_double:
-        case org.omg.CORBA.TCKind._tk_boolean:
-        case org.omg.CORBA.TCKind._tk_char:
-        case org.omg.CORBA.TCKind._tk_octet:
-        case org.omg.CORBA.TCKind._tk_any:
-        case org.omg.CORBA.TCKind._tk_TypeCode:
-        case org.omg.CORBA.TCKind._tk_Principal:
-        case org.omg.CORBA.TCKind._tk_string:
-        case org.omg.CORBA.TCKind._tk_longlong:
-        case org.omg.CORBA.TCKind._tk_ulonglong:
-        case org.omg.CORBA.TCKind._tk_longdouble:
-        case org.omg.CORBA.TCKind._tk_wchar:
-        case org.omg.CORBA.TCKind._tk_wstring:
-        case org.omg.CORBA.TCKind._tk_fixed: {
+        case _tk_null:
+        case _tk_void:
+        case _tk_short:
+        case _tk_long:
+        case _tk_ushort:
+        case _tk_ulong:
+        case _tk_float:
+        case _tk_double:
+        case _tk_boolean:
+        case _tk_char:
+        case _tk_octet:
+        case _tk_any:
+        case _tk_TypeCode:
+        case _tk_Principal:
+        case _tk_string:
+        case _tk_longlong:
+        case _tk_ulonglong:
+        case _tk_longdouble:
+        case _tk_wchar:
+        case _tk_wstring:
+        case _tk_fixed: {
             TypeCode p = new TypeCode();
             p.kind_ = kind;
             p.length_ = 0; // For strings
@@ -179,11 +236,11 @@ public final class TypeCodeFactory {
             break;
         }
 
-        case org.omg.CORBA.TCKind._tk_objref:
+        case _tk_objref:
             tc = createInterfaceTC("IDL:omg.org/CORBA/Object:1.0", "Object");
             break;
 
-        case org.omg.CORBA.TCKind._tk_value:
+        case _tk_value:
             tc = createValueTC("IDL:omg.org/CORBA/ValueBase:1.0", "ValueBase", VM_ABSTRACT.value, null, new ValueMember[0]);
             break;
 
@@ -201,44 +258,39 @@ public final class TypeCodeFactory {
         Assert.ensure(id != null && name != null);
 
         if (!checkId(id))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidId)
-                    + ": " + id, MinorCodes.MinorInvalidId,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidId)
+                    + ": " + id, MinorInvalidId,
+                    COMPLETED_NO);
         if (!checkName(name))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidName)
-                    + ": " + name, MinorCodes.MinorInvalidName,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidName)
+                    + ": " + name, MinorInvalidName,
+                    COMPLETED_NO);
 
         for (int i = 0; i < members.length; i++) {
             if (!checkName(members[i].name))
-                throw new BAD_PARAM(MinorCodes
-                        .describeBadParam(MinorCodes.MinorInvalidMemberName)
+                throw new BAD_PARAM(describeBadParam(MinorInvalidMemberName)
                         + ": " + members[i].name,
-                        MinorCodes.MinorInvalidMemberName,
-                        CompletionStatus.COMPLETED_NO);
+                        MinorInvalidMemberName,
+                        COMPLETED_NO);
             if (!checkType(members[i].type))
-                throw new BAD_TYPECODE(MinorCodes
-                        .describeBadTypecode(MinorCodes.MinorInvalidMemberType)
+                throw new BAD_TYPECODE(describeBadTypecode(MinorInvalidMemberType)
                         + ": " + members[i].name,
-                        MinorCodes.MinorInvalidMemberType,
-                        CompletionStatus.COMPLETED_NO);
+                        MinorInvalidMemberType,
+                        COMPLETED_NO);
             for (int j = i + 1; j < members.length; j++)
                 if (members[i].name.length() > 0
                         && members[i].name.equalsIgnoreCase(members[j].name)) {
                     throw new BAD_PARAM(
-                            MinorCodes
-                                    .describeBadParam(MinorCodes.MinorInvalidMemberName)
+                            describeBadParam(MinorInvalidMemberName)
                                     + ": " + members[i].name,
-                            MinorCodes.MinorInvalidMemberName,
-                            CompletionStatus.COMPLETED_NO);
+                            MinorInvalidMemberName,
+                            COMPLETED_NO);
                 }
         }
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_struct;
+        tc.kind_ = tk_struct;
         tc.id_ = id;
         tc.name_ = name;
 
@@ -250,12 +302,11 @@ public final class TypeCodeFactory {
             try {
                 tc.memberTypes_[i] = (TypeCode) members[i].type;
             } catch (ClassCastException ex) {
-                tc.memberTypes_[i] = TypeCode
-                        ._OB_convertForeignTypeCode(members[i].type);
+                tc.memberTypes_[i] = _OB_convertForeignTypeCode(members[i].type);
             }
         }
 
-        TypeCode._OB_embedRecTC(tc);
+        _OB_embedRecTC(tc);
         return tc;
     }
 
@@ -265,78 +316,69 @@ public final class TypeCodeFactory {
         Assert.ensure(id != null && name != null);
 
         if (!checkId(id))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidId)
-                    + ": " + id, MinorCodes.MinorInvalidId,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidId)
+                    + ": " + id, MinorInvalidId,
+                    COMPLETED_NO);
         if (!checkName(name))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidName)
-                    + ": " + name, MinorCodes.MinorInvalidName,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidName)
+                    + ": " + name, MinorInvalidName,
+                    COMPLETED_NO);
 
-        org.omg.CORBA.TypeCode origDisc = TypeCode
-                ._OB_getOrigType(discriminator_type);
+        org.omg.CORBA.TypeCode origDisc = _OB_getOrigType(discriminator_type);
         switch (origDisc.kind().value()) {
-        case org.omg.CORBA.TCKind._tk_short:
-        case org.omg.CORBA.TCKind._tk_ushort:
-        case org.omg.CORBA.TCKind._tk_long:
-        case org.omg.CORBA.TCKind._tk_ulong:
-        case org.omg.CORBA.TCKind._tk_longlong:
-        case org.omg.CORBA.TCKind._tk_ulonglong:
-        case org.omg.CORBA.TCKind._tk_char:
-        case org.omg.CORBA.TCKind._tk_boolean:
-        case org.omg.CORBA.TCKind._tk_wchar:
-        case org.omg.CORBA.TCKind._tk_enum:
+        case _tk_short:
+        case _tk_ushort:
+        case _tk_long:
+        case _tk_ulong:
+        case _tk_longlong:
+        case _tk_ulonglong:
+        case _tk_char:
+        case _tk_boolean:
+        case _tk_wchar:
+        case _tk_enum:
             break;
 
         default:
             throw new BAD_PARAM(
-                    MinorCodes
-                            .describeBadParam(MinorCodes.MinorInvalidDiscriminatorType),
-                    MinorCodes.MinorInvalidDiscriminatorType,
-                    CompletionStatus.COMPLETED_NO);
+                    describeBadParam(MinorInvalidDiscriminatorType),
+                    MinorInvalidDiscriminatorType,
+                    COMPLETED_NO);
         }
 
         for (int i = 0; i < members.length; i++) {
             if (!checkName(members[i].name))
-                throw new BAD_PARAM(MinorCodes
-                        .describeBadParam(MinorCodes.MinorInvalidMemberName)
+                throw new BAD_PARAM(describeBadParam(MinorInvalidMemberName)
                         + ": " + members[i].name,
-                        MinorCodes.MinorInvalidMemberName,
-                        CompletionStatus.COMPLETED_NO);
+                        MinorInvalidMemberName,
+                        COMPLETED_NO);
             if (!checkType(members[i].type))
-                throw new BAD_TYPECODE(MinorCodes
-                        .describeBadTypecode(MinorCodes.MinorInvalidMemberType)
+                throw new BAD_TYPECODE(describeBadTypecode(MinorInvalidMemberType)
                         + ": " + members[i].name,
-                        MinorCodes.MinorInvalidMemberType,
-                        CompletionStatus.COMPLETED_NO);
+                        MinorInvalidMemberType,
+                        COMPLETED_NO);
             org.omg.CORBA.TypeCode labelType = members[i].label.type();
-            org.omg.CORBA.TypeCode origLabelType = TypeCode
-                    ._OB_getOrigType(labelType);
-            org.omg.CORBA.TCKind kind = origLabelType.kind();
-            if (kind != org.omg.CORBA.TCKind.tk_octet
+            org.omg.CORBA.TypeCode origLabelType = _OB_getOrigType(labelType);
+            TCKind kind = origLabelType.kind();
+            if (kind != tk_octet
                     && !origLabelType.equivalent(discriminator_type)) {
                 throw new BAD_PARAM(
-                        MinorCodes
-                                .describeBadParam(MinorCodes.MinorIncompatibleLabelType)
+                        describeBadParam(MinorIncompatibleLabelType)
                                 + ": " + members[i].name,
-                        MinorCodes.MinorIncompatibleLabelType,
-                        CompletionStatus.COMPLETED_NO);
+                        MinorIncompatibleLabelType,
+                        COMPLETED_NO);
             }
             for (int j = i + 1; j < members.length; j++) {
-                if (kind != org.omg.CORBA.TCKind.tk_octet) {
+                if (kind != tk_octet) {
                     org.omg.CORBA.TypeCode otherLabelType = members[j].label
                             .type();
                     if (origLabelType.equivalent(otherLabelType)
                             && compareLabels(kind, members[i].label,
                                     members[j].label)) {
                         throw new BAD_PARAM(
-                                MinorCodes
-                                        .describeBadParam(MinorCodes.MinorDuplicateLabel)
+                                describeBadParam(MinorDuplicateLabel)
                                         + ": " + members[i].name,
-                                MinorCodes.MinorDuplicateLabel,
-                                CompletionStatus.COMPLETED_NO);
+                                MinorDuplicateLabel,
+                                COMPLETED_NO);
                     }
                 }
             }
@@ -344,25 +386,24 @@ public final class TypeCodeFactory {
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_union;
+        tc.kind_ = tk_union;
         tc.id_ = id;
         tc.name_ = name;
         try {
             tc.discriminatorType_ = (TypeCode) discriminator_type;
         } catch (ClassCastException ex) {
-            tc.discriminatorType_ = TypeCode
-                    ._OB_convertForeignTypeCode(discriminator_type);
+            tc.discriminatorType_ = _OB_convertForeignTypeCode(discriminator_type);
         }
 
-        tc.labels_ = new Any[members.length];
+        tc.labels_ = new org.apache.yoko.orb.CORBA.Any[members.length];
         tc.memberNames_ = new String[members.length];
         tc.memberTypes_ = new TypeCode[members.length];
 
         for (int i = 0; i < members.length; i++) {
             try {
-                tc.labels_[i] = (Any) members[i].label;
+                tc.labels_[i] = (org.apache.yoko.orb.CORBA.Any) members[i].label;
             } catch (ClassCastException ex) {
-                tc.labels_[i] = new Any(
+                tc.labels_[i] = new org.apache.yoko.orb.CORBA.Any(
                         members[i].label);
             }
 
@@ -371,12 +412,11 @@ public final class TypeCodeFactory {
             try {
                 tc.memberTypes_[i] = (TypeCode) members[i].type;
             } catch (ClassCastException ex) {
-                tc.memberTypes_[i] = TypeCode
-                        ._OB_convertForeignTypeCode(members[i].type);
+                tc.memberTypes_[i] = _OB_convertForeignTypeCode(members[i].type);
             }
         }
 
-        TypeCode._OB_embedRecTC(tc);
+        _OB_embedRecTC(tc);
         return tc;
     }
 
@@ -385,37 +425,33 @@ public final class TypeCodeFactory {
         Assert.ensure(id != null && name != null);
 
         if (!checkId(id))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidId)
-                    + ": " + id, MinorCodes.MinorInvalidId,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidId)
+                    + ": " + id, MinorInvalidId,
+                    COMPLETED_NO);
         if (!checkName(name))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidName)
-                    + ": " + name, MinorCodes.MinorInvalidName,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidName)
+                    + ": " + name, MinorInvalidName,
+                    COMPLETED_NO);
 
         for (int i = 0; i < members.length; i++) {
             if (!checkName(members[i]))
-                throw new BAD_PARAM(MinorCodes
-                        .describeBadParam(MinorCodes.MinorInvalidMemberName)
-                        + ": " + members[i], MinorCodes.MinorInvalidMemberName,
-                        CompletionStatus.COMPLETED_NO);
+                throw new BAD_PARAM(describeBadParam(MinorInvalidMemberName)
+                        + ": " + members[i], MinorInvalidMemberName,
+                        COMPLETED_NO);
             for (int j = i + 1; j < members.length; j++)
                 if (members[i].length() > 0
                         && members[i].equalsIgnoreCase(members[j])) {
                     throw new BAD_PARAM(
-                            MinorCodes
-                                    .describeBadParam(MinorCodes.MinorInvalidMemberName)
+                            describeBadParam(MinorInvalidMemberName)
                                     + ": " + members[i],
-                            MinorCodes.MinorInvalidMemberName,
-                            CompletionStatus.COMPLETED_NO);
+                            MinorInvalidMemberName,
+                            COMPLETED_NO);
                 }
         }
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_enum;
+        tc.kind_ = tk_enum;
         tc.id_ = id;
         tc.name_ = name;
 
@@ -431,32 +467,28 @@ public final class TypeCodeFactory {
         Assert.ensure(id != null && name != null);
 
         if (!checkId(id))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidId)
-                    + ": " + id, MinorCodes.MinorInvalidId,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidId)
+                    + ": " + id, MinorInvalidId,
+                    COMPLETED_NO);
         if (!checkName(name))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidName)
-                    + ": " + name, MinorCodes.MinorInvalidName,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidName)
+                    + ": " + name, MinorInvalidName,
+                    COMPLETED_NO);
         if (!checkType(original_type))
-            throw new BAD_TYPECODE(MinorCodes
-                    .describeBadTypecode(MinorCodes.MinorInvalidMemberType),
-                    MinorCodes.MinorInvalidMemberType,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_TYPECODE(describeBadTypecode(MinorInvalidMemberType),
+                    MinorInvalidMemberType,
+                    COMPLETED_NO);
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_alias;
+        tc.kind_ = tk_alias;
         tc.id_ = id;
         tc.name_ = name;
 
         try {
             tc.contentType_ = (TypeCode) original_type;
         } catch (ClassCastException ex) {
-            tc.contentType_ = TypeCode
-                    ._OB_convertForeignTypeCode(original_type);
+            tc.contentType_ = _OB_convertForeignTypeCode(original_type);
         }
 
         return tc;
@@ -467,44 +499,39 @@ public final class TypeCodeFactory {
         Assert.ensure(id != null && name != null);
 
         if (!checkId(id))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidId)
-                    + ": " + id, MinorCodes.MinorInvalidId,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidId)
+                    + ": " + id, MinorInvalidId,
+                    COMPLETED_NO);
         if (!checkName(name))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidName)
-                    + ": " + name, MinorCodes.MinorInvalidName,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidName)
+                    + ": " + name, MinorInvalidName,
+                    COMPLETED_NO);
 
         for (int i = 0; i < members.length; i++) {
             if (!checkName(members[i].name))
-                throw new BAD_PARAM(MinorCodes
-                        .describeBadParam(MinorCodes.MinorInvalidMemberName)
+                throw new BAD_PARAM(describeBadParam(MinorInvalidMemberName)
                         + ": " + members[i].name,
-                        MinorCodes.MinorInvalidMemberName,
-                        CompletionStatus.COMPLETED_NO);
+                        MinorInvalidMemberName,
+                        COMPLETED_NO);
             if (!checkType(members[i].type))
-                throw new BAD_TYPECODE(MinorCodes
-                        .describeBadTypecode(MinorCodes.MinorInvalidMemberType)
+                throw new BAD_TYPECODE(describeBadTypecode(MinorInvalidMemberType)
                         + ": " + members[i].name,
-                        MinorCodes.MinorInvalidMemberType,
-                        CompletionStatus.COMPLETED_NO);
+                        MinorInvalidMemberType,
+                        COMPLETED_NO);
             for (int j = i + 1; j < members.length; j++)
                 if (members[i].name.length() > 0
                         && members[i].name.equalsIgnoreCase(members[j].name)) {
                     throw new BAD_PARAM(
-                            MinorCodes
-                                    .describeBadParam(MinorCodes.MinorInvalidMemberName)
+                            describeBadParam(MinorInvalidMemberName)
                                     + ": " + members[i].name,
-                            MinorCodes.MinorInvalidMemberName,
-                            CompletionStatus.COMPLETED_NO);
+                            MinorInvalidMemberName,
+                            COMPLETED_NO);
                 }
         }
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_except;
+        tc.kind_ = tk_except;
         tc.id_ = id;
         tc.name_ = name;
 
@@ -516,12 +543,11 @@ public final class TypeCodeFactory {
             try {
                 tc.memberTypes_[i] = (TypeCode) members[i].type;
             } catch (ClassCastException ex) {
-                tc.memberTypes_[i] = TypeCode
-                        ._OB_convertForeignTypeCode(members[i].type);
+                tc.memberTypes_[i] = _OB_convertForeignTypeCode(members[i].type);
             }
         }
 
-        TypeCode._OB_embedRecTC(tc);
+        _OB_embedRecTC(tc);
         return tc;
     }
 
@@ -530,19 +556,17 @@ public final class TypeCodeFactory {
         Assert.ensure(id != null && name != null);
 
         if (!checkId(id))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidId)
-                    + ": " + id, MinorCodes.MinorInvalidId,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidId)
+                    + ": " + id, MinorInvalidId,
+                    COMPLETED_NO);
         if (!checkName(name))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidName)
-                    + ": " + name, MinorCodes.MinorInvalidName,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidName)
+                    + ": " + name, MinorInvalidName,
+                    COMPLETED_NO);
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_objref;
+        tc.kind_ = tk_objref;
         tc.id_ = id;
         tc.name_ = name;
 
@@ -554,7 +578,7 @@ public final class TypeCodeFactory {
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_string;
+        tc.kind_ = tk_string;
         tc.length_ = bound;
 
         return tc;
@@ -565,7 +589,7 @@ public final class TypeCodeFactory {
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_wstring;
+        tc.kind_ = tk_wstring;
         tc.length_ = bound;
 
         return tc;
@@ -576,7 +600,7 @@ public final class TypeCodeFactory {
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_fixed;
+        tc.kind_ = tk_fixed;
         tc.fixedDigits_ = digits;
         tc.fixedScale_ = scale;
 
@@ -588,19 +612,18 @@ public final class TypeCodeFactory {
         Assert.ensure(bound >= 0);
 
         if (!checkType(element_type))
-            throw new BAD_TYPECODE(MinorCodes
-                    .describeBadTypecode(MinorCodes.MinorInvalidMemberType),
-                    MinorCodes.MinorInvalidMemberType,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_TYPECODE(describeBadTypecode(MinorInvalidMemberType),
+                    MinorInvalidMemberType,
+                    COMPLETED_NO);
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_sequence;
+        tc.kind_ = tk_sequence;
         tc.length_ = bound;
         try {
             tc.contentType_ = (TypeCode) element_type;
         } catch (ClassCastException ex) {
-            tc.contentType_ = TypeCode._OB_convertForeignTypeCode(element_type);
+            tc.contentType_ = _OB_convertForeignTypeCode(element_type);
         }
 
         return tc;
@@ -616,19 +639,18 @@ public final class TypeCodeFactory {
         Assert.ensure(length > 0);
 
         if (!checkType(element_type))
-            throw new BAD_TYPECODE(MinorCodes
-                    .describeBadTypecode(MinorCodes.MinorInvalidMemberType),
-                    MinorCodes.MinorInvalidMemberType,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_TYPECODE(describeBadTypecode(MinorInvalidMemberType),
+                    MinorInvalidMemberType,
+                    COMPLETED_NO);
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_array;
+        tc.kind_ = tk_array;
         tc.length_ = length;
         try {
             tc.contentType_ = (TypeCode) element_type;
         } catch (ClassCastException ex) {
-            tc.contentType_ = TypeCode._OB_convertForeignTypeCode(element_type);
+            tc.contentType_ = _OB_convertForeignTypeCode(element_type);
         }
 
         return tc;
@@ -640,20 +662,17 @@ public final class TypeCodeFactory {
         Assert.ensure(id != null && name != null);
 
         if (!checkId(id))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidId)
-                    + ": " + id, MinorCodes.MinorInvalidId,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidId)
+                    + ": " + id, MinorInvalidId,
+                    COMPLETED_NO);
         if (!checkName(name))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidName)
-                    + ": " + name, MinorCodes.MinorInvalidName,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidName)
+                    + ": " + name, MinorInvalidName,
+                    COMPLETED_NO);
         if (concrete_base != null) {
             try {
-                org.omg.CORBA.TypeCode origBaseType = TypeCode
-                        ._OB_getOrigType(concrete_base);
-                if (origBaseType.kind() != org.omg.CORBA.TCKind.tk_value)
+                org.omg.CORBA.TypeCode origBaseType = _OB_getOrigType(concrete_base);
+                if (origBaseType.kind() != tk_value)
                     throw new BAD_TYPECODE();
                 // TODO: No standard minor code
             } catch (BAD_TYPECODE ex) {
@@ -663,41 +682,37 @@ public final class TypeCodeFactory {
 
         for (int i = 0; i < members.length; i++) {
             if (!checkName(members[i].name))
-                throw new BAD_PARAM(MinorCodes
-                        .describeBadParam(MinorCodes.MinorInvalidMemberName)
+                throw new BAD_PARAM(describeBadParam(MinorInvalidMemberName)
                         + ": " + members[i].name,
-                        MinorCodes.MinorInvalidMemberName,
-                        CompletionStatus.COMPLETED_NO);
+                        MinorInvalidMemberName,
+                        COMPLETED_NO);
             if (!checkType(members[i].type))
-                throw new BAD_TYPECODE(MinorCodes
-                        .describeBadTypecode(MinorCodes.MinorInvalidMemberType)
+                throw new BAD_TYPECODE(describeBadTypecode(MinorInvalidMemberType)
                         + ": " + members[i].name,
-                        MinorCodes.MinorInvalidMemberType,
-                        CompletionStatus.COMPLETED_NO);
+                        MinorInvalidMemberType,
+                        COMPLETED_NO);
             if (!CHECK_IDL_NAMES) continue;
             for (int j = i + 1; j < members.length; j++)
                 if (members[i].name.length() > 0
                         && members[i].name.equalsIgnoreCase(members[j].name)) {
                     throw new BAD_PARAM(
-                            MinorCodes
-                                    .describeBadParam(MinorCodes.MinorInvalidMemberName)
+                            describeBadParam(MinorInvalidMemberName)
                                     + ": " + members[i].name,
-                            MinorCodes.MinorInvalidMemberName,
-                            CompletionStatus.COMPLETED_NO);
+                            MinorInvalidMemberName,
+                            COMPLETED_NO);
                 }
         }
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_value;
+        tc.kind_ = tk_value;
         tc.id_ = id;
         tc.name_ = name;
         tc.typeModifier_ = type_modifier;
         try {
             tc.concreteBaseType_ = (TypeCode) concrete_base;
         } catch (ClassCastException ex) {
-            tc.concreteBaseType_ = TypeCode
-                    ._OB_convertForeignTypeCode(concrete_base);
+            tc.concreteBaseType_ = _OB_convertForeignTypeCode(concrete_base);
         }
 
         tc.memberNames_ = new String[members.length];
@@ -710,14 +725,13 @@ public final class TypeCodeFactory {
             try {
                 tc.memberTypes_[i] = (TypeCode) members[i].type;
             } catch (ClassCastException ex) {
-                tc.memberTypes_[i] = TypeCode
-                        ._OB_convertForeignTypeCode(members[i].type);
+                tc.memberTypes_[i] = _OB_convertForeignTypeCode(members[i].type);
             }
 
             tc.memberVisibility_[i] = members[i].access;
         }
 
-        TypeCode._OB_embedRecTC(tc);
+        _OB_embedRecTC(tc);
         return tc;
     }
 
@@ -726,30 +740,27 @@ public final class TypeCodeFactory {
         Assert.ensure(id != null && name != null);
 
         if (!checkId(id))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidId)
-                    + ": " + id, MinorCodes.MinorInvalidId,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidId)
+                    + ": " + id, MinorInvalidId,
+                    COMPLETED_NO);
         if (!checkName(name))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidName)
-                    + ": " + name, MinorCodes.MinorInvalidName,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidName)
+                    + ": " + name, MinorInvalidName,
+                    COMPLETED_NO);
         if (!checkType(boxed_type))
-            throw new BAD_TYPECODE(MinorCodes
-                    .describeBadTypecode(MinorCodes.MinorInvalidMemberType),
-                    MinorCodes.MinorInvalidMemberType,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_TYPECODE(describeBadTypecode(MinorInvalidMemberType),
+                    MinorInvalidMemberType,
+                    COMPLETED_NO);
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_value_box;
+        tc.kind_ = tk_value_box;
         tc.id_ = id;
         tc.name_ = name;
         try {
             tc.contentType_ = (TypeCode) boxed_type;
         } catch (ClassCastException ex) {
-            tc.contentType_ = TypeCode._OB_convertForeignTypeCode(boxed_type);
+            tc.contentType_ = _OB_convertForeignTypeCode(boxed_type);
         }
 
         return tc;
@@ -759,19 +770,17 @@ public final class TypeCodeFactory {
         Assert.ensure(id != null && name != null);
 
         if (!checkId(id))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidId)
-                    + ": " + id, MinorCodes.MinorInvalidId,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidId)
+                    + ": " + id, MinorInvalidId,
+                    COMPLETED_NO);
         if (!checkName(name))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidName)
-                    + ": " + name, MinorCodes.MinorInvalidName,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidName)
+                    + ": " + name, MinorInvalidName,
+                    COMPLETED_NO);
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_native;
+        tc.kind_ = tk_native;
         tc.id_ = id;
         tc.name_ = name;
 
@@ -782,10 +791,9 @@ public final class TypeCodeFactory {
         Assert.ensure(id != null);
 
         if (!checkId(id))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidId)
-                    + ": " + id, MinorCodes.MinorInvalidId,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidId)
+                    + ": " + id, MinorInvalidId,
+                    COMPLETED_NO);
 
         TypeCode tc = new TypeCode();
 
@@ -799,19 +807,17 @@ public final class TypeCodeFactory {
         Assert.ensure(id != null && name != null);
 
         if (!checkId(id))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidId)
-                    + ": " + id, MinorCodes.MinorInvalidId,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidId)
+                    + ": " + id, MinorInvalidId,
+                    COMPLETED_NO);
         if (!checkName(name))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidName)
-                    + ": " + name, MinorCodes.MinorInvalidName,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidName)
+                    + ": " + name, MinorInvalidName,
+                    COMPLETED_NO);
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = org.omg.CORBA.TCKind.tk_abstract_interface;
+        tc.kind_ = tk_abstract_interface;
         tc.id_ = id;
         tc.name_ = name;
 
@@ -823,19 +829,17 @@ public final class TypeCodeFactory {
         Assert.ensure(id != null && name != null);
 
         if (!checkId(id))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidId)
-                    + ": " + id, MinorCodes.MinorInvalidId,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidId)
+                    + ": " + id, MinorInvalidId,
+                    COMPLETED_NO);
         if (!checkName(name))
-            throw new BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorInvalidName)
-                    + ": " + name, MinorCodes.MinorInvalidName,
-                    CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorInvalidName)
+                    + ": " + name, MinorInvalidName,
+                    COMPLETED_NO);
 
         TypeCode tc = new TypeCode();
 
-        tc.kind_ = TCKind.tk_local_interface;
+        tc.kind_ = tk_local_interface;
         tc.id_ = id;
         tc.name_ = name;
 
