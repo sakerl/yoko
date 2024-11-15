@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,13 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.orb.OBPortableServer.POAManagerFactory_impl;
-import org.apache.yoko.orb.OBPortableServer.POA_impl;
-import org.apache.yoko.orb.PortableServer.PoaCurrentImpl;
-import org.apache.yoko.util.Assert;
-import org.apache.yoko.util.MinorCodes;
-import org.omg.CORBA.BAD_INV_ORDER;
-import org.omg.CORBA.INITIALIZE;
-import org.omg.CORBA.ORBPackage.InvalidName;
-import org.omg.PortableServer.CurrentPackage.NoContext;
-import org.omg.PortableServer.POA;
+import static java.lang.Thread.currentThread;
+import static org.apache.yoko.util.MinorCodes.MinorDestroyWouldBlock;
+import static org.apache.yoko.util.MinorCodes.MinorORBDestroyed;
+import static org.apache.yoko.util.MinorCodes.MinorShutdownCalled;
+import static org.apache.yoko.util.MinorCodes.describeBadInvOrder;
+import static org.apache.yoko.util.MinorCodes.describeInitialize;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -34,12 +31,22 @@ import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.apache.yoko.util.MinorCodes.MinorDestroyWouldBlock;
-import static org.apache.yoko.util.MinorCodes.MinorORBDestroyed;
-import static org.apache.yoko.util.MinorCodes.MinorShutdownCalled;
-import static org.apache.yoko.util.MinorCodes.describeBadInvOrder;
-import static org.apache.yoko.util.MinorCodes.describeInitialize;
-import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+import org.apache.yoko.orb.OBPortableServer.POAManager;
+import org.apache.yoko.orb.OBPortableServer.POAManagerFactory;
+import org.apache.yoko.orb.OBPortableServer.POAManagerFactoryHelper;
+import org.apache.yoko.orb.OBPortableServer.POAManagerFactory_impl;
+import org.apache.yoko.orb.OBPortableServer.POA_impl;
+import org.apache.yoko.orb.PortableServer.PoaCurrentImpl;
+import org.apache.yoko.util.Assert;
+import org.omg.CORBA.BAD_INV_ORDER;
+import org.omg.CORBA.INITIALIZE;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.Policy;
+import org.omg.CORBA.PolicyError;
+import org.omg.CORBA.ORBPackage.InvalidName;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.CurrentPackage.NoContext;
+import org.omg.PortableServer.POAManagerFactoryPackage.ManagerAlreadyExists;
 
 public final class ORBControl {
     //
@@ -154,20 +161,20 @@ public final class ORBControl {
         // error if the this operation is called after ORB destruction
         //
         if (state == State.DESTROYED)
-            throw new org.omg.CORBA.INITIALIZE(
-                    MinorCodes.describeInitialize(MinorCodes.MinorORBDestroyed),
-                    MinorCodes.MinorORBDestroyed, org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new INITIALIZE(
+                    describeInitialize(MinorORBDestroyed),
+                    MinorORBDestroyed, COMPLETED_NO);
 
         if (state == State.SERVER_SHUTDOWN || state == State.CLIENT_SHUTDOWN)
-            throw new org.omg.CORBA.BAD_INV_ORDER(
-                    MinorCodes.describeBadInvOrder(MinorCodes.MinorShutdownCalled),
-                    MinorCodes.MinorShutdownCalled, org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_INV_ORDER(
+                    describeBadInvOrder(MinorShutdownCalled),
+                    MinorShutdownCalled, COMPLETED_NO);
 
         if (state == State.NOT_RUNNING) {
             //
             // Remember the main thread id
             //
-            mainThread_ = Thread.currentThread();
+            mainThread_ = currentThread();
 
             //
             // Set the state to State.RUNNING
@@ -232,7 +239,7 @@ public final class ORBControl {
         //
         // If this is not the main thread then do nothing
         //
-        if (mainThread_ != Thread.currentThread())
+        if (mainThread_ != currentThread())
             return false;
 
         //
@@ -252,7 +259,7 @@ public final class ORBControl {
         //
         // If this is not the main thread then do nothing
         //
-        if (mainThread_ != Thread.currentThread())
+        if (mainThread_ != currentThread())
             return;
 
         completeServerShutdown();
@@ -268,7 +275,7 @@ public final class ORBControl {
         // If this is not the main thread then block until the ORB is
         // shutdown
         //
-        if (mainThread_ != Thread.currentThread()) {
+        if (mainThread_ != currentThread()) {
             blockServerShutdownComplete();
             return;
         }
@@ -388,9 +395,9 @@ public final class ORBControl {
         // error if the this operation is called after ORB destruction
         //
         if (state == State.DESTROYED)
-            throw new org.omg.CORBA.INITIALIZE(
-                    MinorCodes.describeInitialize(MinorCodes.MinorORBDestroyed),
-                    MinorCodes.MinorORBDestroyed, org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new INITIALIZE(
+                    describeInitialize(MinorORBDestroyed),
+                    MinorORBDestroyed, COMPLETED_NO);
 
         //
         // If the ORB client side is already shutdown, then we're done
@@ -449,7 +456,7 @@ public final class ORBControl {
     //
     // Initialize the Root POA
     //
-    public void initializeRootPOA(org.omg.CORBA.ORB orb) {
+    public void initializeRootPOA(ORB orb) {
         String serverId = orbInstance_.getServerId();
 
         //
@@ -466,22 +473,22 @@ public final class ORBControl {
         //
         // Create the Root POAManager
         //
-        org.apache.yoko.orb.OBPortableServer.POAManagerFactory factory = null;
+        POAManagerFactory factory = null;
         try {
-            factory = org.apache.yoko.orb.OBPortableServer.POAManagerFactoryHelper.narrow(ism.resolveInitialReferences("POAManagerFactory"));
-        } catch (org.omg.CORBA.ORBPackage.InvalidName ex) {
+            factory = POAManagerFactoryHelper.narrow(ism.resolveInitialReferences("POAManagerFactory"));
+        } catch (InvalidName ex) {
             throw Assert.fail(ex);
         }
 
         //
         // First attempt to locate the root POAManager
         //
-        org.apache.yoko.orb.OBPortableServer.POAManager manager = null;
+        POAManager manager = null;
 
         org.omg.PortableServer.POAManager[] managers = factory.list();
         for (int i = 0; i < managers.length; i++) {
             if (managers[i].get_id().equals("RootPOAManager")) {
-                manager = (org.apache.yoko.orb.OBPortableServer.POAManager) managers[i];
+                manager = (POAManager) managers[i];
                 break;
             }
         }
@@ -491,9 +498,9 @@ public final class ORBControl {
         //
         if (manager == null) {
             try {
-                org.omg.CORBA.Policy[] emptyPl = new org.omg.CORBA.Policy[0];
-                manager = (org.apache.yoko.orb.OBPortableServer.POAManager) (factory.create_POAManager("RootPOAManager", emptyPl));
-            } catch (org.omg.PortableServer.POAManagerFactoryPackage.ManagerAlreadyExists ex) {
+                Policy[] emptyPl = new Policy[0];
+                manager = (POAManager) (factory.create_POAManager("RootPOAManager", emptyPl));
+            } catch (ManagerAlreadyExists ex) {
                 throw Assert.fail(ex);
             }
             // catch(org.apache.yoko.orb.OCI.InvalidParam ex)
@@ -504,7 +511,7 @@ public final class ORBControl {
             // logger.error(err);
             // throw new org.omg.CORBA.INITIALIZE(err);
             // }
-            catch (org.omg.CORBA.PolicyError ex) {
+            catch (PolicyError ex) {
                 // TODO : Is this correct?
                 throw Assert.fail(ex);
             }
@@ -519,7 +526,7 @@ public final class ORBControl {
 
         try {
             ism.addInitialReference("RootPOA", root, true);
-        } catch (org.omg.CORBA.ORBPackage.InvalidName ex) {
+        } catch (InvalidName ex) {
             throw Assert.fail(ex);
         }
 
@@ -529,7 +536,7 @@ public final class ORBControl {
         //
         // TODO-B3: Is there some other point that can be used to do this?
         //
-        org.apache.yoko.orb.OBPortableServer.POAManagerFactory_impl factoryImpl = (org.apache.yoko.orb.OBPortableServer.POAManagerFactory_impl) factory;
+        POAManagerFactory_impl factoryImpl = (POAManagerFactory_impl) factory;
         factoryImpl._OB_initializeIMR(root, this);
     }
 }
