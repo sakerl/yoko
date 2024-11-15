@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public class ObjectIdHasher {
         return hashCode_;
     }
 
-    public boolean equals(java.lang.Object o) {
+    public boolean equals(Object o) {
         ObjectIdHasher h = (ObjectIdHasher) o;
 
         return comp(oid_, h.oid_);
