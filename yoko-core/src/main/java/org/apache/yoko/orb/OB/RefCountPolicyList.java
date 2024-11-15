@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,49 @@
  */
 package org.apache.yoko.orb.OB;
 
-final public class RefCountPolicyList {
+import org.omg.BiDirPolicy.BIDIRECTIONAL_POLICY_TYPE;
+import org.omg.BiDirPolicy.BidirectionalPolicy;
+import org.omg.BiDirPolicy.NORMAL;
+import org.omg.CORBA.Policy;
+import org.omg.Messaging.MAX_HOPS_POLICY_TYPE;
+import org.omg.Messaging.MaxHopsPolicy;
+import org.omg.Messaging.ORDER_TEMPORAL;
+import org.omg.Messaging.PriorityRange;
+import org.omg.Messaging.QUEUE_ORDER_POLICY_TYPE;
+import org.omg.Messaging.QueueOrderPolicy;
+import org.omg.Messaging.REBIND_POLICY_TYPE;
+import org.omg.Messaging.RELATIVE_REQ_TIMEOUT_POLICY_TYPE;
+import org.omg.Messaging.RELATIVE_RT_TIMEOUT_POLICY_TYPE;
+import org.omg.Messaging.REPLY_END_TIME_POLICY_TYPE;
+import org.omg.Messaging.REPLY_PRIORITY_POLICY_TYPE;
+import org.omg.Messaging.REPLY_START_TIME_POLICY_TYPE;
+import org.omg.Messaging.REQUEST_END_TIME_POLICY_TYPE;
+import org.omg.Messaging.REQUEST_PRIORITY_POLICY_TYPE;
+import org.omg.Messaging.REQUEST_START_TIME_POLICY_TYPE;
+import org.omg.Messaging.ROUTE_NONE;
+import org.omg.Messaging.ROUTING_POLICY_TYPE;
+import org.omg.Messaging.RebindPolicy;
+import org.omg.Messaging.RelativeRequestTimeoutPolicy;
+import org.omg.Messaging.RelativeRoundtripTimeoutPolicy;
+import org.omg.Messaging.ReplyEndTimePolicy;
+import org.omg.Messaging.ReplyPriorityPolicy;
+import org.omg.Messaging.ReplyStartTimePolicy;
+import org.omg.Messaging.RequestEndTimePolicy;
+import org.omg.Messaging.RequestPriorityPolicy;
+import org.omg.Messaging.RequestStartTimePolicy;
+import org.omg.Messaging.RoutingPolicy;
+import org.omg.Messaging.RoutingTypeRange;
+import org.omg.Messaging.SYNC_NONE;
+import org.omg.Messaging.SYNC_SCOPE_POLICY_TYPE;
+import org.omg.Messaging.SyncScopePolicy;
+import org.omg.Messaging.TRANSPARENT;
+import org.omg.TimeBase.UtcT;
+
+public final class RefCountPolicyList {
     //
     // The immutable PolicyList
     //
-    public org.omg.CORBA.Policy[] value;
+    public Policy[] value;
 
     //
     // The immutable value of the retry policy
@@ -43,22 +81,22 @@ final public class RefCountPolicyList {
     //
     // The immutable value of the request start time policy
     //
-    public org.omg.TimeBase.UtcT requestStartTime;
+    public UtcT requestStartTime;
 
     //
     // The immutable value of the request end time policy
     //
-    public org.omg.TimeBase.UtcT requestEndTime;
+    public UtcT requestEndTime;
 
     //
     // The immutable value of the reply start time policy
     //
-    public org.omg.TimeBase.UtcT replyStartTime;
+    public UtcT replyStartTime;
 
     //
     // The immutable value of the reply end time policy
     //
-    public org.omg.TimeBase.UtcT replyEndTime;
+    public UtcT replyEndTime;
 
     //
     // The immutable value of the relative request timeout policy
@@ -105,17 +143,17 @@ final public class RefCountPolicyList {
     //
     // the immutable value of the request priority policy
     //
-    public org.omg.Messaging.PriorityRange requestPriority;
+    public PriorityRange requestPriority;
 
     //
     // the immutable value of the reply priority policy
     //
-    public org.omg.Messaging.PriorityRange replyPriority;
+    public PriorityRange replyPriority;
 
     //
     // the immutable value of the routing policy
     //
-    public org.omg.Messaging.RoutingTypeRange routingRange;
+    public RoutingTypeRange routingRange;
 
     //
     // the immutable value of the max hops policy
@@ -131,7 +169,7 @@ final public class RefCountPolicyList {
     // RefCountPolicyList private and protected members
     // ----------------------------------------------------------------------
 
-    private static RetryAttributes getRetry(org.omg.CORBA.Policy[] policies) {
+    private static RetryAttributes getRetry(Policy[] policies) {
         RetryAttributes attributes = new RetryAttributes();
         for (int i = 0; i < policies.length; i++) {
             if (policies[i].policy_type() == RETRY_POLICY_ID.value) {
@@ -153,7 +191,7 @@ final public class RefCountPolicyList {
         return attributes;
     }
 
-    private static int getConnectTimeout(org.omg.CORBA.Policy[] policies) {
+    private static int getConnectTimeout(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
             if (policies[i].policy_type() == CONNECT_TIMEOUT_POLICY_ID.value) {
                 ConnectTimeoutPolicy policy = (ConnectTimeoutPolicy) policies[i];
@@ -178,7 +216,7 @@ final public class RefCountPolicyList {
     // TODO: This needs to be replaced with the new messaging timeout
     // policies below.
     //
-    private static int getRequestTimeout(org.omg.CORBA.Policy[] policies) {
+    private static int getRequestTimeout(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
             if (policies[i].policy_type() == REQUEST_TIMEOUT_POLICY_ID.value) {
                 RequestTimeoutPolicy policy = (RequestTimeoutPolicy) policies[i];
@@ -199,7 +237,7 @@ final public class RefCountPolicyList {
         return -1;
     }
 
-    private static int getReplyTimeout(org.omg.CORBA.Policy[] policies) {
+    private static int getReplyTimeout(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
             if (policies[i].policy_type() == REPLY_TIMEOUT_POLICY_ID.value) {
                 ReplyTimeoutPolicy policy = (ReplyTimeoutPolicy) policies[i];
@@ -220,58 +258,58 @@ final public class RefCountPolicyList {
         return -1;
     }
 
-    private org.omg.TimeBase.UtcT getRequestStartTime(
-            org.omg.CORBA.Policy[] policies) {
+    private UtcT getRequestStartTime(
+            Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.REQUEST_START_TIME_POLICY_TYPE.value) {
-                org.omg.Messaging.RequestStartTimePolicy policy = (org.omg.Messaging.RequestStartTimePolicy) policies[i];
+            if (policies[i].policy_type() == REQUEST_START_TIME_POLICY_TYPE.value) {
+                RequestStartTimePolicy policy = (RequestStartTimePolicy) policies[i];
                 return policy.start_time();
             }
         }
 
-        return org.apache.yoko.orb.OB.TimeHelper.utcMin();
+        return TimeHelper.utcMin();
     }
 
-    private org.omg.TimeBase.UtcT getRequestEndTime(
-            org.omg.CORBA.Policy[] policies) {
+    private UtcT getRequestEndTime(
+            Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.REQUEST_END_TIME_POLICY_TYPE.value) {
-                org.omg.Messaging.RequestEndTimePolicy policy = (org.omg.Messaging.RequestEndTimePolicy) policies[i];
+            if (policies[i].policy_type() == REQUEST_END_TIME_POLICY_TYPE.value) {
+                RequestEndTimePolicy policy = (RequestEndTimePolicy) policies[i];
                 return policy.end_time();
             }
         }
 
-        return org.apache.yoko.orb.OB.TimeHelper.utcMin();
+        return TimeHelper.utcMin();
     }
 
-    private org.omg.TimeBase.UtcT getReplyStartTime(
-            org.omg.CORBA.Policy[] policies) {
+    private UtcT getReplyStartTime(
+            Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.REPLY_START_TIME_POLICY_TYPE.value) {
-                org.omg.Messaging.ReplyStartTimePolicy policy = (org.omg.Messaging.ReplyStartTimePolicy) policies[i];
+            if (policies[i].policy_type() == REPLY_START_TIME_POLICY_TYPE.value) {
+                ReplyStartTimePolicy policy = (ReplyStartTimePolicy) policies[i];
                 return policy.start_time();
             }
         }
 
-        return org.apache.yoko.orb.OB.TimeHelper.utcMin();
+        return TimeHelper.utcMin();
     }
 
-    private org.omg.TimeBase.UtcT getReplyEndTime(
+    private UtcT getReplyEndTime(
             org.omg.CORBA.Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.REPLY_END_TIME_POLICY_TYPE.value) {
-                org.omg.Messaging.ReplyEndTimePolicy policy = (org.omg.Messaging.ReplyEndTimePolicy) policies[i];
+            if (policies[i].policy_type() == REPLY_END_TIME_POLICY_TYPE.value) {
+                ReplyEndTimePolicy policy = (ReplyEndTimePolicy) policies[i];
                 return policy.end_time();
             }
         }
 
-        return org.apache.yoko.orb.OB.TimeHelper.utcMin();
+        return TimeHelper.utcMin();
     }
 
-    private long getRelativeRequestTimeout(org.omg.CORBA.Policy[] policies) {
+    private long getRelativeRequestTimeout(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.RELATIVE_REQ_TIMEOUT_POLICY_TYPE.value) {
-                org.omg.Messaging.RelativeRequestTimeoutPolicy policy = (org.omg.Messaging.RelativeRequestTimeoutPolicy) policies[i];
+            if (policies[i].policy_type() == RELATIVE_REQ_TIMEOUT_POLICY_TYPE.value) {
+                RelativeRequestTimeoutPolicy policy = (RelativeRequestTimeoutPolicy) policies[i];
                 return policy.relative_expiry();
             }
         }
@@ -279,10 +317,10 @@ final public class RefCountPolicyList {
         return 0;
     }
 
-    private long getRelativeRoundTripTimeout(org.omg.CORBA.Policy[] policies) {
+    private long getRelativeRoundTripTimeout(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.RELATIVE_RT_TIMEOUT_POLICY_TYPE.value) {
-                org.omg.Messaging.RelativeRoundtripTimeoutPolicy policy = (org.omg.Messaging.RelativeRoundtripTimeoutPolicy) policies[i];
+            if (policies[i].policy_type() == RELATIVE_RT_TIMEOUT_POLICY_TYPE.value) {
+                RelativeRoundtripTimeoutPolicy policy = (RelativeRoundtripTimeoutPolicy) policies[i];
                 return policy.relative_expiry();
             }
         }
@@ -290,29 +328,29 @@ final public class RefCountPolicyList {
         return 0;
     }
 
-    private static short getRebindMode(org.omg.CORBA.Policy[] policies) {
+    private static short getRebindMode(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.REBIND_POLICY_TYPE.value) {
-                org.omg.Messaging.RebindPolicy policy = (org.omg.Messaging.RebindPolicy) policies[i];
+            if (policies[i].policy_type() == REBIND_POLICY_TYPE.value) {
+                RebindPolicy policy = (RebindPolicy) policies[i];
                 return policy.rebind_mode();
             }
         }
 
-        return org.omg.Messaging.TRANSPARENT.value;
+        return TRANSPARENT.value;
     }
 
-    private static short getSyncScope(org.omg.CORBA.Policy[] policies) {
+    private static short getSyncScope(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.SYNC_SCOPE_POLICY_TYPE.value) {
-                org.omg.Messaging.SyncScopePolicy policy = (org.omg.Messaging.SyncScopePolicy) policies[i];
+            if (policies[i].policy_type() == SYNC_SCOPE_POLICY_TYPE.value) {
+                SyncScopePolicy policy = (SyncScopePolicy) policies[i];
                 return policy.synchronization();
             }
         }
 
-        return org.omg.Messaging.SYNC_NONE.value;
+        return SYNC_NONE.value;
     }
 
-    private static short getLocationTransparency(org.omg.CORBA.Policy[] policies) {
+    private static short getLocationTransparency(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
             if (policies[i].policy_type() == LOCATION_TRANSPARENCY_POLICY_ID.value) {
                 LocationTransparencyPolicy policy = (LocationTransparencyPolicy) policies[i];
@@ -323,19 +361,19 @@ final public class RefCountPolicyList {
         return LOCATION_TRANSPARENCY_RELAXED.value;
     }
 
-    private static short getBiDirMode(org.omg.CORBA.Policy[] policies) {
+    private static short getBiDirMode(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.BiDirPolicy.BIDIRECTIONAL_POLICY_TYPE.value) {
-                org.omg.BiDirPolicy.BidirectionalPolicy policy = (org.omg.BiDirPolicy.BidirectionalPolicy) policies[i];
+            if (policies[i].policy_type() == BIDIRECTIONAL_POLICY_TYPE.value) {
+                BidirectionalPolicy policy = (BidirectionalPolicy) policies[i];
 
                 return policy.value();
             }
         }
 
-        return org.omg.BiDirPolicy.NORMAL.value;
+        return NORMAL.value;
     }
 
-    private static boolean getInterceptor(org.omg.CORBA.Policy[] policies) {
+    private static boolean getInterceptor(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
             if (policies[i].policy_type() == INTERCEPTOR_POLICY_ID.value) {
                 InterceptorPolicy policy = (InterceptorPolicy) policies[i];
@@ -346,7 +384,7 @@ final public class RefCountPolicyList {
         return true;
     }
 
-    private static boolean getLocateRequest(org.omg.CORBA.Policy[] policies) {
+    private static boolean getLocateRequest(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
             if (policies[i].policy_type() == LOCATE_REQUEST_POLICY_ID.value) {
                 LocateRequestPolicy policy = (LocateRequestPolicy) policies[i];
@@ -357,58 +395,58 @@ final public class RefCountPolicyList {
         return false;
     }
 
-    public static org.omg.Messaging.PriorityRange getRequestPriority(
-            org.omg.CORBA.Policy[] policies) {
+    public static PriorityRange getRequestPriority(
+            Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.REQUEST_PRIORITY_POLICY_TYPE.value) {
-                org.omg.Messaging.RequestPriorityPolicy policy = (org.omg.Messaging.RequestPriorityPolicy) policies[i];
+            if (policies[i].policy_type() == REQUEST_PRIORITY_POLICY_TYPE.value) {
+                RequestPriorityPolicy policy = (RequestPriorityPolicy) policies[i];
                 return policy.priority_range();
             }
         }
 
-        org.omg.Messaging.PriorityRange range = new org.omg.Messaging.PriorityRange();
+        PriorityRange range = new PriorityRange();
         range.min = 0;
         range.max = 0;
 
         return range;
     }
 
-    public static org.omg.Messaging.PriorityRange getReplyPriority(
-            org.omg.CORBA.Policy[] policies) {
+    public static PriorityRange getReplyPriority(
+            Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.REPLY_PRIORITY_POLICY_TYPE.value) {
-                org.omg.Messaging.ReplyPriorityPolicy policy = (org.omg.Messaging.ReplyPriorityPolicy) policies[i];
+            if (policies[i].policy_type() == REPLY_PRIORITY_POLICY_TYPE.value) {
+                ReplyPriorityPolicy policy = (ReplyPriorityPolicy) policies[i];
                 return policy.priority_range();
             }
         }
 
-        org.omg.Messaging.PriorityRange range = new org.omg.Messaging.PriorityRange();
+        PriorityRange range = new PriorityRange();
         range.min = 0;
         range.max = 0;
 
         return range;
     }
 
-    public static org.omg.Messaging.RoutingTypeRange getRoutingRange(
-            org.omg.CORBA.Policy[] policies) {
+    public static RoutingTypeRange getRoutingRange(
+            Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.ROUTING_POLICY_TYPE.value) {
-                org.omg.Messaging.RoutingPolicy policy = (org.omg.Messaging.RoutingPolicy) policies[i];
+            if (policies[i].policy_type() == ROUTING_POLICY_TYPE.value) {
+                RoutingPolicy policy = (RoutingPolicy) policies[i];
                 return policy.routing_range();
             }
         }
 
-        org.omg.Messaging.RoutingTypeRange range = new org.omg.Messaging.RoutingTypeRange();
-        range.min = org.omg.Messaging.ROUTE_NONE.value;
-        range.max = org.omg.Messaging.ROUTE_NONE.value;
+        RoutingTypeRange range = new RoutingTypeRange();
+        range.min = ROUTE_NONE.value;
+        range.max = ROUTE_NONE.value;
 
         return range;
     }
 
-    public static short getMaxHops(org.omg.CORBA.Policy[] policies) {
+    public static short getMaxHops(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.MAX_HOPS_POLICY_TYPE.value) {
-                org.omg.Messaging.MaxHopsPolicy policy = (org.omg.Messaging.MaxHopsPolicy) policies[i];
+            if (policies[i].policy_type() == MAX_HOPS_POLICY_TYPE.value) {
+                MaxHopsPolicy policy = (MaxHopsPolicy) policies[i];
                 return policy.max_hops();
             }
         }
@@ -416,22 +454,22 @@ final public class RefCountPolicyList {
         return Short.MAX_VALUE;
     }
 
-    public static short getQueueOrder(org.omg.CORBA.Policy[] policies) {
+    public static short getQueueOrder(Policy[] policies) {
         for (int i = 0; i < policies.length; i++) {
-            if (policies[i].policy_type() == org.omg.Messaging.QUEUE_ORDER_POLICY_TYPE.value) {
-                org.omg.Messaging.QueueOrderPolicy policy = (org.omg.Messaging.QueueOrderPolicy) policies[i];
+            if (policies[i].policy_type() == QUEUE_ORDER_POLICY_TYPE.value) {
+                QueueOrderPolicy policy = (QueueOrderPolicy) policies[i];
                 return policy.allowed_orders();
             }
         }
 
-        return org.omg.Messaging.ORDER_TEMPORAL.value;
+        return ORDER_TEMPORAL.value;
     }
 
     // ----------------------------------------------------------------------
     // RefCountPolicyList public members
     // ----------------------------------------------------------------------
 
-    public RefCountPolicyList(org.omg.CORBA.Policy[] v) {
+    public RefCountPolicyList(Policy[] v) {
         value = v;
         retry = getRetry(v);
         connectTimeout = getConnectTimeout(v);
