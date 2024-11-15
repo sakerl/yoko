@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,33 @@
  */
 package org.apache.yoko.orb.OB;
 
+import static java.security.AccessController.doPrivileged;
+import static java.util.logging.Logger.getLogger;
+import static org.apache.yoko.util.MinorCodes.describeBadInvOrder;
+import static org.apache.yoko.util.MinorCodes.describeBadParam;
+import static org.apache.yoko.util.MinorCodes.describeCommFailure;
+import static org.apache.yoko.util.MinorCodes.describeImpLimit;
+import static org.apache.yoko.util.MinorCodes.describeInitialize;
+import static org.apache.yoko.util.MinorCodes.describeIntfRepos;
+import static org.apache.yoko.util.MinorCodes.describeInvPolicy;
+import static org.apache.yoko.util.MinorCodes.describeMarshal;
+import static org.apache.yoko.util.MinorCodes.describeNoImplement;
+import static org.apache.yoko.util.MinorCodes.describeNoMemory;
+import static org.apache.yoko.util.MinorCodes.describeNoResources;
+import static org.apache.yoko.util.MinorCodes.describeObjectNotExist;
+import static org.apache.yoko.util.MinorCodes.describeUnknown;
+import static org.apache.yoko.util.PrivilegedActions.GET_CONTEXT_CLASS_LOADER;
+
+import java.io.PrintStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.logging.Logger;
+
 import org.apache.yoko.orb.IOP.ServiceContexts;
 import org.apache.yoko.orb.exceptions.Transients;
 import org.apache.yoko.osgi.ProviderLocator;
 import org.apache.yoko.util.Assert;
-import org.apache.yoko.util.MinorCodes;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_CONTEXT;
 import org.omg.CORBA.BAD_INV_ORDER;
@@ -67,17 +89,8 @@ import org.omg.IOP.SendingContextRunTime;
 import org.omg.IOP.ServiceContext;
 import org.omg.SendingContext.CodeBase;
 
-import java.io.PrintStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.logging.Logger;
-
-import static java.security.AccessController.doPrivileged;
-import static org.apache.yoko.util.PrivilegedActions.GET_CONTEXT_CLASS_LOADER;
-
 public final class Util {
-    static final Logger logger = Logger.getLogger(Util.class.getName());
+    static final Logger logger = getLogger(Util.class.getName());
     // Print octets to stream
     public static void printOctets(PrintStream out, byte[] oct, int offset, int length) {
         final int inc = 8;
@@ -139,19 +152,19 @@ public final class Util {
 
         switch (id) {
         case "IDL:omg.org/CORBA/BAD_PARAM:1.0": {
-            String reason = MinorCodes.describeBadParam(minor);
+            String reason = describeBadParam(minor);
             return new BAD_PARAM(reason, minor, status);
         }
         case "IDL:omg.org/CORBA/NO_MEMORY:1.0": {
-            String reason = MinorCodes.describeNoMemory(minor);
+            String reason = describeNoMemory(minor);
             return new NO_MEMORY(reason, minor, status);
         }
         case "IDL:omg.org/CORBA/IMP_LIMIT:1.0": {
-            String reason = MinorCodes.describeImpLimit(minor);
+            String reason = describeImpLimit(minor);
             return new IMP_LIMIT(reason, minor, status);
         }
         case "IDL:omg.org/CORBA/COMM_FAILURE:1.0": {
-            String reason = MinorCodes.describeCommFailure(minor);
+            String reason = describeCommFailure(minor);
             return new COMM_FAILURE(reason, minor, status);
         }
         case "IDL:omg.org/CORBA/INV_OBJREF:1.0":
@@ -161,15 +174,15 @@ public final class Util {
         case "IDL:omg.org/CORBA/INTERNAL:1.0":
             return new INTERNAL(minor, status);
         case "IDL:omg.org/CORBA/MARSHAL:1.0": {
-            String reason = MinorCodes.describeMarshal(minor);
+            String reason = describeMarshal(minor);
             return new MARSHAL(reason, minor, status);
         }
         case "IDL:omg.org/CORBA/INITIALIZE:1.0": {
-            String reason = MinorCodes.describeInitialize(minor);
+            String reason = describeInitialize(minor);
             return new INITIALIZE(reason, minor, status);
         }
         case "IDL:omg.org/CORBA/NO_IMPLEMENT:1.0": {
-            String reason = MinorCodes.describeNoImplement(minor);
+            String reason = describeNoImplement(minor);
             return new NO_IMPLEMENT(reason, minor, status);
         }
         case "IDL:omg.org/CORBA/BAD_TYPECODE:1.0":
@@ -177,7 +190,7 @@ public final class Util {
         case "IDL:omg.org/CORBA/BAD_OPERATION:1.0":
             return new BAD_OPERATION(minor, status);
         case "IDL:omg.org/CORBA/NO_RESOURCES:1.0": {
-            String reason = MinorCodes.describeNoResources(minor);
+            String reason = describeNoResources(minor);
             return new NO_RESOURCES(reason, minor, status);
         }
         case "IDL:omg.org/CORBA/NO_RESPONSE:1.0":
@@ -185,7 +198,7 @@ public final class Util {
         case "IDL:omg.org/CORBA/PERSIST_STORE:1.0":
             return new PERSIST_STORE(minor, status);
         case "IDL:omg.org/CORBA/BAD_INV_ORDER:1.0": {
-            String reason = MinorCodes.describeBadInvOrder(minor);
+            String reason = describeBadInvOrder(minor);
             return new BAD_INV_ORDER(reason, minor, status);
         }
         case "IDL:omg.org/CORBA/TRANSIENT:1.0": {
@@ -198,7 +211,7 @@ public final class Util {
         case "IDL:omg.org/CORBA/INV_FLAG:1.0":
             return new INV_FLAG(minor, status);
         case "IDL:omg.org/CORBA/INTF_REPOS:1.0": {
-            String reason = MinorCodes.describeIntfRepos(minor);
+            String reason = describeIntfRepos(minor);
             return new INTF_REPOS(reason, minor, status);
         }
         case "IDL:omg.org/CORBA/BAD_CONTEXT:1.0":
@@ -208,7 +221,7 @@ public final class Util {
         case "IDL:omg.org/CORBA/DATA_CONVERSION:1.0":
             return new DATA_CONVERSION(minor, status);
         case "IDL:omg.org/CORBA/OBJECT_NOT_EXIST:1.0": {
-            String reason = MinorCodes.describeObjectNotExist(minor);
+            String reason = describeObjectNotExist(minor);
             return new OBJECT_NOT_EXIST(reason, minor, status);
         }
         case "IDL:omg.org/CORBA/TRANSACTION_REQUIRED:1.0":
@@ -218,7 +231,7 @@ public final class Util {
         case "IDL:omg.org/CORBA/INVALID_TRANSACTION:1.0":
             return new INVALID_TRANSACTION(minor, status);
         case "IDL:omg.org/CORBA/INV_POLICY:1.0": {
-            String reason = MinorCodes.describeInvPolicy(minor);
+            String reason = describeInvPolicy(minor);
             return new INV_POLICY(reason, minor, status);
         }
         case "IDL:omg.org/CORBA/CODESET_INCOMPATIBLE:1.0":
@@ -236,7 +249,7 @@ public final class Util {
         }
 
         // Unknown exception
-        String reason = MinorCodes.describeUnknown(minor);
+        String reason = describeUnknown(minor);
         return new UNKNOWN(reason, minor, status);
     }
 
