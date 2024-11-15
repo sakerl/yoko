@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,37 @@
  */
 package org.apache.yoko.orb.OB;
 
+import static java.lang.Boolean.getBoolean;
+import static java.security.AccessController.doPrivileged;
+import static java.util.logging.Level.FINE;
+import static javax.rmi.CORBA.Util.createValueHandler;
+import static org.apache.yoko.logging.VerboseLogging.MARSHAL_LOG;
+import static org.apache.yoko.orb.CORBA.TypeCode._OB_getOrigType;
+import static org.apache.yoko.orb.OB.ValueReader.SettingsHolder.IGNORE_INVALID_VALUE_TAG;
+import static org.apache.yoko.util.Exceptions.as;
+import static org.apache.yoko.util.MinorCodes.MinorNoValueFactory;
+import static org.apache.yoko.util.MinorCodes.MinorReadInvalidIndirection;
+import static org.apache.yoko.util.MinorCodes.describeMarshal;
+import static org.apache.yoko.util.PrivilegedActions.GET_CONTEXT_CLASS_LOADER;
+import static org.apache.yoko.util.PrivilegedActions.action;
+import static org.apache.yoko.util.PrivilegedActions.getNoArgConstructor;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+import static org.omg.CORBA.TCKind.tk_abstract_interface;
+import static org.omg.CORBA.TCKind.tk_value;
+import static org.omg.CORBA.TCKind.tk_value_box;
+
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.security.PrivilegedActionException;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
+
+import javax.rmi.CORBA.Util;
+import javax.rmi.CORBA.ValueHandler;
+
 import org.apache.yoko.io.ReadBuffer;
 import org.apache.yoko.orb.CORBA.InputStream;
 import org.apache.yoko.orb.CORBA.OutputStream;
@@ -28,44 +59,18 @@ import org.omg.CORBA.DataInputStream;
 import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.StringHolder;
 import org.omg.CORBA.SystemException;
-import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.TypeCodePackage.BadKind;
-import org.omg.CORBA.TypeCodePackage.Bounds;
 import org.omg.CORBA.VM_CUSTOM;
 import org.omg.CORBA.VM_NONE;
 import org.omg.CORBA.VM_TRUNCATABLE;
 import org.omg.CORBA.WStringValueHelper;
+import org.omg.CORBA.TypeCodePackage.BadKind;
+import org.omg.CORBA.TypeCodePackage.Bounds;
 import org.omg.CORBA.portable.BoxedValueHelper;
 import org.omg.CORBA.portable.IndirectionException;
 import org.omg.CORBA.portable.StreamableValue;
 import org.omg.CORBA.portable.ValueFactory;
 import org.omg.SendingContext.CodeBase;
-
-import javax.rmi.CORBA.Util;
-import javax.rmi.CORBA.ValueHandler;
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.security.PrivilegedActionException;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Optional;
-import java.util.logging.Level;
-
-import static java.lang.Boolean.getBoolean;
-import static java.security.AccessController.doPrivileged;
-import static java.util.logging.Level.FINE;
-import static org.apache.yoko.logging.VerboseLogging.MARSHAL_LOG;
-import static org.apache.yoko.orb.OB.ValueReader.SettingsHolder.IGNORE_INVALID_VALUE_TAG;
-import static org.apache.yoko.util.Exceptions.as;
-import static org.apache.yoko.util.MinorCodes.MinorNoValueFactory;
-import static org.apache.yoko.util.MinorCodes.MinorReadInvalidIndirection;
-import static org.apache.yoko.util.MinorCodes.describeMarshal;
-import static org.apache.yoko.util.PrivilegedActions.GET_CONTEXT_CLASS_LOADER;
-import static org.apache.yoko.util.PrivilegedActions.action;
-import static org.apache.yoko.util.PrivilegedActions.getNoArgConstructor;
-import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
 public final class ValueReader {
 
@@ -826,7 +831,7 @@ public final class ValueReader {
     /** Remarshal each valuetype member */
     private void copyValueState(TypeCode tc, OutputStream out) {
         try {
-            if (tc.kind() == TCKind.tk_value) {
+            if (tc.kind() == tk_value) {
                 //
                 // First copy the state of the concrete base type, if any
                 //
@@ -839,7 +844,7 @@ public final class ValueReader {
 //                  logger.fine("writing member of typecode " + tc.member_type(i).kind().value());
                     out.write_InputStream(in_, tc.member_type(i));
                 }
-            } else if (tc.kind() == TCKind.tk_value_box) {
+            } else if (tc.kind() == tk_value_box) {
                 out.write_InputStream(in_, tc.content_type());
             } else {
                 throw Assert.fail();
@@ -871,11 +876,11 @@ public final class ValueReader {
 //      logger.finer("Locating type code for id " + id);
         while (result == null) {
             try {
-                final TypeCode t2 = org.apache.yoko.orb.CORBA.TypeCode._OB_getOrigType(t);
+                final TypeCode t2 = _OB_getOrigType(t);
 //              logger.finer("Checking typecode " + id + " against " + t2.id());
                 if (id.equals(t2.id())) {
                     result = t;
-                } else if ((t2.kind() == TCKind.tk_value) && (t2.type_modifier() == VM_TRUNCATABLE.value)) {
+                } else if ((t2.kind() == tk_value) && (t2.type_modifier() == VM_TRUNCATABLE.value)) {
                     t = t2.concrete_base_type();
 //                  logger.finer("Iterating with concrete type " + t.id());
                 } else {
@@ -909,7 +914,7 @@ public final class ValueReader {
         }
 
         if (MARSHAL_LOG.isLoggable(FINE)) MARSHAL_LOG.fine(String.format("Reading RMI value of type \"%s\"", repid));
-        if (valueHandler == null) valueHandler = javax.rmi.CORBA.Util.createValueHandler();
+        if (valueHandler == null) valueHandler = createValueHandler();
 
         final String repoClassName = RepIds.query(repid).toClassName();
 
@@ -1074,7 +1079,7 @@ public final class ValueReader {
             positionTable_ = new Hashtable<>(131);
         }
 
-        final TypeCode origTC = org.apache.yoko.orb.CORBA.TypeCode._OB_getOrigType(tc);
+        final TypeCode origTC = _OB_getOrigType(tc);
 
         final Header h = new Header();
         h.tag = in_.read_long();
@@ -1158,7 +1163,7 @@ public final class ValueReader {
             short mod = VM_NONE.value;
             try {
                 tcId = origTC.id();
-                if (origTC.kind() == TCKind.tk_value) {
+                if (origTC.kind() == tk_value) {
                     mod = origTC.type_modifier();
                 }
             } catch (BadKind ex) {
@@ -1276,7 +1281,7 @@ public final class ValueReader {
             // because we don't have the BoxedHelper and may not be
             // able to locate one via the class loader.
             //
-            if ((idPos < factoryPos) || (h.ids.length == 0) || (origTC.kind() == TCKind.tk_value_box)) {
+            if ((idPos < factoryPos) || (h.ids.length == 0) || (origTC.kind() == tk_value_box)) {
 
                 //
                 // We may need to truncate the state of this value, which
@@ -1351,7 +1356,7 @@ public final class ValueReader {
             //
         }
 
-        final TypeCode origTC = org.apache.yoko.orb.CORBA.TypeCode._OB_getOrigType(tc);
+        final TypeCode origTC = _OB_getOrigType(tc);
 
         if (MARSHAL_LOG.isLoggable(FINE))
             MARSHAL_LOG.fine(String.format(
@@ -1361,7 +1366,7 @@ public final class ValueReader {
         //
         // Check if the Any contains an abstract interface
         //
-        if (origTC.kind() == TCKind.tk_abstract_interface) {
+        if (origTC.kind() == tk_abstract_interface) {
             final boolean b = in_.read_boolean();
             if (b) {
                 MARSHAL_LOG.fine("Reading an object reference for an abstract interface");
@@ -1421,7 +1426,7 @@ public final class ValueReader {
         //
         // No need to worry about truncation for boxed valuetypes
         //
-        if (origTC.kind() == TCKind.tk_value_box) {
+        if (origTC.kind() == tk_value_box) {
             try {
                 any.insert_Value(readValue(tc.id()), tc);
                 return;
