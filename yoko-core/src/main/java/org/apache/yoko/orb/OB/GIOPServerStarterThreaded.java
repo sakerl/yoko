@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,20 @@ import org.apache.yoko.orb.OCI.Acceptor;
 import org.apache.yoko.orb.OCI.Transport;
 import org.apache.yoko.util.Assert;
 import org.apache.yoko.util.MinorCodes;
+import org.omg.CORBA.IMP_LIMIT;
+import org.omg.CORBA.NO_PERMISSION;
+import org.omg.CORBA.SystemException;
 
 import java.util.concurrent.ExecutorService;
+import java.util.logging.Level;
 
 import static java.util.logging.Level.INFO;
 import static org.apache.yoko.orb.OB.GIOPServerStarter.ServerState.ACTIVE;
 import static org.apache.yoko.orb.OB.GIOPServerStarter.ServerState.CLOSED;
 import static org.apache.yoko.orb.OB.GIOPServerStarter.ServerState.HOLDING;
+import static org.apache.yoko.util.MinorCodes.MinorThreadLimit;
+import static org.apache.yoko.util.MinorCodes.describeImpLimit;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 import static org.apache.yoko.logging.VerboseLogging.CONN_IN_LOG;
 
 
@@ -57,7 +64,7 @@ final class GIOPServerStarterThreaded extends GIOPServerStarter {
                     }
                     GIOPConnection connection = new GIOPConnectionThreaded(orbInstance_, t, oaInterface_);
                     connection.setState(State.CLOSING);
-                } catch (org.omg.CORBA.SystemException ex) {
+                } catch (SystemException ex) {
                 }
             } while (true);
 
@@ -89,10 +96,9 @@ final class GIOPServerStarterThreaded extends GIOPServerStarter {
         } catch (OutOfMemoryError ex) {
             acceptor_.close();
             serverState = ServerState.CLOSED;
-            throw new org.omg.CORBA.IMP_LIMIT(MinorCodes
-                    .describeImpLimit(MinorCodes.MinorThreadLimit),
-                    MinorCodes.MinorThreadLimit,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new IMP_LIMIT(describeImpLimit(MinorThreadLimit),
+                    MinorThreadLimit,
+                    COMPLETED_NO);
         }
     }
 
@@ -172,15 +178,15 @@ final class GIOPServerStarterThreaded extends GIOPServerStarter {
             //
             // Get new transport, blocking
             //
-            org.apache.yoko.orb.OCI.Transport transport = null;
+            Transport transport = null;
             try {
                 transport = acceptor_.accept(true);
                 Assert.ensure(transport != null);
-            } catch (org.omg.CORBA.NO_PERMISSION ex) {
+            } catch (NO_PERMISSION ex) {
                 //
                 // Ignore NO_PERMISSION exceptions
                 //
-            } catch (org.omg.CORBA.SystemException ex) {
+            } catch (SystemException ex) {
                 //
                 // Ignore exception. This probably means that the server
                 // exceeded the number of available file descriptors.
@@ -232,9 +238,9 @@ final class GIOPServerStarterThreaded extends GIOPServerStarter {
                             connection.setState(State.CLOSING);
                             logger.fine("set connection state to closing");
                         }
-                    } catch (org.omg.CORBA.SystemException ex) {
+                    } catch (SystemException ex) {
                         String msg = "can't accept connection\n" + ex.getMessage();
-                        logger.log(java.util.logging.Level.WARNING, msg, ex);
+                        logger.log(Level.WARNING, msg, ex);
                     }
                 }
 
