@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,13 @@ import org.apache.yoko.util.Assert;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.INITIALIZE;
 import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.TRANSIENT;
 
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import static java.util.logging.Logger.getLogger;
 import static org.apache.yoko.util.MinorCodes.*;
 import static org.omg.CORBA.CompletionStatus.*;
 
@@ -90,7 +92,7 @@ final class DispatchThreadPerRequest_impl extends LocalObject implements Dispatc
             Thread t = new Dispatcher(request);
             t.start();
         } catch (OutOfMemoryError e) {
-            throw new org.omg.CORBA.TRANSIENT();
+            throw new TRANSIENT();
         }
     }
 }
@@ -134,7 +136,7 @@ final class DispatchThreadPool_impl extends LocalObject implements DispatchStrat
 }
 
 public final class DispatchStrategyFactory_impl extends LocalObject implements DispatchStrategyFactory {
-    private static final Logger logger = Logger.getLogger(DispatchStrategyFactory.class.getName());
+    private static final Logger logger = getLogger(DispatchStrategyFactory.class.getName());
     //
     // A sequence of thread pools. The index in the sequence is the
     // thread pool id.
