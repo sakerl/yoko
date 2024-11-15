@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,23 @@
  */
 package org.apache.yoko.orb.OB;
 
+import org.apache.yoko.orb.OCI.Acceptor;
 import org.apache.yoko.util.Assert;
 
+import static java.util.logging.Logger.getLogger;
+
+import java.util.Enumeration;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 public final class ServerManager {
-    static final Logger logger = Logger.getLogger(ServerManager.class.getName());
+    static final Logger logger = getLogger(ServerManager.class.getName());
     
     private boolean destroy_; // if destroy() was called
 
     private CollocatedServer collocatedServer_; // The collocated server
 
-    private java.util.Vector allServers_ = new java.util.Vector(); // all other
+    private Vector allServers_ = new Vector(); // all other
                                                                     // servers
 
     // ----------------------------------------------------------------------
@@ -48,8 +53,8 @@ public final class ServerManager {
     // ----------------------------------------------------------------------
 
     public ServerManager(ORBInstance orbInstance,
-            org.apache.yoko.orb.OCI.Acceptor[] acceptors,
-            org.apache.yoko.orb.OB.OAInterface oaInterface, int concModel) {
+            Acceptor[] acceptors,
+            OAInterface oaInterface, int concModel) {
         destroy_ = false;
 
         //
@@ -79,7 +84,7 @@ public final class ServerManager {
         //
         // Destroy all servers
         //
-        java.util.Enumeration e = allServers_.elements();
+        Enumeration e = allServers_.elements();
         while (e.hasMoreElements())
             ((Server) e.nextElement()).destroy();
 
@@ -89,7 +94,7 @@ public final class ServerManager {
 
     public synchronized void hold() {
         logger.fine("Holding all servers"); 
-        java.util.Enumeration e = allServers_.elements();
+        Enumeration e = allServers_.elements();
         while (e.hasMoreElements()) {
             ((Server) e.nextElement()).hold();
         }
@@ -97,7 +102,7 @@ public final class ServerManager {
 
     public synchronized void activate() {
         logger.fine("Activating all servers"); 
-        java.util.Enumeration e = allServers_.elements();
+        Enumeration e = allServers_.elements();
         while (e.hasMoreElements()) {
             ((Server) e.nextElement()).activate();
         }
@@ -107,12 +112,12 @@ public final class ServerManager {
         return collocatedServer_;
     }
 
-    public synchronized org.apache.yoko.orb.OB.Server[] getServers() {
-        org.apache.yoko.orb.OB.Server[] servers = new org.apache.yoko.orb.OB.Server[allServers_
+    public synchronized Server[] getServers() {
+        Server[] servers = new Server[allServers_
                 .size()];
 
         for (int i = 0; i < allServers_.size(); i++) {
-            servers[i] = (org.apache.yoko.orb.OB.Server) allServers_.elementAt(i);
+            servers[i] = (Server) allServers_.elementAt(i);
         }
         return servers;
     }
