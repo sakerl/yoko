@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.OB;
+
+import org.apache.yoko.orb.OB.BootManagerPackage.NotFound;
+import org.omg.CORBA.BooleanHolder;
+import org.omg.CORBA.ObjectHolder;
 
 //
 // IDL:orb.yoko.apache.org/OB/BootLocator:1.0
@@ -50,7 +54,7 @@ public interface BootLocatorOperations
 
     void
     locate(byte[] oid,
-           org.omg.CORBA.ObjectHolder obj,
-           org.omg.CORBA.BooleanHolder add)
-        throws org.apache.yoko.orb.OB.BootManagerPackage.NotFound;
+           ObjectHolder obj,
+           BooleanHolder add)
+        throws NotFound;
 }
