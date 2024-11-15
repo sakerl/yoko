@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,13 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.util.MinorCodes;
+import static java.lang.Character.digit;
+import static org.apache.yoko.util.MinorCodes.MinorBadAddress;
+import static org.apache.yoko.util.MinorCodes.MinorOther;
+import static org.apache.yoko.util.MinorCodes.describeBadParam;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
+import org.omg.CORBA.BAD_PARAM;
 
 class URLUtil {
     // 
@@ -37,21 +43,19 @@ class URLUtil {
             //
             if (ch == '%') {
                 if (pos + 2 >= len)
-                    throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                            .describeBadParam(MinorCodes.MinorBadAddress)
+                    throw new BAD_PARAM(describeBadParam(MinorBadAddress)
                             + ": bad escape sequence length",
-                            MinorCodes.MinorBadAddress,
-                            org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                            MinorBadAddress,
+                            COMPLETED_NO);
 
-                int c1 = Character.digit(str.charAt(++pos), 16);
-                int c2 = Character.digit(str.charAt(++pos), 16);
+                int c1 = digit(str.charAt(++pos), 16);
+                int c2 = digit(str.charAt(++pos), 16);
 
                 if (c1 == -1 || c2 == -1)
-                    throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                            .describeBadParam(MinorCodes.MinorOther)
+                    throw new BAD_PARAM(describeBadParam(MinorOther)
                             + ": escape sequence contains invalid characters",
-                            MinorCodes.MinorOther,
-                            org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                            MinorOther,
+                            COMPLETED_NO);
 
                 ch = (char) ((c1 << 4) | c2);
             }
