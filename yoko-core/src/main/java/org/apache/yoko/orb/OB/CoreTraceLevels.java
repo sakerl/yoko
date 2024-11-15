@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,16 @@
  */
 package org.apache.yoko.orb.OB;
 
+import java.util.Enumeration;
+
 import org.apache.yoko.util.Assert;
 
-final public class CoreTraceLevels {
+public final class CoreTraceLevels {
 
     public CoreTraceLevels(Logger logger, java.util.Properties properties) {
 
         String propRoot = "yoko.orb.trace.";
-        java.util.Enumeration keys = properties.keys();
+        Enumeration keys = properties.keys();
         while (keys.hasMoreElements()) {
             String key = (String) keys.nextElement();
             if (!key.startsWith(propRoot))
