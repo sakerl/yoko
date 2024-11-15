@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,14 +34,14 @@ final class UTF16Reader extends CodeSetReader {
         //
         // check if this was a BOM
         //
-        if (((Flags_ & CodeSetReader.FIRST_CHAR) != 0)
+        if (((Flags_ & FIRST_CHAR) != 0)
                 && (v == (char) 0xFEFF)) {
             //
             // it was a big endian BOM
             //
             v = (char) ((readBuffer.readByte() & 0xff) << 8);
             v |= (char) ((readBuffer.readByte() & 0xff));
-        } else if (((Flags_ & CodeSetReader.FIRST_CHAR) != 0)
+        } else if (((Flags_ & FIRST_CHAR) != 0)
                 && (v == (char) 0xFFFE)) {
             //
             // it was a little endian BOM
@@ -52,8 +52,8 @@ final class UTF16Reader extends CodeSetReader {
             //
             // enable the little endian reader flag
             //
-            Flags_ |= CodeSetReader.L_ENDIAN;
-        } else if ((Flags_ & CodeSetReader.L_ENDIAN) != 0) {
+            Flags_ |= L_ENDIAN;
+        } else if ((Flags_ & L_ENDIAN) != 0) {
             //
             // swap the character input
             //
@@ -63,14 +63,14 @@ final class UTF16Reader extends CodeSetReader {
         //
         // turn off the first character reading
         //
-        Flags_ &= ~CodeSetReader.FIRST_CHAR;
+        Flags_ &= ~FIRST_CHAR;
 
         return v;
     }
 
     public int count_wchar(char first) {
         // if we're the first character and this is a BOM, then we need to return 4
-        if (((Flags_ & CodeSetReader.FIRST_CHAR) != 0)
+        if (((Flags_ & FIRST_CHAR) != 0)
                 && ((first == (char) 0xFEFF) || first == (char) 0xFFFE))
             return 4;
         return 2;
