@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.orb.OB.CONNECTION_REUSE_POLICY_ID;
-import org.apache.yoko.orb.OB.ConnectionReusePolicy;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.Policy;
 
-final public class ConnectionReusePolicy_impl extends org.omg.CORBA.LocalObject
+public final class ConnectionReusePolicy_impl extends LocalObject
         implements ConnectionReusePolicy {
     private boolean value_;
 
@@ -36,7 +36,7 @@ final public class ConnectionReusePolicy_impl extends org.omg.CORBA.LocalObject
         return CONNECTION_REUSE_POLICY_ID.value;
     }
 
-    public org.omg.CORBA.Policy copy() {
+    public Policy copy() {
         return this;
     }
 
