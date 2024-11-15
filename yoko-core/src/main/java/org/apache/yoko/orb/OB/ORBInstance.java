@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,9 @@ import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CORBA.PolicyManager;
 import org.omg.CORBA.PolicyManagerHelper;
 import org.omg.IOP.CodecFactory;
+
+import static java.lang.Integer.parseInt;
+import static java.util.concurrent.Executors.newCachedThreadPool;
 
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -128,14 +131,14 @@ public final class ORBInstance {
 
         // Create the server and client executors
         // TODO why are these separate?
-        clientExecutor = Executors.newCachedThreadPool(
+        clientExecutor = newCachedThreadPool(
                 r -> {
                     Thread result = new Thread(r);
                     result.setDaemon(true);
                     return result;
                 }
         );
-        serverExecutor = Executors.newCachedThreadPool(
+        serverExecutor = newCachedThreadPool(
                 r -> {
                     Thread result = new Thread(r);
                     result.setDaemon(true);
@@ -153,7 +156,7 @@ public final class ORBInstance {
 
         // get the number of AMI worker threads
         String amiWorkersStr = this.properties.getProperty("yoko.orb.ami_workers");
-        int amiWorkers = amiWorkersStr == null ? 1 : Math.max(1, Integer.parseInt(amiWorkersStr));
+        int amiWorkers = amiWorkersStr == null ? 1 : Math.max(1, parseInt(amiWorkersStr));
 
         asyncHandler = new OrbAsyncHandler(amiWorkers);
     }
