@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,20 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.util.MinorCodes;
+import static org.apache.yoko.util.MinorCodes.MinorBadSchemeName;
+import static org.apache.yoko.util.MinorCodes.describeBadParam;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
-public class URLRegistry_impl extends org.omg.CORBA.LocalObject implements
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import org.apache.yoko.orb.OB.URLRegistryPackage.SchemeAlreadyExists;
+import org.omg.CORBA.BAD_PARAM;
+import org.omg.CORBA.LocalObject;
+
+public class URLRegistry_impl extends LocalObject implements
         URLRegistry {
-    private java.util.Hashtable schemes_ = new java.util.Hashtable();
+    private Hashtable schemes_ = new Hashtable();
 
     // ------------------------------------------------------------------
     // URLRegistry_impl constructor
@@ -35,10 +44,10 @@ public class URLRegistry_impl extends org.omg.CORBA.LocalObject implements
     // ------------------------------------------------------------------
 
     public void add_scheme(URLScheme scheme)
-            throws org.apache.yoko.orb.OB.URLRegistryPackage.SchemeAlreadyExists {
+            throws SchemeAlreadyExists {
         String name = scheme.name();
         if (schemes_.containsKey(name))
-            throw new org.apache.yoko.orb.OB.URLRegistryPackage.SchemeAlreadyExists();
+            throw new SchemeAlreadyExists();
         schemes_.put(name, scheme);
     }
 
@@ -48,29 +57,27 @@ public class URLRegistry_impl extends org.omg.CORBA.LocalObject implements
 
     public org.omg.CORBA.Object parse_url(String url) {
         if (url == null)
-            throw new org.omg.CORBA.BAD_PARAM();
+            throw new BAD_PARAM();
 
         int colon = url.indexOf(':');
         if (colon <= 0)
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorBadSchemeName),
-                    MinorCodes.MinorBadSchemeName,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorBadSchemeName),
+                    MinorBadSchemeName,
+                    COMPLETED_NO);
 
         String name = url.substring(0, colon).toLowerCase();
         URLScheme scheme = find_scheme(name);
         if (scheme == null)
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorBadSchemeName),
-                    MinorCodes.MinorBadSchemeName,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorBadSchemeName),
+                    MinorBadSchemeName,
+                    COMPLETED_NO);
 
         String urlCopy = name + url.substring(colon);
         return scheme.parse_url(urlCopy);
     }
 
     public void destroy() {
-        java.util.Enumeration e = schemes_.elements();
+        Enumeration e = schemes_.elements();
         while (e.hasMoreElements()) {
             URLScheme scheme = (URLScheme) e.nextElement();
             scheme.destroy();
