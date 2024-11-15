@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,16 @@
  */
 package org.apache.yoko.orb.OB;
 
+import static org.apache.yoko.util.MinorCodes.MinorRequestNotSent;
+import static org.apache.yoko.util.MinorCodes.describeBadInvOrder;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
+import java.util.Vector;
+
 import org.apache.yoko.util.MinorCodes;
+import org.omg.CORBA.BAD_INV_ORDER;
+import org.omg.CORBA.Request;
+import org.omg.CORBA.WrongTransaction;
 
 //
 // The MultiRequestSender class. ORB::send_multiple_requests() and all
@@ -25,7 +34,7 @@ import org.apache.yoko.util.MinorCodes;
 //
 public class MultiRequestSender {
     // org.apache.yoko.orb.CORBA.Request needs access to private members
-    public java.util.Vector deferredRequests_ = new java.util.Vector();
+    public Vector deferredRequests_ = new Vector();
 
     // OBORB_impl creates MultiRequestSender
     public MultiRequestSender() {
@@ -36,7 +45,7 @@ public class MultiRequestSender {
     // ----------------------------------------------------------------------
 
     public synchronized boolean findDeferredRequest(
-            org.omg.CORBA.Request request) {
+            Request request) {
         for (int index = 0; index < deferredRequests_.size(); index++)
             if (deferredRequests_.elementAt(index) == request)
                 return true;
@@ -44,11 +53,11 @@ public class MultiRequestSender {
         return false;
     }
 
-    public synchronized void addDeferredRequest(org.omg.CORBA.Request request) {
+    public synchronized void addDeferredRequest(Request request) {
         deferredRequests_.addElement(request);
     }
 
-    public synchronized void removeDeferredRequest(org.omg.CORBA.Request request) {
+    public synchronized void removeDeferredRequest(Request request) {
         int index;
         for (index = 0; index < deferredRequests_.size(); index++)
             if (deferredRequests_.elementAt(index) == request)
@@ -62,7 +71,7 @@ public class MultiRequestSender {
     // Public member implementations
     // ----------------------------------------------------------------------
 
-    public void sendMultipleRequestsOneway(org.omg.CORBA.Request[] requests) {
+    public void sendMultipleRequestsOneway(Request[] requests) {
         //
         // Send all requests oneway
         //
@@ -70,7 +79,7 @@ public class MultiRequestSender {
             requests[i].send_oneway();
     }
 
-    public void sendMultipleRequestsDeferred(org.omg.CORBA.Request[] requests) {
+    public void sendMultipleRequestsDeferred(Request[] requests) {
         //
         // Send all requests deferred
         //
@@ -80,17 +89,16 @@ public class MultiRequestSender {
 
     public synchronized boolean pollNextResponse() {
         if (deferredRequests_.size() == 0)
-            throw new org.omg.CORBA.BAD_INV_ORDER(MinorCodes
-                    .describeBadInvOrder(MinorCodes.MinorRequestNotSent),
-                    MinorCodes.MinorRequestNotSent,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_INV_ORDER(describeBadInvOrder(MinorRequestNotSent),
+                    MinorRequestNotSent,
+                    COMPLETED_NO);
 
         //
         // Poll all deferred requests
         //
         boolean polled = false;
         for (int i = 0; i < deferredRequests_.size(); i++) {
-            org.omg.CORBA.Request req = (org.omg.CORBA.Request) deferredRequests_
+            Request req = (Request) deferredRequests_
                     .elementAt(i);
             if (req.poll_response())
                 polled = true;
@@ -99,15 +107,15 @@ public class MultiRequestSender {
         return polled;
     }
 
-    public synchronized org.omg.CORBA.Request getNextResponse()
-            throws org.omg.CORBA.WrongTransaction {
-        org.omg.CORBA.Request request = null;
+    public synchronized Request getNextResponse()
+            throws WrongTransaction {
+        Request request = null;
 
         //
         // Try to find a deferred request that has completed already
         //
         for (int i = 0; i < deferredRequests_.size(); i++) {
-            request = (org.omg.CORBA.Request) deferredRequests_.elementAt(i);
+            request = (Request) deferredRequests_.elementAt(i);
             if (((org.apache.yoko.orb.CORBA.Request) request)._OB_completed()) {
                 deferredRequests_.removeElementAt(i);
                 return request;
@@ -119,14 +127,13 @@ public class MultiRequestSender {
         // the first request.
         //
         if (deferredRequests_.size() > 0) {
-            request = (org.omg.CORBA.Request) deferredRequests_.elementAt(0);
+            request = (Request) deferredRequests_.elementAt(0);
             request.get_response();
             return request;
         }
 
-        throw new org.omg.CORBA.BAD_INV_ORDER(MinorCodes
-                .describeBadInvOrder(MinorCodes.MinorRequestNotSent),
-                MinorCodes.MinorRequestNotSent,
-                org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+        throw new BAD_INV_ORDER(describeBadInvOrder(MinorRequestNotSent),
+                MinorRequestNotSent,
+                COMPLETED_NO);
     }
 }
