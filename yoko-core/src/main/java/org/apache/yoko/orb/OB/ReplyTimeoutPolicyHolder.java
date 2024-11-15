@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@ package org.apache.yoko.orb.OB;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.Streamable;
 
-public final class ReplyTimeoutPolicyHolder implements org.omg.CORBA.portable.Streamable {
+public final class ReplyTimeoutPolicyHolder implements Streamable {
     public ReplyTimeoutPolicy value;
 
     public ReplyTimeoutPolicyHolder() {}
