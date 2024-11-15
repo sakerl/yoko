@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,13 @@ import org.omg.IOP.IOR;
 
 import java.util.logging.Logger;
 
+import static java.util.logging.Logger.getLogger;
 import static org.apache.yoko.util.MinorCodes.MinorORBDestroyed;
 import static org.apache.yoko.util.MinorCodes.describeInitialize;
 import static org.omg.CORBA.CompletionStatus.*;
 
 public final class ObjectFactory {
-    private static final Logger logger = Logger.getLogger(ObjectFactory.class.getName());
+    private static final Logger logger = getLogger(ObjectFactory.class.getName());
     private boolean destroy_; // True if destroy() was called
     private ORBInstance orbInstance_; // The ORBInstance object
     private PolicyManager policyManager_; // The PolicyManager object
