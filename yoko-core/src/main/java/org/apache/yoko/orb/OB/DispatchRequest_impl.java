@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.orb.OB.DispatchRequest;
+import org.apache.yoko.orb.OBPortableServer.POA_impl;
+import org.omg.CORBA.LocalObject;
 
-final public class DispatchRequest_impl extends org.omg.CORBA.LocalObject
+public final class DispatchRequest_impl extends LocalObject
         implements DispatchRequest {
     //
     // The POA
     //
-    protected org.apache.yoko.orb.OBPortableServer.POA_impl poa_;
+    protected POA_impl poa_;
 
     //
     // The ObjectId
@@ -41,7 +42,7 @@ final public class DispatchRequest_impl extends org.omg.CORBA.LocalObject
     // ------------------------------------------------------------------
 
     public DispatchRequest_impl(
-            org.apache.yoko.orb.OBPortableServer.POA_impl poa, byte[] oid,
+            POA_impl poa, byte[] oid,
             Upcall upcall) {
         poa_ = poa;
         oid_ = oid;
