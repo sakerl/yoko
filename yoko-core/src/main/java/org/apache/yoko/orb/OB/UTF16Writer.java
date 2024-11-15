@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ final class UTF16Writer extends CodeSetWriter {
         // if this character is the same character as the BOM, then we
         // need to escape it with the Big Endian BOM
         //
-        if (((Flags_ & CodeSetWriter.FIRST_CHAR) != 0) && (v == (char) 0xFEFF || v == (char) 0xFFFE)) {
+        if (((Flags_ & FIRST_CHAR) != 0) && (v == (char) 0xFEFF || v == (char) 0xFFFE)) {
             writeBuffer.writeByte(0xFE);
             writeBuffer.writeByte(0xFF);
         }
@@ -44,12 +44,12 @@ final class UTF16Writer extends CodeSetWriter {
         //
         // turn off the FIRST_CHAR flag
         //
-        Flags_ &= ~CodeSetWriter.FIRST_CHAR;
+        Flags_ &= ~FIRST_CHAR;
     }
 
     public int count_wchar(char v) {
         // we need to escape the first character if its a BOM
-        if (((Flags_ & CodeSetWriter.FIRST_CHAR) != 0) && (v == 0xFEFF || v == 0xFFFE))
+        if (((Flags_ & FIRST_CHAR) != 0) && (v == 0xFEFF || v == 0xFFFE))
             return 4;
 
         return 2;
