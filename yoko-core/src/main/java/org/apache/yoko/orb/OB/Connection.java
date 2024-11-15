@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,7 @@
  */
 package org.apache.yoko.orb.OB;
 
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
-
+import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.logging.Logger.getLogger;
@@ -32,6 +26,12 @@ import static org.apache.yoko.orb.OB.Connection.Access.READ;
 import static org.apache.yoko.orb.OB.Connection.Access.WRITE;
 import static org.apache.yoko.orb.OB.Connection.Flag.CLOSING_LOGGED;
 import static org.apache.yoko.util.CollectionExtras.readOnlyEnumSet;
+
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 abstract class Connection {
     private final static Logger logger = getLogger(Connection.class.getName());
@@ -88,19 +88,19 @@ abstract class Connection {
             map.put(CLOSING, readOnlyEnumSet(ERROR, CLOSED));
             map.put(ERROR, readOnlyEnumSet(CLOSED));
             map.put(CLOSED, readOnlyEnumSet(STALE));
-            map.put(STALE, Collections.EMPTY_SET);
+            map.put(STALE, emptySet());
         }
 
-        State() { this.permissions = Collections.EMPTY_SET; }
+        State() { this.permissions = emptySet(); }
 
         State(Access...permissions) {
             // EnumSet.of() requires an initial element, but it's ok to add the element twice
             this.permissions = unmodifiableSet(EnumSet.of(permissions[0], permissions));
         }
 
-        final boolean cannotTransitionTo(State next) { return !!!canGoTo(next); }
+        final boolean cannotTransitionTo(State next) { return !canGoTo(next); }
         private boolean canGoTo(State next) { return ALLOWED_TRANSITIONS.get(this).contains(next); }
-        final boolean forbids(Access op) { return !!!permissions.contains(op); }
+        final boolean forbids(Access op) { return !permissions.contains(op); }
         final boolean isClosed() {return this == CLOSED || this == STALE; }
 
         abstract void applyTo(Connection conn);
