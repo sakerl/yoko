@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,28 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.apache.yoko.util.MinorCodes;
+import static org.apache.yoko.util.MinorCodes.MinorBadAddress;
+import static org.apache.yoko.util.MinorCodes.MinorBadSchemeSpecificPart;
+import static org.apache.yoko.util.MinorCodes.MinorOther;
+import static org.apache.yoko.util.MinorCodes.describeBadParam;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
-public class CorbalocURLScheme_impl extends org.omg.CORBA.LocalObject implements
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+
+import org.apache.yoko.orb.OB.CorbalocURLSchemePackage.ProtocolAlreadyExists;
+import org.omg.CORBA.BAD_PARAM;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.ORBPackage.InvalidName;
+import org.omg.IOP.IOR;
+import org.omg.IOP.TaggedProfile;
+
+public class CorbalocURLScheme_impl extends LocalObject implements
         CorbalocURLScheme {
     private ORBInstance orbInstance_;
 
-    private java.util.Hashtable protocols_ = new java.util.Hashtable();
+    private Hashtable protocols_ = new Hashtable();
 
     // ------------------------------------------------------------------
     // CorbalocURLScheme_impl private member implementations
@@ -35,12 +50,11 @@ public class CorbalocURLScheme_impl extends org.omg.CORBA.LocalObject implements
         for (int i = 0; i < result.length; i++) {
             char ch = keyStr.charAt(i);
             if (ch > 255) {
-                throw new org.omg.CORBA.BAD_PARAM(
-                        MinorCodes
-                                .describeBadParam(MinorCodes.MinorBadSchemeSpecificPart)
+                throw new BAD_PARAM(
+                        describeBadParam(MinorBadSchemeSpecificPart)
                                 + ": invalid character in key, char value = 0x" + Integer.toHexString(ch),
-                        MinorCodes.MinorBadSchemeSpecificPart,
-                        org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                        MinorBadSchemeSpecificPart,
+                        COMPLETED_NO);
             }
             result[i] = (byte) ch;
         }
@@ -56,32 +70,29 @@ public class CorbalocURLScheme_impl extends org.omg.CORBA.LocalObject implements
         if (str.substring(startIdx, startIdx + 4).equals("rir:")) {
             int comma = str.indexOf(',', startIdx);
             if (comma != -1 && comma <= endIdx) {
-                throw new org.omg.CORBA.BAD_PARAM(
-                        MinorCodes
-                                .describeBadParam(MinorCodes.MinorBadSchemeSpecificPart)
+                throw new BAD_PARAM(
+                        describeBadParam(MinorBadSchemeSpecificPart)
                                 + ": rir cannot be used with other protocols",
-                        MinorCodes.MinorBadSchemeSpecificPart,
-                        org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                        MinorBadSchemeSpecificPart,
+                        COMPLETED_NO);
             }
 
             if (startIdx + 3 != endIdx) {
-                throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                        .describeBadParam(MinorCodes.MinorBadAddress)
+                throw new BAD_PARAM(describeBadParam(MinorBadAddress)
                         + ": rir does not allow an address",
-                        MinorCodes.MinorBadAddress,
-                        org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                        MinorBadAddress,
+                        COMPLETED_NO);
             }
 
             try {
                 InitialServiceManager initialServiceManager = orbInstance_.getInitialServiceManager();
                 return initialServiceManager.resolveInitialReferences(keyStr);
-            } catch (org.omg.CORBA.ORBPackage.InvalidName ex) {
-                throw new org.omg.CORBA.BAD_PARAM(
-                        MinorCodes
-                                .describeBadParam(MinorCodes.MinorBadSchemeSpecificPart)
+            } catch (InvalidName ex) {
+                throw new BAD_PARAM(
+                        describeBadParam(MinorBadSchemeSpecificPart)
                                 + ": invalid initial reference token \"" + keyStr + "\"",
-                        MinorCodes.MinorBadSchemeSpecificPart,
-                        org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                        MinorBadSchemeSpecificPart,
+                        COMPLETED_NO);
             }
         }
 
@@ -93,7 +104,7 @@ public class CorbalocURLScheme_impl extends org.omg.CORBA.LocalObject implements
         // 
         // Convert addresses (separated by ',') into IOR profiles
         // 
-        java.util.Vector profiles = new java.util.Vector();
+        Vector profiles = new Vector();
         int pos = startIdx;
         while (pos <= endIdx) {
             //
@@ -103,12 +114,11 @@ public class CorbalocURLScheme_impl extends org.omg.CORBA.LocalObject implements
             String protocol;
             int colon = str.indexOf(':', pos);
             if (colon == -1) {
-                throw new org.omg.CORBA.BAD_PARAM(
-                        MinorCodes
-                                .describeBadParam(MinorCodes.MinorBadSchemeSpecificPart)
+                throw new BAD_PARAM(
+                        describeBadParam(MinorBadSchemeSpecificPart)
                                 + ": no protocol",
-                        MinorCodes.MinorBadSchemeSpecificPart,
-                        org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                        MinorBadSchemeSpecificPart,
+                        COMPLETED_NO);
             }
             else if (colon > endIdx) {
                 break;
@@ -125,12 +135,11 @@ public class CorbalocURLScheme_impl extends org.omg.CORBA.LocalObject implements
             // Check for rir (again)
             //
             if (protocol.equals("rir")) {
-                throw new org.omg.CORBA.BAD_PARAM(
-                        MinorCodes
-                                .describeBadParam(MinorCodes.MinorBadSchemeSpecificPart)
+                throw new BAD_PARAM(
+                        describeBadParam(MinorBadSchemeSpecificPart)
                                 + ": rir cannot be used with other protocols",
-                        MinorCodes.MinorBadSchemeSpecificPart,
-                        org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                        MinorBadSchemeSpecificPart,
+                        COMPLETED_NO);
             }
 
             //
@@ -164,17 +173,16 @@ public class CorbalocURLScheme_impl extends org.omg.CORBA.LocalObject implements
             }
         }
 
-        if (profiles.size() == 0) {
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorBadSchemeSpecificPart)
+        if (profiles.isEmpty()) {
+            throw new BAD_PARAM(describeBadParam(MinorBadSchemeSpecificPart)
                     + ": no valid protocol addresses",
-                    MinorCodes.MinorBadSchemeSpecificPart,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+                    MinorBadSchemeSpecificPart,
+                    COMPLETED_NO);
         }
 
-        org.omg.IOP.IOR ior = new org.omg.IOP.IOR();
+        IOR ior = new IOR();
         ior.type_id = "";
-        ior.profiles = new org.omg.IOP.TaggedProfile[profiles.size()];
+        ior.profiles = new TaggedProfile[profiles.size()];
         profiles.copyInto(ior.profiles);
 
         ObjectFactory objectFactory = orbInstance_.getObjectFactory();
@@ -208,19 +216,17 @@ public class CorbalocURLScheme_impl extends org.omg.CORBA.LocalObject implements
         // we consider this to be an invalid URL
         //
         if (slash == -1) {
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorOther)
-                    + ": no key specified", MinorCodes.MinorOther,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorOther)
+                    + ": no key specified", MinorOther,
+                    COMPLETED_NO);
         }
 
         int addrStart = 9; // skip "corbaloc:"
         int addrEnd = slash - 1;
         if (addrStart == slash) {
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                    .describeBadParam(MinorCodes.MinorBadAddress)
-                    + ": no protocol address", MinorCodes.MinorBadAddress,
-                    org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorBadAddress)
+                    + ": no protocol address", MinorBadAddress,
+                    COMPLETED_NO);
         }
 
         String key = url.substring(slash + 1);
@@ -228,7 +234,7 @@ public class CorbalocURLScheme_impl extends org.omg.CORBA.LocalObject implements
     }
 
     public void destroy() {
-        java.util.Enumeration e = protocols_.elements();
+        Enumeration e = protocols_.elements();
         while (e.hasMoreElements()) {
             CorbalocProtocol protocol = (CorbalocProtocol) e.nextElement();
             protocol.destroy();
@@ -238,10 +244,10 @@ public class CorbalocURLScheme_impl extends org.omg.CORBA.LocalObject implements
     }
 
     public void add_protocol(CorbalocProtocol protocol)
-            throws org.apache.yoko.orb.OB.CorbalocURLSchemePackage.ProtocolAlreadyExists {
+            throws ProtocolAlreadyExists {
         String name = protocol.name();
         if (protocols_.containsKey(name)) {
-            throw new org.apache.yoko.orb.OB.CorbalocURLSchemePackage.ProtocolAlreadyExists();
+            throw new ProtocolAlreadyExists();
         }
         protocols_.put(name, protocol);
     }
