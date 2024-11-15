@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,19 @@
  */
 package org.apache.yoko.orb.OB;
 
+import static java.util.Collections.synchronizedSet;
+import static org.apache.yoko.orb.exceptions.Transients.NO_USABLE_PROFILE_IN_IOR;
+import static org.apache.yoko.util.MinorCodes.MinorORBDestroyed;
+import static org.apache.yoko.util.MinorCodes.describeInitialize;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.yoko.orb.OBPortableServer.POAManager;
 import org.apache.yoko.orb.OBPortableServer.POAManagerFactory;
 import org.apache.yoko.orb.OBPortableServer.POAManager_impl;
@@ -26,9 +39,7 @@ import org.apache.yoko.orb.OCI.ConFactoryRegistry;
 import org.apache.yoko.orb.OCI.Connector;
 import org.apache.yoko.orb.OCI.ConnectorInfo;
 import org.apache.yoko.orb.OCI.ProfileInfo;
-import org.apache.yoko.orb.exceptions.Transients;
 import org.apache.yoko.util.Assert;
-import org.apache.yoko.util.MinorCodes;
 import org.omg.BiDirPolicy.BIDIRECTIONAL_POLICY_TYPE;
 import org.omg.BiDirPolicy.BOTH;
 import org.omg.BiDirPolicy.BidirectionalPolicy;
@@ -39,16 +50,6 @@ import org.omg.CORBA.Policy;
 import org.omg.IOP.IOR;
 import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
 import org.omg.PortableServer.POAManagerPackage.State;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static java.util.Collections.synchronizedSet;
-import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
 public final class ClientManager {
     static final Logger logger = Logger.getLogger(ClientManager.class.getName());
@@ -138,9 +139,8 @@ public final class ClientManager {
         // if this operation is called after ORB destruction
         //
         if (destroyed) {
-            throw new INITIALIZE(MinorCodes
-                    .describeInitialize(MinorCodes.MinorORBDestroyed),
-                    MinorCodes.MinorORBDestroyed,
+            throw new INITIALIZE(describeInitialize(MinorORBDestroyed),
+                    MinorORBDestroyed,
                     COMPLETED_NO);
         }
 
@@ -365,7 +365,7 @@ public final class ClientManager {
         // TRANSIENT exception
         //
         if (pairs.isEmpty()) {
-            throw Transients.NO_USABLE_PROFILE_IN_IOR.create();
+            throw NO_USABLE_PROFILE_IN_IOR.create();
         }
 
         //
