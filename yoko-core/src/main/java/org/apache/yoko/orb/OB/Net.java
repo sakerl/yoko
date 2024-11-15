@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
  */
 package org.apache.yoko.orb.OB;
 
+import static java.net.InetAddress.getByName;
+import static java.net.InetAddress.getLocalHost;
+import static java.security.AccessController.doPrivileged;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
@@ -36,13 +39,13 @@ public final class Net {
         if (host1.equals(host2) || (matchLoopback && host2.equals(LOOPBACK_NAME))) return true;
         try {
             // compare address matches
-            return AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
+            return doPrivileged(new PrivilegedExceptionAction<Boolean>() {
                 @Override
                 public Boolean run() throws UnknownHostException {
-                    InetAddress addr1 = InetAddress.getByName(host1);
-                    InetAddress addr2 = InetAddress.getByName(host2);
+                    InetAddress addr1 = getByName(host1);
+                    InetAddress addr2 = getByName(host2);
                     return (addr1.equals(addr2) ||
-                            (matchLoopback && addr2.equals(InetAddress.getByName(LOOPBACK_NAME))));
+                            (matchLoopback && addr2.equals(getByName(LOOPBACK_NAME))));
                 }
             });
         } catch (PrivilegedActionException e) {
@@ -71,14 +74,14 @@ public final class Net {
 
         try {
             if (!numeric) {
-                host = java.net.InetAddress.getLocalHost().getHostName(); 
+                host = getLocalHost().getHostName(); 
             } else {
-                host = java.net.InetAddress.getLocalHost().getHostAddress();
+                host = getLocalHost().getHostAddress();
             }
 
             if (host.equals("127.0.0.1") || host.equals("localhost")) {
             }
-        } catch (java.net.UnknownHostException ex) {
+        } catch (UnknownHostException ex) {
             // logger.warning("ORB_init: " +
             // "can't resolve hostname\n" +
             // "using `localhost' (127.0.0.1) " +
