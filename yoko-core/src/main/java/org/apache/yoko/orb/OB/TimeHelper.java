@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,18 @@
  */
 package org.apache.yoko.orb.OB;
 
-import org.omg.CORBA.*;
-import org.omg.TimeBase.*;
+import static java.lang.System.currentTimeMillis;
+import static java.util.Calendar.DST_OFFSET;
+import static java.util.Calendar.ZONE_OFFSET;
+import static java.util.TimeZone.getTimeZone;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import org.omg.CORBA.BAD_PARAM;
+import org.omg.TimeBase.IntervalT;
+import org.omg.TimeBase.UtcT;
 
 //
 // This is a simpler set of functions to work with TimeBase::UtcT, and
@@ -32,7 +42,7 @@ public class TimeHelper {
     // 100 nanoseconds = 10^-7 seconds and 1 millisecond = 10^-3 seconds,
     // hence there are 10^4 (10,000) milliseconds per 100 nanoseconds.
     //
-    private final static long HNanosPerMilli = 10000L;
+    private static final long HNanosPerMilli = 10000L;
 
     //
     // 100 ns units from 15 October 1582 00:00:00 to 1 January 1970 00:00:00.
@@ -40,43 +50,43 @@ public class TimeHelper {
     // Time difference in 100 ns units between DCE and POSIX time base.
     // 141427 days with 86400 seconds each.
     //
-    private final static long DCEToPosix = 141427L * 86400L * HNanosPerMilli * 1000;
+    private static final long DCEToPosix = 141427L * 86400L * HNanosPerMilli * 1000;
 
     //
     // Max TimeT value
     //
-    public final static long MaxTimeT = 0xffffffffffffffffL;
+    public static final long MaxTimeT = 0xffffffffffffffffL;
 
     //
     // Max InaccuracyT value
     //
-    public final static long MaxInaccuracyT = 0xffffffffffffL;
+    public static final long MaxInaccuracyT = 0xffffffffffffL;
 
     public static UtcT utcNow(long inaccuracy) {
         if (Unsigned.gt(inaccuracy, MaxInaccuracyT))
             throw new BAD_PARAM();
 
-        long time = Unsigned.add(Unsigned.multiply(System.currentTimeMillis(),
+        long time = Unsigned.add(Unsigned.multiply(currentTimeMillis(),
                 HNanosPerMilli), DCEToPosix);
-        java.util.Calendar cal = java.util.Calendar.getInstance();
-        int offset = cal.get(java.util.Calendar.ZONE_OFFSET)
-                + cal.get(java.util.Calendar.DST_OFFSET);
+        Calendar cal = Calendar.getInstance();
+        int offset = cal.get(ZONE_OFFSET)
+                + cal.get(DST_OFFSET);
 
         return toUtcT(time, inaccuracy, (short) (offset / 60000));
     }
 
     public static UtcT utcMin() {
-        java.util.Calendar cal = java.util.Calendar.getInstance();
-        int offset = cal.get(java.util.Calendar.ZONE_OFFSET)
-                + cal.get(java.util.Calendar.DST_OFFSET);
+        Calendar cal = Calendar.getInstance();
+        int offset = cal.get(ZONE_OFFSET)
+                + cal.get(DST_OFFSET);
 
         return toUtcT(0, 0, (short) (offset / 60000));
     }
 
     public static UtcT utcMax() {
-        java.util.Calendar cal = java.util.Calendar.getInstance();
-        int offset = cal.get(java.util.Calendar.ZONE_OFFSET)
-                + cal.get(java.util.Calendar.DST_OFFSET);
+        Calendar cal = Calendar.getInstance();
+        int offset = cal.get(ZONE_OFFSET)
+                + cal.get(DST_OFFSET);
 
         return toUtcT(MaxTimeT, 0, (short) (offset / 60000));
     }
@@ -147,10 +157,10 @@ public class TimeHelper {
         //
         // Convert to string
         //
-        java.text.SimpleDateFormat date = new java.text.SimpleDateFormat(
+        java.text.SimpleDateFormat date = new SimpleDateFormat(
                 "MM/dd/yy HH:mm:ss:SSS");
-        date.setTimeZone(java.util.TimeZone.getTimeZone("GMT"));
-        return date.format(new java.util.Date(milliTime));
+        date.setTimeZone(getTimeZone("GMT"));
+        return date.format(new Date(milliTime));
     }
 
     public static String toTimeString(UtcT time) {
@@ -165,10 +175,10 @@ public class TimeHelper {
         //
         // Convert to string
         //
-        java.text.SimpleDateFormat date = new java.text.SimpleDateFormat(
+        SimpleDateFormat date = new SimpleDateFormat(
                 "HH:mm:ss:SSS");
-        date.setTimeZone(java.util.TimeZone.getTimeZone("GMT"));
-        return date.format(new java.util.Date(milliTime));
+        date.setTimeZone(getTimeZone("GMT"));
+        return date.format(new Date(milliTime));
     }
 
     public static String toString(long time) {
