@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,9 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINEST;
 import static org.apache.yoko.logging.VerboseLogging.CONN_OUT_LOG;
 import static org.apache.yoko.orb.OB.CodeSetInfo.ISO_LATIN_1;
+import static org.apache.yoko.orb.OB.CodeSetUtil.getCodeConverters;
+import static org.apache.yoko.orb.OB.SendingContextRuntimes.SENDING_CONTEXT_RUNTIME;
+import static org.apache.yoko.orb.exceptions.Transients.ACTIVE_CONNECTION_MANAGEMENT;
 import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
 /**
@@ -108,7 +111,7 @@ final class GIOPClient extends Client {
     //
     protected synchronized GIOPConnection getWorker(boolean create, final int timeout) {
         if (destroy_)
-            throw Transients.ACTIVE_CONNECTION_MANAGEMENT.create();
+            throw ACTIVE_CONNECTION_MANAGEMENT.create();
 
         if (connection_ == null)
             reuseInboundConnection();
@@ -231,7 +234,7 @@ final class GIOPClient extends Client {
                 codeSetSC_.context_data = outCSC.copyWrittenBytes();
             }
         }
-        if (codeBaseSC_ == null) codeBaseSC_ = SendingContextRuntimes.SENDING_CONTEXT_RUNTIME;
+        if (codeBaseSC_ == null) codeBaseSC_ = SENDING_CONTEXT_RUNTIME;
         // NOTE: We don't initialize the INVOCATION_POLICIES service context
         // here because the list of policies can change from one invocation to
         // the next. Instead, we need to get the policies and build the
@@ -276,7 +279,7 @@ final class GIOPClient extends Client {
         // Get all profiles usable for the connector
         List<ProfileInfo> profileInfos = new ArrayList<>();
         for (ProfileInfo anAll : connector_.get_usable_profiles(ior, policies)) {
-            CodeConverters conv = CodeSetUtil.getCodeConverters(orbInstance_, anAll);
+            CodeConverters conv = getCodeConverters(orbInstance_, anAll);
             // Filter out profiles which would require a different code converter
             if (codeConverters().equals(conv)) profileInfos.add(anAll);
         }
