@@ -18,6 +18,8 @@
 
 package org.apache.yoko.rmi.impl;
 
+import static java.util.stream.Collectors.toUnmodifiableList;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
@@ -25,6 +27,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectInputStream.GetField;
 import java.io.ObjectOutputStream;
 import java.io.ObjectOutputStream.PutField;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.io.ObjectStreamField;
 import java.io.Serializable;
 
@@ -33,11 +40,25 @@ import org.apache.yoko.orb.CORBA.OutputStream;
 import org.junit.jupiter.api.Test;
 import org.omg.CORBA.ORB;
 
+import acme.AbstractInterface;
+import acme.AbstractValue;
+import acme.StringValue;
 import testify.iiop.annotation.ConfigureOrb;
 
+@SuppressWarnings({"serial"})
 @ConfigureOrb
-public class SerialPersistentFieldsTest {
-    static class PrimitiveData implements Serializable {
+public abstract class SerialPersistentFieldsTest implements Serializable {
+    @Test
+    public void marshalAndUnmarshal(ORB orb) {
+        OutputStream out = (OutputStream)orb.create_output_stream();
+        out.write_value(this);
+        System.out.println(out.getBufferReader().dumpAllData());
+        InputStream in = out.create_input_stream();
+        Serializable result = in.read_value();
+        assertNotNull(result);
+    }
+
+    public static class Primitives extends SerialPersistentFieldsTest {
         private static final ObjectStreamField[] serialPersistentFields = {
                 new ObjectStreamField("z", boolean.class),
                 new ObjectStreamField("b", byte.class),
@@ -74,7 +95,7 @@ public class SerialPersistentFieldsTest {
         private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
             GetField fields = in.readFields();
             assertEquals(Z, fields.get("z", false));
-            assertEquals(B, fields.get("b", 0));
+            assertEquals(B, fields.get("b", (byte)0));
             assertEquals(C, fields.get("c", (char)0));
             assertEquals(S, fields.get("s", (short)0));
             assertEquals(I, fields.get("i", 0));
@@ -84,13 +105,59 @@ public class SerialPersistentFieldsTest {
         }
     }
 
-    @Test
-    public void testPrimitiveData(ORB orb) throws IOException {
-        System.out.println("###Hello### " + orb.getClass().getName());
-        PrimitiveData obj = new PrimitiveData();
-        OutputStream out = (OutputStream)orb.create_output_stream();
-        out.write_value(obj);
-        System.out.println(out.getBufferReader().dumpAllData());
-        InputStream in = out.create_input_stream();
+    public static class MiscellaneousTypes extends SerialPersistentFieldsTest {
+        private static final ObjectStreamField[] serialPersistentFields = {
+                new ObjectStreamField("s", String.class),
+                new ObjectStreamField("c", Class.class),
+                new ObjectStreamField("d", Date.class),
+                new ObjectStreamField("e", Enum.class),
+                new ObjectStreamField("t", TimeUnit.class),
+        };
+        static final String S = "a string";
+        static final Class<?> C = String.class;
+        static final Date D = new Date();
+        static final Enum<?> E = TimeUnit.DAYS;
+        static final TimeUnit T = TimeUnit.MICROSECONDS;
+
+        private void writeObject(ObjectOutputStream out) throws IOException {
+            System.out.println("### writeObject() called");
+            PutField fields = out.putFields();
+            fields.put("s", S);
+            fields.put("c", C);
+            fields.put("d", D);
+            fields.put("e", E);
+            fields.put("t", T);
+            out.writeFields();
+        }
+
+        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+            GetField fields = in.readFields();
+            assertEquals(S, fields.get("s", ""));
+            assertEquals(C, fields.get("c", null));
+            assertEquals(D, fields.get("d", null));
+            assertEquals(E, fields.get("e", null));
+            assertEquals(T, fields.get("t", null));
+        }
+    }
+
+    public static class ValueTypes extends SerialPersistentFieldsTest {
+        private static final ObjectStreamField[] serialPersistentFields = {
+                new ObjectStreamField("abstractValue", AbstractInterface.class),
+                new ObjectStreamField("valueInterface", AbstractValue.class),
+                new ObjectStreamField("valueClass", StringValue.class)
+        };
+        private static final List<String> FIELD_NAMES = Stream.of(serialPersistentFields).map(ObjectStreamField::getName).collect(toUnmodifiableList());
+
+        private void writeObject(ObjectOutputStream out) throws IOException {
+            System.out.println("### writeObject() called");
+            PutField fields = out.putFields();
+            FIELD_NAMES.forEach(name -> fields.put(name, new StringValue(name)));
+            out.writeFields();
+        }
+
+        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+            GetField fields = in.readFields();
+            for (String name: FIELD_NAMES) assertEquals(name, ((StringValue) fields.get(name, null)).toString());
+        }
     }
 }
