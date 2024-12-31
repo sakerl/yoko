@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,12 @@
  */
 package org.apache.yoko.orb.OBMessageRouting;
 
+import org.omg.CORBA.Policy;
+import org.omg.MessageRouting.UNLIMITED_PING_POLICY_TYPE;
+import org.omg.MessageRouting.UnlimitedPing;
+
 public class UnlimitedPingPolicy_impl extends
-        org.omg.MessageRouting.UnlimitedPing {
+        UnlimitedPing {
     public UnlimitedPingPolicy_impl() {
     }
 
@@ -30,10 +34,10 @@ public class UnlimitedPingPolicy_impl extends
     }
 
     public int policy_type() {
-        return org.omg.MessageRouting.UNLIMITED_PING_POLICY_TYPE.value;
+        return UNLIMITED_PING_POLICY_TYPE.value;
     }
 
-    public org.omg.CORBA.Policy copy() {
+    public Policy copy() {
         return null;
     }
 
