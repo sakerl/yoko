@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,11 @@
  */
 package org.apache.yoko.orb.OBMessageRouting;
 
-public class ResumePolicy_impl extends org.omg.MessageRouting.ResumePolicy {
+import org.omg.CORBA.Policy;
+import org.omg.MessageRouting.RESUME_POLICY_TYPE;
+import org.omg.MessageRouting.ResumePolicy;
+
+public class ResumePolicy_impl extends ResumePolicy {
     public ResumePolicy_impl() {
     }
 
@@ -26,10 +30,10 @@ public class ResumePolicy_impl extends org.omg.MessageRouting.ResumePolicy {
     }
 
     public int policy_type() {
-        return org.omg.MessageRouting.RESUME_POLICY_TYPE.value;
+        return RESUME_POLICY_TYPE.value;
     }
 
-    public org.omg.CORBA.Policy copy() {
+    public Policy copy() {
         return null;
     }
 
