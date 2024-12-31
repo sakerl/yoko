@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,16 @@
  */
 package org.apache.yoko.orb.OBMessageRouting;
 
+import org.omg.CORBA.portable.ValueFactory;
+import org.omg.CORBA_2_3.portable.InputStream;
+
 public class ImmediateSuspendPolicyFactory_impl implements
-        org.omg.CORBA.portable.ValueFactory {
+        ValueFactory {
     public ImmediateSuspendPolicyFactory_impl() {
     }
 
     public java.io.Serializable read_value(
-            org.omg.CORBA_2_3.portable.InputStream in) {
+            InputStream in) {
         return in.read_value(new ImmediateSuspendPolicy_impl());
     }
 }
