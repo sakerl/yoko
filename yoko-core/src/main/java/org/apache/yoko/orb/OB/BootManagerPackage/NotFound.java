@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,16 @@ package org.apache.yoko.orb.OB.BootManagerPackage;
 //
 // IDL:orb.yoko.apache.org/OB/BootManager/NotFound:1.0
 //
+
+import org.omg.CORBA.UserException;
+
 /**
  *
  * This exception indicates that a binding has not been found.
  *
  **/
 
-final public class NotFound extends org.omg.CORBA.UserException
+final public class NotFound extends UserException
 {
     private static final String _ob_id = "IDL:orb.yoko.apache.org/OB/BootManager/NotFound:1.0";
 
