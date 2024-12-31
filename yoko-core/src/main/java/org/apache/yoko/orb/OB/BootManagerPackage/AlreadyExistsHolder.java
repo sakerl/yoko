@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,14 @@
  */
 package org.apache.yoko.orb.OB.BootManagerPackage;
 
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.Streamable;
+
 //
 // IDL:orb.yoko.apache.org/OB/BootManager/AlreadyExists:1.0
 //
-final public class AlreadyExistsHolder implements org.omg.CORBA.portable.Streamable
+final public class AlreadyExistsHolder implements Streamable
 {
     public AlreadyExists value;
 
@@ -36,13 +40,13 @@ final public class AlreadyExistsHolder implements org.omg.CORBA.portable.Streama
     }
 
     public void
-    _read(org.omg.CORBA.portable.InputStream in)
+    _read(InputStream in)
     {
         value = AlreadyExistsHelper.read(in);
     }
 
     public void
-    _write(org.omg.CORBA.portable.OutputStream out)
+    _write(OutputStream out)
     {
         AlreadyExistsHelper.write(out, value);
     }
