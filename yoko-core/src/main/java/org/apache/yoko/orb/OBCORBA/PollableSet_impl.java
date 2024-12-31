@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,28 @@
 package org.apache.yoko.orb.OBCORBA;
 
 import org.apache.yoko.util.Assert;
+import org.omg.CORBA.DIIPollable;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.NO_IMPLEMENT;
+import org.omg.CORBA.NO_RESPONSE;
+import org.omg.CORBA.Pollable;
+import org.omg.CORBA.PollableSet;
+import org.omg.CORBA.PollableSetPackage.NoPossiblePollable;
+import org.omg.CORBA.PollableSetPackage.UnknownPollable;
+import org.omg.CORBA.SystemException;
+import org.omg.CORBA.TIMEOUT;
 
-public class PollableSet_impl extends org.omg.CORBA.LocalObject implements
-        org.omg.CORBA.PollableSet {
+import java.util.LinkedList;
+import java.util.ListIterator;
+
+import static java.lang.System.currentTimeMillis;
+
+public class PollableSet_impl extends LocalObject implements
+        PollableSet {
     //
     // List of pollable objects in this set
     //
-    protected java.util.LinkedList pollableList_ = new java.util.LinkedList();
+    protected LinkedList pollableList_ = new LinkedList();
 
     //
     // Constructor
@@ -35,14 +50,14 @@ public class PollableSet_impl extends org.omg.CORBA.LocalObject implements
     //
     // IDL:omg.org/CORBA/PollableSet/create_dii_pollable:1.0
     //
-    public org.omg.CORBA.DIIPollable create_dii_pollable() {
-        throw new org.omg.CORBA.NO_IMPLEMENT();
+    public DIIPollable create_dii_pollable() {
+        throw new NO_IMPLEMENT();
     }
 
     //
     // IDL:omg.org/CORBA/PollableSet/add_pollable:1.0
     //
-    public void add_pollable(org.omg.CORBA.Pollable potential) {
+    public void add_pollable(Pollable potential) {
         Assert.ensure(potential != null);
         pollableList_.addLast(potential);
     }
@@ -50,11 +65,11 @@ public class PollableSet_impl extends org.omg.CORBA.LocalObject implements
     //
     // IDL:omg.org/CORBA/PollableSet/get_ready_pollable:1.0
     //
-    public org.omg.CORBA.Pollable get_ready_pollable(int timeout)
-            throws org.omg.CORBA.PollableSetPackage.NoPossiblePollable,
-            org.omg.CORBA.SystemException {
+    public Pollable get_ready_pollable(int timeout)
+            throws NoPossiblePollable,
+            SystemException {
         if (pollableList_.size() == 0)
-            throw new org.omg.CORBA.PollableSetPackage.NoPossiblePollable();
+            throw new NoPossiblePollable();
 
         //
         // try to return a pollable item in the timeout specified
@@ -63,14 +78,14 @@ public class PollableSet_impl extends org.omg.CORBA.LocalObject implements
             //
             // starting time of query
             //
-            long start_time = System.currentTimeMillis();
+            long start_time = currentTimeMillis();
 
             //
             // are there any pollables ready?
             //
-            java.util.ListIterator iter = pollableList_.listIterator(0);
+            ListIterator iter = pollableList_.listIterator(0);
             while (iter.hasNext()) {
-                org.omg.CORBA.Pollable pollable = (org.omg.CORBA.Pollable) iter
+                Pollable pollable = (Pollable) iter
                         .next();
 
                 if (pollable.is_ready(0)) {
@@ -85,7 +100,7 @@ public class PollableSet_impl extends org.omg.CORBA.LocalObject implements
             // a NO_RESPONSE if there is no timeout specified
             //
             if (timeout == 0)
-                throw new org.omg.CORBA.NO_RESPONSE();
+                throw new NO_RESPONSE();
 
             //
             // Yield for now to give another thread a timeslice
@@ -101,7 +116,7 @@ public class PollableSet_impl extends org.omg.CORBA.LocalObject implements
             //
             // the ending time of the query
             //
-            long end_time = System.currentTimeMillis();
+            long end_time = currentTimeMillis();
 
             //
             // subtract difference in time from the timeout value
@@ -116,21 +131,21 @@ public class PollableSet_impl extends org.omg.CORBA.LocalObject implements
             // check if all the time has now expired
             //
             if (timeout == 0)
-                throw new org.omg.CORBA.TIMEOUT();
+                throw new TIMEOUT();
         }
     }
 
     //
     // IDL:omg.org/CORBA/PollableSet/remove:1.0
     //
-    public void remove(org.omg.CORBA.Pollable potential)
-            throws org.omg.CORBA.PollableSetPackage.UnknownPollable {
+    public void remove(Pollable potential)
+            throws UnknownPollable {
         Assert.ensure(potential != null);
 
         //
         // iterate the list, looking for a match
         //
-        java.util.ListIterator iter = pollableList_.listIterator(0);
+        ListIterator iter = pollableList_.listIterator(0);
         while (iter.hasNext()) {
             if (potential == iter.next()) {
                 iter.remove();
@@ -141,7 +156,7 @@ public class PollableSet_impl extends org.omg.CORBA.LocalObject implements
         //
         // never found the item
         //
-        throw new org.omg.CORBA.PollableSetPackage.UnknownPollable();
+        throw new UnknownPollable();
     }
 
     //
