@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,18 @@
  */
 package org.apache.yoko.orb.OBMessageRouting;
 
+import org.omg.CORBA.portable.ValueFactory;
+import org.omg.CORBA_2_3.portable.InputStream;
+
+import java.io.Serializable;
+
 public class LimitedPingPolicyFactory_impl implements
-        org.omg.CORBA.portable.ValueFactory {
+        ValueFactory {
     public LimitedPingPolicyFactory_impl() {
     }
 
-    public java.io.Serializable read_value(
-            org.omg.CORBA_2_3.portable.InputStream in) {
+    public Serializable read_value(
+            InputStream in) {
         return in.read_value(new LimitedPingPolicy_impl());
     }
 }
