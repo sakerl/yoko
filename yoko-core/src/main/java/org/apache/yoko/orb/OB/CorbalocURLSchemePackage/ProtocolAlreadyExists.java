@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2024 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,12 @@ package org.apache.yoko.orb.OB.CorbalocURLSchemePackage;
 //
 // IDL:orb.yoko.apache.org/OB/CorbalocURLScheme/ProtocolAlreadyExists:1.0
 //
+
+import org.omg.CORBA.UserException;
+
 /** Another protocol already exists with the same name. */
 
-final public class ProtocolAlreadyExists extends org.omg.CORBA.UserException
+final public class ProtocolAlreadyExists extends UserException
 {
     private static final String _ob_id = "IDL:orb.yoko.apache.org/OB/CorbalocURLScheme/ProtocolAlreadyExists:1.0";
 
