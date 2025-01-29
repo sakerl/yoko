@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,29 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.apache.yoko.orb.OBPortableInterceptor;
+
+import org.apache.yoko.orb.OB.InitialServiceManager;
+import org.apache.yoko.orb.OB.PIManager;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
+import org.omg.CORBA.ORB;
+import org.omg.IOP.CodecFactory;
+import org.omg.PortableInterceptor.ClientRequestInterceptor;
+import org.omg.PortableInterceptor.IORInterceptor;
+import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
 import org.omg.PortableInterceptor.ORBInitInfoPackage.InvalidName;
+import org.omg.PortableInterceptor.PolicyFactory;
+import org.omg.PortableInterceptor.ServerRequestInterceptor;
 
 //
 // An ORBacus-specific derivation of PortableInterceptor::ORBInitInfo
 //
-final public class ORBInitInfo_impl extends org.omg.CORBA.LocalObject implements
-        org.apache.yoko.orb.OBPortableInterceptor.ORBInitInfo {
+final public class ORBInitInfo_impl extends LocalObject implements
+        ORBInitInfo {
     //
     // The ORB
     //
-    private org.omg.CORBA.ORB orb_;
+    private ORB orb_;
 
     //
     // Arguments
@@ -41,17 +53,17 @@ final public class ORBInitInfo_impl extends org.omg.CORBA.LocalObject implements
     //
     // The PIManager
     //
-    private org.apache.yoko.orb.OB.PIManager manager_;
+    private PIManager manager_;
 
     //
     // The initial service mgr
     //
-    private org.apache.yoko.orb.OB.InitialServiceManager initServiceManager_;
+    private InitialServiceManager initServiceManager_;
 
     //
     // The Codec Factory
     //
-    private org.omg.IOP.CodecFactory codecFactory_; // The codec factory
+    private CodecFactory codecFactory_; // The codec factory
 
     private boolean destroy_;
 
@@ -59,10 +71,10 @@ final public class ORBInitInfo_impl extends org.omg.CORBA.LocalObject implements
     // Public member implementations
     // ------------------------------------------------------------------
 
-    public ORBInitInfo_impl(org.omg.CORBA.ORB orb, String[] args, String id,
-            org.apache.yoko.orb.OB.PIManager manager,
-            org.apache.yoko.orb.OB.InitialServiceManager initServiceManager,
-            org.omg.IOP.CodecFactory codecFactory) {
+    public ORBInitInfo_impl(ORB orb, String[] args, String id,
+                            PIManager manager,
+                            InitialServiceManager initServiceManager,
+                            CodecFactory codecFactory) {
         orb_ = orb;
         args_ = args;
         id_ = id;
@@ -78,7 +90,7 @@ final public class ORBInitInfo_impl extends org.omg.CORBA.LocalObject implements
 
     public String[] arguments() {
         if (destroy_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST(
+            throw new OBJECT_NOT_EXIST(
                     "Object has been destroyed");
 
         String[] seq = new String[args_.length];
@@ -88,38 +100,38 @@ final public class ORBInitInfo_impl extends org.omg.CORBA.LocalObject implements
 
     public String orb_id() {
         if (destroy_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST(
+            throw new OBJECT_NOT_EXIST(
                     "Object has been destroyed");
 
         return id_;
     }
 
-    public org.omg.IOP.CodecFactory codec_factory() {
+    public CodecFactory codec_factory() {
         if (destroy_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST(
+            throw new OBJECT_NOT_EXIST(
                     "Object has been destroyed");
 
         return codecFactory_;
     }
 
     public void register_initial_reference(String name, org.omg.CORBA.Object obj)
-            throws org.omg.PortableInterceptor.ORBInitInfoPackage.InvalidName {
+            throws InvalidName {
         if (destroy_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST(
+            throw new OBJECT_NOT_EXIST(
                     "Object has been destroyed");
 
         try {
             initServiceManager_.addInitialReference(name, obj);
         } catch (org.omg.CORBA.ORBPackage.InvalidName ex) {
-            throw (org.omg.PortableInterceptor.ORBInitInfoPackage.InvalidName)new 
-                org.omg.PortableInterceptor.ORBInitInfoPackage.InvalidName().initCause(ex); 
+            throw (InvalidName)new
+                InvalidName().initCause(ex);
         }
     }
 
     public org.omg.CORBA.Object resolve_initial_references(String name)
-            throws org.omg.PortableInterceptor.ORBInitInfoPackage.InvalidName {
+            throws InvalidName {
         if (destroy_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST(
+            throw new OBJECT_NOT_EXIST(
                     "Object has been destroyed");
 
         // TODO: check state
@@ -129,35 +141,35 @@ final public class ORBInitInfo_impl extends org.omg.CORBA.LocalObject implements
             // doesn't exist. 
             return orb_.resolve_initial_references(name);
         } catch (org.omg.CORBA.ORBPackage.InvalidName ex) {
-            throw (org.omg.PortableInterceptor.ORBInitInfoPackage.InvalidName)new 
-                org.omg.PortableInterceptor.ORBInitInfoPackage.InvalidName().initCause(ex); 
+            throw (InvalidName)new
+                InvalidName().initCause(ex);
         }
     }
 
     public void add_client_request_interceptor(
-            org.omg.PortableInterceptor.ClientRequestInterceptor i)
-            throws org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName {
+            ClientRequestInterceptor i)
+            throws DuplicateName {
         if (destroy_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST(
+            throw new OBJECT_NOT_EXIST(
                     "Object has been destroyed");
 
         manager_.addClientRequestInterceptor(i);
     }
 
     public void add_server_request_interceptor(
-            org.omg.PortableInterceptor.ServerRequestInterceptor i)
-            throws org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName {
+            ServerRequestInterceptor i)
+            throws DuplicateName {
         if (destroy_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST(
+            throw new OBJECT_NOT_EXIST(
                     "Object has been destroyed");
 
         manager_.addServerRequestInterceptor(i);
     }
 
-    public void add_ior_interceptor(org.omg.PortableInterceptor.IORInterceptor i)
-            throws org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName {
+    public void add_ior_interceptor(IORInterceptor i)
+            throws DuplicateName {
         if (destroy_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST(
+            throw new OBJECT_NOT_EXIST(
                     "Object has been destroyed");
 
         manager_.addIORInterceptor(i, false);
@@ -165,24 +177,24 @@ final public class ORBInitInfo_impl extends org.omg.CORBA.LocalObject implements
 
     public int allocate_slot_id() {
         if (destroy_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST(
+            throw new OBJECT_NOT_EXIST(
                     "Object has been destroyed");
 
         return manager_.allocateSlotId();
     }
 
     public void register_policy_factory(int type,
-            org.omg.PortableInterceptor.PolicyFactory factory) {
+            PolicyFactory factory) {
         if (destroy_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST(
+            throw new OBJECT_NOT_EXIST(
                     "Object has been destroyed");
 
         manager_.registerPolicyFactory(type, factory);
     }
 
-    public org.omg.CORBA.ORB orb() {
+    public ORB orb() {
         if (destroy_)
-            throw new org.omg.CORBA.OBJECT_NOT_EXIST(
+            throw new OBJECT_NOT_EXIST(
                     "Object has been destroyed");
 
         return orb_;
