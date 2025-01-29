@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,20 @@ package org.apache.yoko.orb.OBPortableInterceptor;
 //
 // IDL:orb.yoko.apache.org/OBPortableInterceptor/TransientORT:1.0
 //
+
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.StreamableValue;
+import org.omg.IOP.IOR;
+import org.omg.IOP.IORHelper;
+import org.omg.PortableInterceptor.AdapterNameHelper;
+import org.omg.PortableInterceptor.ORBIdHelper;
+import org.omg.PortableInterceptor.ServerIdHelper;
+
 /***/
 
-public abstract class TransientORT implements org.omg.CORBA.portable.StreamableValue,
+public abstract class TransientORT implements StreamableValue,
                                               ObjectReferenceTemplate
 {
     //
@@ -58,7 +69,7 @@ public abstract class TransientORT implements org.omg.CORBA.portable.StreamableV
     //
     /***/
 
-    protected org.omg.IOP.IOR the_ior_template;
+    protected IOR the_ior_template;
 
     private static String[] _OB_truncatableIds_ =
     {
@@ -72,26 +83,26 @@ public abstract class TransientORT implements org.omg.CORBA.portable.StreamableV
     }
 
     public void
-    _read(org.omg.CORBA.portable.InputStream in)
+    _read(InputStream in)
     {
-        the_server_id = org.omg.PortableInterceptor.ServerIdHelper.read(in);
-        the_orb_id = org.omg.PortableInterceptor.ORBIdHelper.read(in);
-        the_adapter_name = org.omg.PortableInterceptor.AdapterNameHelper.read(in);
+        the_server_id = ServerIdHelper.read(in);
+        the_orb_id = ORBIdHelper.read(in);
+        the_adapter_name = AdapterNameHelper.read(in);
         the_create_time = in.read_ulong();
-        the_ior_template = org.omg.IOP.IORHelper.read(in);
+        the_ior_template = IORHelper.read(in);
     }
 
     public void
-    _write(org.omg.CORBA.portable.OutputStream out)
+    _write(OutputStream out)
     {
-        org.omg.PortableInterceptor.ServerIdHelper.write(out, the_server_id);
-        org.omg.PortableInterceptor.ORBIdHelper.write(out, the_orb_id);
-        org.omg.PortableInterceptor.AdapterNameHelper.write(out, the_adapter_name);
+        ServerIdHelper.write(out, the_server_id);
+        ORBIdHelper.write(out, the_orb_id);
+        AdapterNameHelper.write(out, the_adapter_name);
         out.write_ulong(the_create_time);
-        org.omg.IOP.IORHelper.write(out, the_ior_template);
+        IORHelper.write(out, the_ior_template);
     }
 
-    public org.omg.CORBA.TypeCode
+    public TypeCode
     _type()
     {
         return TransientORTHelper.type();
