@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,20 @@ package org.apache.yoko.orb.OBPortableInterceptor;
 //
 // IDL:orb.yoko.apache.org/OBPortableInterceptor/IMRORT:1.0
 //
+
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.StreamableValue;
+import org.omg.PortableInterceptor.AdapterNameHelper;
+import org.omg.PortableInterceptor.ObjectReferenceTemplate;
+import org.omg.PortableInterceptor.ServerIdHelper;
+import org.omg.PortableInterceptor.ObjectReferenceTemplateHelper;
+
 /***/
 
-public abstract class IMRORT implements org.omg.CORBA.portable.StreamableValue,
-                                        org.omg.PortableInterceptor.ObjectReferenceTemplate
+public abstract class IMRORT implements StreamableValue,
+                                        ObjectReferenceTemplate
 {
     //
     // IDL:orb.yoko.apache.org/OBPortableInterceptor/IMRORT/the_server_id:1.0
@@ -44,7 +54,7 @@ public abstract class IMRORT implements org.omg.CORBA.portable.StreamableValue,
     //
     /***/
 
-    protected org.omg.PortableInterceptor.ObjectReferenceTemplate the_real_template;
+    protected ObjectReferenceTemplate the_real_template;
 
     private static String[] _OB_truncatableIds_ =
     {
@@ -58,22 +68,22 @@ public abstract class IMRORT implements org.omg.CORBA.portable.StreamableValue,
     }
 
     public void
-    _read(org.omg.CORBA.portable.InputStream in)
+    _read(InputStream in)
     {
-        the_server_id = org.omg.PortableInterceptor.ServerIdHelper.read(in);
-        the_adapter_name = org.omg.PortableInterceptor.AdapterNameHelper.read(in);
-        the_real_template = org.omg.PortableInterceptor.ObjectReferenceTemplateHelper.read(in);
+        the_server_id = ServerIdHelper.read(in);
+        the_adapter_name = AdapterNameHelper.read(in);
+        the_real_template = ObjectReferenceTemplateHelper.read(in);
     }
 
     public void
-    _write(org.omg.CORBA.portable.OutputStream out)
+    _write(OutputStream out)
     {
-        org.omg.PortableInterceptor.ServerIdHelper.write(out, the_server_id);
-        org.omg.PortableInterceptor.AdapterNameHelper.write(out, the_adapter_name);
-        org.omg.PortableInterceptor.ObjectReferenceTemplateHelper.write(out, the_real_template);
+        ServerIdHelper.write(out, the_server_id);
+        AdapterNameHelper.write(out, the_adapter_name);
+        ObjectReferenceTemplateHelper.write(out, the_real_template);
     }
 
-    public org.omg.CORBA.TypeCode
+    public TypeCode
     _type()
     {
         return IMRORTHelper.type();
