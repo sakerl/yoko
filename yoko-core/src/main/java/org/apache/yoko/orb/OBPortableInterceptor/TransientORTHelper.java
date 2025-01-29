@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,28 @@
 package org.apache.yoko.orb.OBPortableInterceptor;
 
 import org.apache.yoko.util.MinorCodes;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.BAD_OPERATION;
+import org.omg.CORBA.BAD_PARAM;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.PRIVATE_MEMBER;
+import org.omg.CORBA.VM_NONE;
+import org.omg.CORBA.ValueMember;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.IOP.IORHelper;
+import org.omg.PortableInterceptor.AdapterNameHelper;
+import org.omg.PortableInterceptor.ORBIdHelper;
+import org.omg.PortableInterceptor.ServerIdHelper;
+
+import java.io.Serializable;
+
+import static org.apache.yoko.util.MinorCodes.MinorIncompatibleObjectType;
+import static org.apache.yoko.util.MinorCodes.MinorTypeMismatch;
+import static org.apache.yoko.util.MinorCodes.describeBadOperation;
+import static org.apache.yoko.util.MinorCodes.describeBadParam;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
+import static org.omg.CORBA.TCKind.tk_ulong;
 
 //
 // IDL:orb.yoko.apache.org/OBPortableInterceptor/TransientORT:1.0
@@ -25,26 +47,25 @@ import org.apache.yoko.util.MinorCodes;
 final public class TransientORTHelper
 {
     public static void
-    insert(org.omg.CORBA.Any any, TransientORT val)
+    insert(Any any, TransientORT val)
     {
         any.insert_Value(val, type());
     }
 
     public static TransientORT
-    extract(org.omg.CORBA.Any any)
+    extract(Any any)
     {
         if(any.type().equivalent(type()))
         {
-            java.io.Serializable _ob_v = any.extract_Value();
+            Serializable _ob_v = any.extract_Value();
             if(_ob_v == null || _ob_v instanceof TransientORT)
                 return (TransientORT)_ob_v;
         }
 
 
-        throw new org.omg.CORBA.BAD_OPERATION(
-            MinorCodes
-                    .describeBadOperation(MinorCodes.MinorTypeMismatch),
-            MinorCodes.MinorTypeMismatch, org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+        throw new BAD_OPERATION(
+            describeBadOperation(MinorTypeMismatch),
+            MinorTypeMismatch, COMPLETED_NO);
     }
 
     private static org.omg.CORBA.TypeCode typeCode_;
@@ -54,35 +75,35 @@ final public class TransientORTHelper
     {
         if(typeCode_ == null)
         {
-            org.omg.CORBA.ORB orb = org.omg.CORBA.ORB.init();
-            org.omg.CORBA.ValueMember[] members = new org.omg.CORBA.ValueMember[5];
+            ORB orb = ORB.init();
+            ValueMember[] members = new ValueMember[5];
 
-            members[0] = new org.omg.CORBA.ValueMember();
+            members[0] = new ValueMember();
             members[0].name = "the_server_id";
-            members[0].type = org.omg.PortableInterceptor.ServerIdHelper.type();
-            members[0].access = org.omg.CORBA.PRIVATE_MEMBER.value;
+            members[0].type = ServerIdHelper.type();
+            members[0].access = PRIVATE_MEMBER.value;
 
-            members[1] = new org.omg.CORBA.ValueMember();
+            members[1] = new ValueMember();
             members[1].name = "the_orb_id";
-            members[1].type = org.omg.PortableInterceptor.ORBIdHelper.type();
-            members[1].access = org.omg.CORBA.PRIVATE_MEMBER.value;
+            members[1].type = ORBIdHelper.type();
+            members[1].access = PRIVATE_MEMBER.value;
 
-            members[2] = new org.omg.CORBA.ValueMember();
+            members[2] = new ValueMember();
             members[2].name = "the_adapter_name";
-            members[2].type = org.omg.PortableInterceptor.AdapterNameHelper.type();
-            members[2].access = org.omg.CORBA.PRIVATE_MEMBER.value;
+            members[2].type = AdapterNameHelper.type();
+            members[2].access = PRIVATE_MEMBER.value;
 
-            members[3] = new org.omg.CORBA.ValueMember();
+            members[3] = new ValueMember();
             members[3].name = "the_create_time";
-            members[3].type = orb.get_primitive_tc(org.omg.CORBA.TCKind.tk_ulong);
-            members[3].access = org.omg.CORBA.PRIVATE_MEMBER.value;
+            members[3].type = orb.get_primitive_tc(tk_ulong);
+            members[3].access = PRIVATE_MEMBER.value;
 
-            members[4] = new org.omg.CORBA.ValueMember();
+            members[4] = new ValueMember();
             members[4].name = "the_ior_template";
-            members[4].type = org.omg.IOP.IORHelper.type();
-            members[4].access = org.omg.CORBA.PRIVATE_MEMBER.value;
+            members[4].type = IORHelper.type();
+            members[4].access = PRIVATE_MEMBER.value;
 
-            typeCode_ = orb.create_value_tc(id(), "TransientORT", org.omg.CORBA.VM_NONE.value, null, members);
+            typeCode_ = orb.create_value_tc(id(), "TransientORT", VM_NONE.value, null, members);
         }
 
         return typeCode_;
@@ -95,25 +116,23 @@ final public class TransientORTHelper
     }
 
     public static TransientORT
-    read(org.omg.CORBA.portable.InputStream in)
+    read(InputStream in)
     {
         if(!(in instanceof org.omg.CORBA_2_3.portable.InputStream)) {
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                .describeBadParam(MinorCodes.MinorIncompatibleObjectType),
-                MinorCodes.MinorIncompatibleObjectType,
-                org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorIncompatibleObjectType),
+                MinorIncompatibleObjectType,
+                COMPLETED_NO);
         }
         return (TransientORT)((org.omg.CORBA_2_3.portable.InputStream)in).read_value(id());
     }
 
     public static void
-    write(org.omg.CORBA.portable.OutputStream out, TransientORT val)
+    write(OutputStream out, TransientORT val)
     {
         if(!(out instanceof org.omg.CORBA_2_3.portable.OutputStream)) {
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                .describeBadParam(MinorCodes.MinorIncompatibleObjectType),
-                MinorCodes.MinorIncompatibleObjectType,
-                org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorIncompatibleObjectType),
+                MinorIncompatibleObjectType,
+                COMPLETED_NO);
         }
         ((org.omg.CORBA_2_3.portable.OutputStream)out).write_value(val, id());
     }
