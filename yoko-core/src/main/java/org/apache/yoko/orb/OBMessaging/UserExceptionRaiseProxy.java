@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,10 @@ package org.apache.yoko.orb.OBMessaging;
 
 import org.apache.yoko.osgi.ProviderLocator;
 import org.apache.yoko.util.Assert;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.UserException;
+import org.omg.Messaging._ExceptionHolder;
+import org.omg.CORBA.Any;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -26,18 +30,18 @@ import static java.security.AccessController.doPrivileged;
 import static org.apache.yoko.util.PrivilegedActions.GET_CONTEXT_CLASS_LOADER;
 
 public class UserExceptionRaiseProxy {
-    public void raise(org.omg.Messaging._ExceptionHolder execptHolder)
-            throws org.omg.CORBA.UserException {
+    public void raise(_ExceptionHolder execptHolder)
+            throws UserException {
     }
 
     public void raise_with_list(
-            org.omg.Messaging._ExceptionHolder exceptHolder,
-            org.omg.CORBA.TypeCode[] exceptList)
-            throws org.omg.CORBA.UserException {
+            _ExceptionHolder exceptHolder,
+            TypeCode[] exceptList)
+            throws UserException {
         try {
             raise(exceptHolder);
-        } catch (org.omg.CORBA.UserException ex) {
-            org.omg.CORBA.Any any = new org.apache.yoko.orb.CORBA.Any();
+        } catch (UserException ex) {
+            Any any = new org.apache.yoko.orb.CORBA.Any();
 
             Class exClass = ex.getClass();
             String className = exClass.getName();
@@ -49,7 +53,7 @@ public class UserExceptionRaiseProxy {
                 // get the appropriate class for the loading.
                 Class c = ProviderLocator.loadClass(className + "Helper", exClass, doPrivileged(GET_CONTEXT_CLASS_LOADER));
                 Class[] paramTypes = new Class[2];
-                paramTypes[0] = org.omg.CORBA.Any.class;
+                paramTypes[0] = Any.class;
                 paramTypes[1] = exClass;
                 java.lang.reflect.Method m = c.getMethod("insert", paramTypes);
 
@@ -89,9 +93,9 @@ public class UserExceptionRaiseProxy {
     }
 
     public void register_as_proxy_with(
-            org.omg.Messaging._ExceptionHolder exceptHolder) {
+            _ExceptionHolder exceptHolder) {
 
-        org.apache.yoko.orb.OBMessaging.ExceptionHolder_impl exImpl = (org.apache.yoko.orb.OBMessaging.ExceptionHolder_impl) exceptHolder;
+        ExceptionHolder_impl exImpl = (ExceptionHolder_impl) exceptHolder;
 
         exImpl._OB_register_raise_proxy(this);
         //
