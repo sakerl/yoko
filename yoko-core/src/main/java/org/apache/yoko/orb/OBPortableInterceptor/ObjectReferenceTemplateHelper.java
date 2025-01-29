@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,23 @@
 package org.apache.yoko.orb.OBPortableInterceptor;
 
 import org.apache.yoko.util.MinorCodes;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.BAD_OPERATION;
+import org.omg.CORBA.BAD_PARAM;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.VM_ABSTRACT;
+import org.omg.CORBA.ValueMember;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+
+import java.io.Serializable;
+
+import static org.apache.yoko.util.MinorCodes.MinorIncompatibleObjectType;
+import static org.apache.yoko.util.MinorCodes.MinorTypeMismatch;
+import static org.apache.yoko.util.MinorCodes.describeBadOperation;
+import static org.apache.yoko.util.MinorCodes.describeBadParam;
+import static org.omg.CORBA.CompletionStatus.COMPLETED_NO;
 
 //
 // IDL:orb.yoko.apache.org/OBPortableInterceptor/ObjectReferenceTemplate:1.0
@@ -25,39 +42,38 @@ import org.apache.yoko.util.MinorCodes;
 final public class ObjectReferenceTemplateHelper
 {
     public static void
-    insert(org.omg.CORBA.Any any, ObjectReferenceTemplate val)
+    insert(Any any, ObjectReferenceTemplate val)
     {
         any.insert_Value(val, type());
     }
 
     public static ObjectReferenceTemplate
-    extract(org.omg.CORBA.Any any)
+    extract(Any any)
     {
         if(any.type().equivalent(type()))
         {
-            java.io.Serializable _ob_v = any.extract_Value();
+            Serializable _ob_v = any.extract_Value();
             if(_ob_v == null || _ob_v instanceof ObjectReferenceTemplate)
                 return (ObjectReferenceTemplate)_ob_v;
         }
 
 
-        throw new org.omg.CORBA.BAD_OPERATION(
-            MinorCodes
-                    .describeBadOperation(MinorCodes.MinorTypeMismatch),
-            MinorCodes.MinorTypeMismatch, org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+        throw new BAD_OPERATION(
+            describeBadOperation(MinorTypeMismatch),
+            MinorTypeMismatch, COMPLETED_NO);
     }
 
-    private static org.omg.CORBA.TypeCode typeCode_;
+    private static TypeCode typeCode_;
 
-    public static org.omg.CORBA.TypeCode
+    public static TypeCode
     type()
     {
         if(typeCode_ == null)
         {
-            org.omg.CORBA.ORB orb = org.omg.CORBA.ORB.init();
-            org.omg.CORBA.ValueMember[] members = new org.omg.CORBA.ValueMember[0];
+            ORB orb = ORB.init();
+            ValueMember[] members = new ValueMember[0];
 
-            typeCode_ = orb.create_value_tc(id(), "ObjectReferenceTemplate", org.omg.CORBA.VM_ABSTRACT.value, null, members);
+            typeCode_ = orb.create_value_tc(id(), "ObjectReferenceTemplate", VM_ABSTRACT.value, null, members);
         }
 
         return typeCode_;
@@ -70,25 +86,23 @@ final public class ObjectReferenceTemplateHelper
     }
 
     public static ObjectReferenceTemplate
-    read(org.omg.CORBA.portable.InputStream in)
+    read(InputStream in)
     {
         if(!(in instanceof org.omg.CORBA_2_3.portable.InputStream)) {
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                .describeBadParam(MinorCodes.MinorIncompatibleObjectType),
-                MinorCodes.MinorIncompatibleObjectType,
-                org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorIncompatibleObjectType),
+                MinorIncompatibleObjectType,
+                COMPLETED_NO);
         }
         return (ObjectReferenceTemplate)((org.omg.CORBA_2_3.portable.InputStream)in).read_value(id());
     }
 
     public static void
-    write(org.omg.CORBA.portable.OutputStream out, ObjectReferenceTemplate val)
+    write(OutputStream out, ObjectReferenceTemplate val)
     {
         if(!(out instanceof org.omg.CORBA_2_3.portable.OutputStream)) {
-            throw new org.omg.CORBA.BAD_PARAM(MinorCodes
-                .describeBadParam(MinorCodes.MinorIncompatibleObjectType),
-                MinorCodes.MinorIncompatibleObjectType,
-                org.omg.CORBA.CompletionStatus.COMPLETED_NO);
+            throw new BAD_PARAM(describeBadParam(MinorIncompatibleObjectType),
+                MinorIncompatibleObjectType,
+                COMPLETED_NO);
         }
         ((org.omg.CORBA_2_3.portable.OutputStream)out).write_value(val, id());
     }
