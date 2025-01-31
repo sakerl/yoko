@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,11 @@
  */
 package org.apache.yoko.orb.OBPortableInterceptor;
 
-import org.apache.yoko.orb.OBPortableInterceptor.IMRORT;
+import org.apache.yoko.orb.OB.ObjectKey;
+import org.apache.yoko.orb.OB.ObjectKeyData;
+import org.omg.PortableInterceptor.ObjectReferenceTemplate;
+
+import static java.lang.System.arraycopy;
 
 //
 // The IMR ObjectReferenceTemplate
@@ -31,7 +35,7 @@ final public class IMRORT_impl extends IMRORT {
     }
 
     public IMRORT_impl(String serverId, String[] adapterName,
-            org.omg.PortableInterceptor.ObjectReferenceTemplate realTemplate) {
+            ObjectReferenceTemplate realTemplate) {
         the_server_id = serverId;
         the_adapter_name = adapterName;
         the_real_template = realTemplate;
@@ -59,10 +63,10 @@ final public class IMRORT_impl extends IMRORT {
         //
         String[] poaId = the_adapter_name;
 
-        org.apache.yoko.orb.OB.ObjectKeyData obkey = new org.apache.yoko.orb.OB.ObjectKeyData();
+        ObjectKeyData obkey = new ObjectKeyData();
         obkey.serverId = the_server_id;
         obkey.poaId = new String[poaId.length];
-        System.arraycopy(poaId, 0, obkey.poaId, 0, poaId.length);
+        arraycopy(poaId, 0, obkey.poaId, 0, poaId.length);
         obkey.oid = id;
         obkey.persistent = true;
         obkey.createTime = 0;
@@ -71,7 +75,7 @@ final public class IMRORT_impl extends IMRORT {
         // CreatePersistentObjectKey/CreateTransientObjectKey instead of
         // populating this ObjectKey data to avoid the copy?
         //
-        byte[] key = org.apache.yoko.orb.OB.ObjectKey.CreateObjectKey(obkey);
+        byte[] key = ObjectKey.CreateObjectKey(obkey);
 
         //
         // Create and return reference using the real template
