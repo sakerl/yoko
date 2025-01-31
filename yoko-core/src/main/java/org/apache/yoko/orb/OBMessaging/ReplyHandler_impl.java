@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  */
 package org.apache.yoko.orb.OBMessaging;
 
-public interface ReplyHandler_impl extends org.omg.Messaging.ReplyHandler {
-    public abstract void _OB_invoke(org.apache.yoko.orb.OB.Downcall down);
+import org.apache.yoko.orb.OB.Downcall;
+import org.omg.Messaging.ReplyHandler;
+
+public interface ReplyHandler_impl extends ReplyHandler {
+    public abstract void _OB_invoke(Downcall down);
 }
