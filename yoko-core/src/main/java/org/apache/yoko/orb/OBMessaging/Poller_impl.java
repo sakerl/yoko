@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,24 @@
  */
 package org.apache.yoko.orb.OBMessaging;
 
-import org.apache.yoko.util.Assert;
+import org.apache.yoko.orb.OB.Downcall;
+import org.apache.yoko.orb.OB.ORBInstance;
+import org.apache.yoko.orb.OB.OrbAsyncHandler;
+import org.apache.yoko.orb.OBCORBA.PollableSet_impl;
+import org.omg.CORBA.NO_IMPLEMENT;
+import org.omg.CORBA.Pollable;
+import org.omg.CORBA.PollableSet;
+import org.omg.Messaging.Poller;
+import org.omg.Messaging.ReplyHandler;
 
-public class Poller_impl implements org.omg.CORBA.Pollable,
-        org.omg.Messaging.Poller {
+import static org.apache.yoko.util.Assert.ensure;
+
+public class Poller_impl implements Pollable,
+        Poller {
     //
     // ORBInstance this poller is bound to
     //
-    protected org.apache.yoko.orb.OB.ORBInstance orbInstance_ = null;
+    protected ORBInstance orbInstance_ = null;
 
     //
     // operation target
@@ -39,13 +49,13 @@ public class Poller_impl implements org.omg.CORBA.Pollable,
     //
     // Associated ReplyHandler
     //
-    protected org.omg.Messaging.ReplyHandler replyHandler_ = null;
+    protected ReplyHandler replyHandler_ = null;
 
     // ----------------------------------------------------------------
     // Standard IDL to Java mapping
     // ----------------------------------------------------------------
     public String[] _truncatable_ids() {
-        throw new org.omg.CORBA.NO_IMPLEMENT();
+        throw new NO_IMPLEMENT();
     }
 
     // ----------------------------------------------------------------
@@ -56,9 +66,9 @@ public class Poller_impl implements org.omg.CORBA.Pollable,
     // IDL:omg.org/CORBA/Pollable/is_ready:1.0
     //
     public boolean is_ready(int timeout) {
-        Assert.ensure(orbInstance_ != null);
+        ensure(orbInstance_ != null);
 
-        org.apache.yoko.orb.OB.OrbAsyncHandler handler = orbInstance_
+        OrbAsyncHandler handler = orbInstance_
                 .getAsyncHandler();
         return handler.is_ready(this, timeout);
     }
@@ -66,10 +76,10 @@ public class Poller_impl implements org.omg.CORBA.Pollable,
     //
     // IDL:omg.org/CORBA/Pollable/create_pollable_set:1.0
     //
-    public org.omg.CORBA.PollableSet create_pollable_set() {
-        Assert.ensure(orbInstance_ != null);
+    public PollableSet create_pollable_set() {
+        ensure(orbInstance_ != null);
 
-        return new org.apache.yoko.orb.OBCORBA.PollableSet_impl();
+        return new PollableSet_impl();
     }
 
     // ----------------------------------------------------------------
@@ -93,11 +103,11 @@ public class Poller_impl implements org.omg.CORBA.Pollable,
     //
     // IDL:omg.org/Messaging/Poller/associated_handler:1.0
     //
-    public org.omg.Messaging.ReplyHandler associated_handler() {
+    public ReplyHandler associated_handler() {
         return replyHandler_;
     }
 
-    public void associated_handler(org.omg.Messaging.ReplyHandler handler) {
+    public void associated_handler(ReplyHandler handler) {
         replyHandler_ = handler;
     }
 
@@ -115,7 +125,7 @@ public class Poller_impl implements org.omg.CORBA.Pollable,
     //
     // set the internal ORBInstance handle
     // 
-    public void _OB_ORBInstance(org.apache.yoko.orb.OB.ORBInstance orb) {
+    public void _OB_ORBInstance(ORBInstance orb) {
         orbInstance_ = orb;
     }
 
@@ -129,8 +139,8 @@ public class Poller_impl implements org.omg.CORBA.Pollable,
     //
     // get the response of this request
     //
-    public org.apache.yoko.orb.OB.Downcall _OB_poll_response() {
-        org.apache.yoko.orb.OB.OrbAsyncHandler handler = orbInstance_
+    public Downcall _OB_poll_response() {
+        OrbAsyncHandler handler = orbInstance_
                 .getAsyncHandler();
         return handler.poll_response(this);
     }
