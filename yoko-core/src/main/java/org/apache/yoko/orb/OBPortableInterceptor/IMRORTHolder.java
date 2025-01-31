@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,14 @@
  */
 package org.apache.yoko.orb.OBPortableInterceptor;
 
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.Streamable;
+
 //
 // IDL:orb.yoko.apache.org/OBPortableInterceptor/IMRORT:1.0
 //
-final public class IMRORTHolder implements org.omg.CORBA.portable.Streamable
+final public class IMRORTHolder implements Streamable
 {
     public IMRORT value;
 
@@ -36,13 +40,13 @@ final public class IMRORTHolder implements org.omg.CORBA.portable.Streamable
     }
 
     public void
-    _read(org.omg.CORBA.portable.InputStream in)
+    _read(InputStream in)
     {
         value = IMRORTHelper.read(in);
     }
 
     public void
-    _write(org.omg.CORBA.portable.OutputStream out)
+    _write(OutputStream out)
     {
         IMRORTHelper.write(out, value);
     }
