@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,18 @@
  */
 package org.apache.yoko.orb.OBPortableInterceptor;
 
+import org.apache.yoko.orb.OB.ORBInstance;
+import org.apache.yoko.orb.OB.ObjectFactory;
+import org.apache.yoko.orb.OB.ObjectKey;
+import org.apache.yoko.orb.OB.ObjectKeyData;
 import org.apache.yoko.orb.OBPortableInterceptor.PersistentORT;
+import org.apache.yoko.orb.OCI.AccFactory;
+import org.apache.yoko.orb.OCI.AccFactoryRegistry;
+import org.omg.IOP.IOR;
+import org.omg.IOP.IORHolder;
+import org.omg.IOP.TaggedProfile;
+
+import static java.lang.System.arraycopy;
 
 //
 // The Persistent ObjectReferenceTemplate
@@ -26,19 +37,19 @@ final public class PersistentORT_impl extends PersistentORT {
     //
     // The ORBInstance object
     //
-    private org.apache.yoko.orb.OB.ORBInstance orbInstance_;
+    private ORBInstance orbInstance_;
 
     // ------------------------------------------------------------------
     // Public member implementations
     // ------------------------------------------------------------------
 
-    public PersistentORT_impl(org.apache.yoko.orb.OB.ORBInstance orbInstance) {
+    public PersistentORT_impl(ORBInstance orbInstance) {
         orbInstance_ = orbInstance;
     }
 
-    public PersistentORT_impl(org.apache.yoko.orb.OB.ORBInstance orbInstance,
-            String serverId, String orbId, String[] adapterName,
-            org.omg.IOP.IOR iorTemplate) {
+    public PersistentORT_impl(ORBInstance orbInstance,
+                              String serverId, String orbId, String[] adapterName,
+                              IOR iorTemplate) {
         orbInstance_ = orbInstance;
 
         the_server_id = serverId;
@@ -60,7 +71,7 @@ final public class PersistentORT_impl extends PersistentORT {
         // CreatePersistentObjectKey/CreateTransientObjectKey instead of
         // populating this ObjectKey data to avoid the copy?
         //
-        org.apache.yoko.orb.OB.ObjectKeyData obkey = new org.apache.yoko.orb.OB.ObjectKeyData();
+        ObjectKeyData obkey = new ObjectKeyData();
         obkey.serverId = the_server_id;
         if (obkey.serverId.length() == 0)
             obkey.serverId = "_RootPOA";
@@ -69,24 +80,24 @@ final public class PersistentORT_impl extends PersistentORT {
         obkey.persistent = true;
         obkey.createTime = 0;
 
-        byte[] key = org.apache.yoko.orb.OB.ObjectKey.CreateObjectKey(obkey);
+        byte[] key = ObjectKey.CreateObjectKey(obkey);
 
-        org.omg.IOP.IOR ior = new org.omg.IOP.IOR();
+        IOR ior = new IOR();
         ior.type_id = repoid;
-        ior.profiles = new org.omg.IOP.TaggedProfile[the_ior_template.profiles.length];
+        ior.profiles = new TaggedProfile[the_ior_template.profiles.length];
         for (int profile = 0; profile < the_ior_template.profiles.length; ++profile) {
-            ior.profiles[profile] = new org.omg.IOP.TaggedProfile();
+            ior.profiles[profile] = new TaggedProfile();
             ior.profiles[profile].tag = the_ior_template.profiles[profile].tag;
             ior.profiles[profile].profile_data = new byte[the_ior_template.profiles[profile].profile_data.length];
-            System.arraycopy(the_ior_template.profiles[profile].profile_data,
+            arraycopy(the_ior_template.profiles[profile].profile_data,
                     0, ior.profiles[profile].profile_data, 0,
                     ior.profiles[profile].profile_data.length);
         }
-        org.omg.IOP.IORHolder iorH = new org.omg.IOP.IORHolder(ior);
+        IORHolder iorH = new IORHolder(ior);
 
-        org.apache.yoko.orb.OCI.AccFactoryRegistry registry = orbInstance_
+        AccFactoryRegistry registry = orbInstance_
                 .getAccFactoryRegistry();
-        org.apache.yoko.orb.OCI.AccFactory[] factories = registry
+        AccFactory[] factories = registry
                 .get_factories();
         for (int i = 0; i < factories.length; ++i)
             factories[i].change_key(iorH, key);
@@ -94,7 +105,7 @@ final public class PersistentORT_impl extends PersistentORT {
         //
         // Create and return reference
         //
-        org.apache.yoko.orb.OB.ObjectFactory objectFactory = orbInstance_
+        ObjectFactory objectFactory = orbInstance_
                 .getObjectFactory();
         return objectFactory.createObject(iorH.value);
     }
@@ -113,7 +124,7 @@ final public class PersistentORT_impl extends PersistentORT {
 
     public String[] adapter_name() {
         String[] result = new String[the_adapter_name.length];
-        System.arraycopy(the_adapter_name, 0, result, 0,
+        arraycopy(the_adapter_name, 0, result, 0,
                 the_adapter_name.length);
         return result;
     }
