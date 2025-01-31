@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,12 @@ package org.apache.yoko.orb.OBPortableInterceptor;
 //
 // IDL:orb.yoko.apache.org/OBPortableInterceptor/ObjectReferenceTemplate:1.0
 //
+
+import org.omg.CORBA.portable.ValueBase;
+
 /***/
 
-public interface ObjectReferenceTemplate extends org.omg.CORBA.portable.ValueBase,
+public interface ObjectReferenceTemplate extends ValueBase,
                                                  org.omg.PortableInterceptor.ObjectReferenceTemplate
 {
     //
