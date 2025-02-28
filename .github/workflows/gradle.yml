@@ -1,4 +1,4 @@
-# Copyright 2024 IBM Corporation and others.
+# Copyright 2025 IBM Corporation and others.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,14 +45,14 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
     - name: Upload test reports
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: reports
         path: '*/build/reports'
     - name: Upload xml test results
       if: always()   # make sure we run it every time even if test step fails
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v4
       with:
           name: xml-report
           path: "**/test-results/**/*.xml"
