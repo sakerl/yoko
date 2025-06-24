@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,6 @@
  */
 package org.apache.yoko;
 
-import org.apache.yoko.orb.CORBA.InputStream;
-import org.apache.yoko.orb.CORBA.OutputStream;
-import org.apache.yoko.orb.OCI.GiopVersion;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.omg.CosNaming.NameComponent;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -36,10 +24,30 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.CoreMatchers.theInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static testify.hex.HexParser.HEX_DUMP;
+
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.rmi.CORBA.Util;
+import javax.rmi.CORBA.ValueHandler;
+
+import org.apache.yoko.orb.CORBA.InputStream;
+import org.apache.yoko.orb.CORBA.OutputStream;
+import org.apache.yoko.orb.OCI.GiopVersion;
+import org.apache.yoko.rmi.impl.ValueHandlerImpl;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.omg.CosNaming.NameComponent;
 
 /**
  * Test writing Java values directly to and reading them back from CDR streams.
@@ -107,6 +115,8 @@ class JavaValueTest {
     @BeforeEach
     void setupStreams() {
         out = new OutputStream(null, GiopVersion.GIOP1_2);
+        ValueHandler vh = Util.createValueHandler();
+        assertInstanceOf(ValueHandlerImpl.class, vh);
     }
 
     @Test
@@ -283,5 +293,43 @@ class JavaValueTest {
         NameComponent[] actual = (NameComponent[])in.read_value(NameComponent[].class);
         NameComponent[] expected = NameComponents.stringToPath("ResolvableCosNamingChecker");
         NameComponents.assertEquals(expected, actual);
+    }
+
+    @Test
+    void unmarshalDateWithDefaultWriteObjectFlag() {
+        writeHex("" +
+            "7fffff0a 00000035 524d493a 6a617661  \".......5RMI:java\"\n" +
+            "2e757469 6c2e4461 74653a41 43313137  \".util.Date:AC117\"\n" +
+            "45323846 45333635 3837413a 36383641  \"E28FE36587A:686A\"\n" +
+            "38313031 34423539 37343139 00bdbdbd  \"81014B597419....\"\n" +
+            "00000002 0201bdbd 7fffff0a 00000044  \"...............D\"\n" +
+            "524d493a 6f72672e 6f6d672e 63757374  \"RMI:org.omg.cust\"\n" +
+            "6f6d2e6a 6176612e 7574696c 2e446174  \"om.java.util.Dat\"\n" +
+            "653a4143 31313745 32384645 33363538  \"e:AC117E28FE3658\"\n" +
+            "37413a36 38364138 31303134 42353937  \"7A:686A81014B597\"\n" +
+            "34313900 00000008 00000000 00000000  \"419.............\"\n" +
+            "ffffffff                             \"....\"");
+        Date actual = (Date)in.read_value(Date.class);
+        Date expected = new Date(0);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void unmarshalDateWithoutDefaultWriteObjectFlag() {
+        writeHex("" +
+            "7fffff0a 00000035 524d493a 6a617661  \".......5RMI:java\"\n" +
+            "2e757469 6c2e4461 74653a41 43313137  \".util.Date:AC117\"\n" +
+            "45323846 45333635 3837413a 36383641  \"E28FE36587A:686A\"\n" +
+            "38313031 34423539 37343139 00bdbdbd  \"81014B597419....\"\n" +
+            "00000002 0200bdbd 7fffff0a 00000044  \"...............D\"\n" +
+            "524d493a 6f72672e 6f6d672e 63757374  \"RMI:org.omg.cust\"\n" +
+            "6f6d2e6a 6176612e 7574696c 2e446174  \"om.java.util.Dat\"\n" +
+            "653a4143 31313745 32384645 33363538  \"e:AC117E28FE3658\"\n" +
+            "37413a36 38364138 31303134 42353937  \"7A:686A81014B597\"\n" +
+            "34313900 00000008 00000000 00000000  \"419.............\"\n" +
+            "ffffffff                             \"....\"");
+        Date actual = (Date)in.read_value(Date.class);
+        Date expected = new Date(0);
+        assertEquals(expected, actual);
     }
 }
