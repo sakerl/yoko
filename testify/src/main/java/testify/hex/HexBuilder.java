@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,6 +95,12 @@ public class HexBuilder {
         return this;
     }
 
+    /** write some raw data, without any length */
+    public HexBuilder bytes(byte[] bytes) {
+        for (byte b: bytes) oct(0xFF & b);
+        return this;
+    }
+
     /** write a string, including the length and a null terminator */
     public HexBuilder str(String s) {
         assert s.matches("\\p{ASCII}*");
@@ -125,5 +131,12 @@ public class HexBuilder {
         try (Formatter f = this.f){
             return f.toString();
         }
+    }
+
+    public String dump() {
+        StringBuilder sb = new StringBuilder(hex());
+        for (int i = 8; i < sb.length(); i+=9)
+            sb.insert(i, (0==(i+1)%36) ? '\n' : ' ');
+        return sb.toString();
     }
 }
