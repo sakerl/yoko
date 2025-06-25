@@ -2,6 +2,7 @@
 .project
 .metadata
 .idea
+.profileconfig.json
 .classpath
 .settings
 target
