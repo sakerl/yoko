@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,13 +96,13 @@ import static testify.iiop.annotation.ConfigureServer.Separation.INTER_PROCESS;
 
 @ConfigureServer(separation = INTER_PROCESS)
 public class TestObjectsByValue {
-    @ConfigureServer(serverOrb = @ConfigureOrb(args = "-OAthreaded"), clientOrb = @ConfigureOrb(args = "-ORBThreaded"))
+    @ConfigureServer(serverOrb = @ConfigureOrb(args = "-OAthreaded"), clientOrb = @ConfigureOrb(args = "-ORBthreaded"))
     public static class TestObjectsByValueThreaded extends TestObjectsByValue {}
-    @ConfigureServer(serverOrb = @ConfigureOrb(args = "-OAthread_per_client"), clientOrb = @ConfigureOrb(args = "-ORBThreaded"))
+    @ConfigureServer(serverOrb = @ConfigureOrb(args = "-OAthread_per_client"), clientOrb = @ConfigureOrb(args = "-ORBthreaded"))
     public static class TestObjectsByValueThreadPerClient extends TestObjectsByValue {}
-    @ConfigureServer(serverOrb = @ConfigureOrb(args = "-OAthread_per_request"), clientOrb = @ConfigureOrb(args = "-ORBThreaded"))
+    @ConfigureServer(serverOrb = @ConfigureOrb(args = "-OAthread_per_request"), clientOrb = @ConfigureOrb(args = "-ORBthreaded"))
     public static class TestObjectsByValueThreadPerRequest extends TestObjectsByValue {}
-    @ConfigureServer(serverOrb = @ConfigureOrb(args = {"-OAthread_pool", "10"}), clientOrb = @ConfigureOrb(args = "-ORBThreaded"))
+    @ConfigureServer(serverOrb = @ConfigureOrb(args = {"-OAthread_pool", "10"}), clientOrb = @ConfigureOrb(args = "-ORBthreaded"))
     public static class TestObjectsByValueThreadPool extends TestObjectsByValue {}
 
     private static TestOBV stub;
