@@ -20,6 +20,9 @@ package org.apache.yoko.util.cmsf;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Provides a stack-based approach to track the Cmsf settings in effect on the current thread.
+ */
 public final class CmsfThreadLocal {
     private static final Logger LOGGER = Logger.getLogger(CmsfThreadLocal.class.getName());
     private static final ThreadLocal<CmsfInfo> cmsfInfo = new ThreadLocal<CmsfInfo>() {
