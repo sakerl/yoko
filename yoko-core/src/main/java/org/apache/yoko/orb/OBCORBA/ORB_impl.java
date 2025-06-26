@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -376,7 +376,7 @@ public class ORB_impl extends ORBSingleton {
                 throw Assert.fail(ex);
             }
             
-            // Install interceptors for Yoko Auxilliary Stream Format
+            // Install interceptors for Yoko Auxiliary Stream Format
             try {
                 piManager.addIORInterceptor(new YasfIORInterceptor(), true);
                 piManager.addClientRequestInterceptor(new YasfClientInterceptor());
