@@ -376,7 +376,7 @@ public class ORB_impl extends ORBSingleton {
                 throw Assert.fail(ex);
             }
             
-            // Install interceptors for Yoko Auxilliary Stream Format
+            // Install interceptors for Yoko Auxiliary Stream Format
             try {
                 piManager.addIORInterceptor(new YasfIORInterceptor(), true);
                 piManager.addClientRequestInterceptor(new YasfClientInterceptor());

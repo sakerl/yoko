@@ -21,6 +21,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Provides a stack-based approach to track the Yasf settings in effect on the current thread.
+ */
 public final class YasfThreadLocal {
     private static final Logger LOGGER = Logger.getLogger(YasfThreadLocal.class.getName());
     private static final ThreadLocal<YasfInfo> yasfInfo = new ThreadLocal<YasfInfo>() {
