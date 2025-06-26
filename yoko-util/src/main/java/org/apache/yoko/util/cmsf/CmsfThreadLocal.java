@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ package org.apache.yoko.util.cmsf;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Provides a stack-based approach to track the Cmsf settings in effect on the current thread.
+ */
 public final class CmsfThreadLocal {
     private static final Logger LOGGER = Logger.getLogger(CmsfThreadLocal.class.getName());
     private static final ThreadLocal<CmsfInfo> cmsfInfo = new ThreadLocal<CmsfInfo>() {
