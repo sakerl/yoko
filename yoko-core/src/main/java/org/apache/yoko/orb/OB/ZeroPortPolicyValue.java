@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,23 @@
  */
 package org.apache.yoko.orb.OB;
 
+import java.io.ObjectStreamException;
+
+import org.omg.CORBA.portable.IDLEntity;
+
 //
 // IDL:orb.yoko.apache.org/OB/ZeroPortPolicyValue:1.0
 //
 /***/
 
-public class ZeroPortPolicyValue implements org.omg.CORBA.portable.IDLEntity
+public class ZeroPortPolicyValue implements IDLEntity
 {
     private boolean value_;
 
-    public final static boolean _ZERO_PORT = true;
-    public final static ZeroPortPolicyValue ZERO_PORT = new ZeroPortPolicyValue(_ZERO_PORT);
-    public final static boolean _NONZERO_PORT = false;
-    public final static ZeroPortPolicyValue NONZERO_PORT = new ZeroPortPolicyValue(_NONZERO_PORT);
+    public static final boolean _ZERO_PORT = true;
+    public static final ZeroPortPolicyValue ZERO_PORT = new ZeroPortPolicyValue(_ZERO_PORT);
+    public static final boolean _NONZERO_PORT = false;
+    public static final ZeroPortPolicyValue NONZERO_PORT = new ZeroPortPolicyValue(_NONZERO_PORT);
 
     protected
     ZeroPortPolicyValue(boolean value)
@@ -54,9 +58,9 @@ public class ZeroPortPolicyValue implements org.omg.CORBA.portable.IDLEntity
         }
     }
 
-    private java.lang.Object
+    private Object
     readResolve()
-        throws java.io.ObjectStreamException
+        throws ObjectStreamException
     {
         return from_boolean(value());
     }
