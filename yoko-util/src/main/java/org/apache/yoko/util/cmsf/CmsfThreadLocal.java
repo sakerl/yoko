@@ -17,6 +17,8 @@
  */
 package org.apache.yoko.util.cmsf;
 
+import org.apache.yoko.io.SimplyCloseable;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,12 +87,13 @@ public final class CmsfThreadLocal {
         return new CmsfOverride(cmsfInfo.get());
     }
 
-    public static void push(byte cmsfv) {
+    public static SimplyCloseable push(byte cmsfv) {
         final CmsfInfo info = cmsfInfo.get();
         final Version version = Version.get(cmsfv);
         if (LOGGER.isLoggable(Level.FINER))
             LOGGER.finer(String.format("CMSF thread local version pushed onto stack: %s", version));
         info.head = new Frame(version, info.head);
+        return CmsfThreadLocal::pop;
     }
 
     public static byte get() {

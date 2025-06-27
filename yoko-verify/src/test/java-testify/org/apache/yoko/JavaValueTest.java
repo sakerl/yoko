@@ -17,13 +17,32 @@
  */
 package org.apache.yoko;
 
+import org.apache.yoko.io.ReadBuffer;
+import org.apache.yoko.io.SimplyCloseable;
+import org.apache.yoko.orb.CORBA.InputStream;
+import org.apache.yoko.orb.CORBA.OutputStream;
+import org.apache.yoko.orb.OCI.GiopVersion;
+import org.apache.yoko.rmi.impl.ValueHandlerImpl;
+import org.apache.yoko.util.cmsf.CmsfThreadLocal;
+import org.apache.yoko.util.rofl.RoflThreadLocal;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.omg.CosNaming.NameComponent;
+
+import javax.rmi.CORBA.Util;
+import javax.rmi.CORBA.ValueHandler;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.apache.yoko.util.rofl.Rofl.RemoteOrb.IBM;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.CoreMatchers.theInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -32,35 +51,8 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static testify.hex.HexBuilder.buildHex;
 import static testify.hex.HexParser.HEX_DUMP;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.rmi.CORBA.Util;
-import javax.rmi.CORBA.ValueHandler;
-
-import org.apache.yoko.io.ReadBuffer;
-import org.apache.yoko.orb.CORBA.InputStream;
-import org.apache.yoko.orb.CORBA.OutputStream;
-import org.apache.yoko.orb.OCI.GiopVersion;
-import org.apache.yoko.rmi.impl.ValueHandlerImpl;
-import org.apache.yoko.util.cmsf.CmsfThreadLocal;
-import org.apache.yoko.util.yasf.Yasf;
-import org.apache.yoko.util.yasf.YasfThreadLocal;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.omg.CosNaming.NameComponent;
-import testify.hex.HexBuilder;
-import testify.hex.HexParser;
-
 /**
  * Test writing Java values directly to and reading them back from CDR streams.
- * This test was created in response to a bug where indirections
- * were not supported in CDR streams
  */
 class JavaValueTest {
     OutputStream out;
@@ -331,11 +323,9 @@ class JavaValueTest {
     @Test
     void marshalDateCmsf2() {
         Date actual = new Date(0);
-        CmsfThreadLocal.push((byte)2);
-        try {
+
+        try (SimplyCloseable x = CmsfThreadLocal.push((byte)2);){
             out.write_value(actual);
-        } finally {
-            CmsfThreadLocal.pop();
         }
         assertHex("" +
                 "7fffff0a 00000035 524d493a 6a617661  \".......5RMI:java\"\n" +
@@ -352,14 +342,27 @@ class JavaValueTest {
     }
 
     @Test
-    void marshalDateCmsf2YasfAll() {
+    void marshalDatelikeJava8Cmsf1() {
         Date actual = new Date(0);
-        CmsfThreadLocal.push((byte)2);
-        YasfThreadLocal.push(EnumSet.allOf(Yasf.class));
-        try {
+        try (SimplyCloseable x = RoflThreadLocal.push(() -> IBM);) {
             out.write_value(actual);
-        } finally {
-            CmsfThreadLocal.pop();
+        }
+            assertHex("" +
+                    "7fffff0a 00000035 524d493a 6a617661  \".......5RMI:java\"\n" +
+                    "2e757469 6c2e4461 74653a41 43313137  \".util.Date:AC117\"\n" +
+                    "45323846 45333635 3837413a 36383641  \"E28FE36587A:686A\"\n" +
+                    "38313031 34423539 37343139 00bdbdbd  \"81014B597419....\"\n" +
+                    "0000000c 0100bdbd 00000000 00000000  \"................\"\n" +
+                    "ffffffff                             \"....\"");
+    }
+
+    @Test
+    void marshalDatelikeJava8Cmsf2() {
+        Date actual = new Date(0);
+        try (
+                SimplyCloseable x = CmsfThreadLocal.push((byte)2);
+                SimplyCloseable y = RoflThreadLocal.push(() -> IBM)) {
+            out.write_value(actual);
         }
         assertHex("" +
                 "7fffff0a 00000035 524d493a 6a617661  \".......5RMI:java\"\n" +
@@ -375,6 +378,75 @@ class JavaValueTest {
                 "ffffffff                             \"....\"");
     }
 
+    @Test
+    void marshalSqlDateCmsf1() {
+        Date actual = new java.sql.Date(0);
+        out.write_value(actual);
+        assertHex("" +
+                "0000:  7fffff0a 00000034 524d493a 6a617661  \".......4RMI:java\"\n" +
+                "0010:  2e73716c 2e446174 653a3044 30393638  \".sql.Date:0D0968\"\n" +
+                "0020:  45383232 36323732 44333a31 34464134  \"E8226272D3:14FA4\"\n" +
+                "0030:  36363833 46333536 36393700 00000010  \"6683F356697.....\"\n" +
+                "0040:  0101bdbd bdbdbdbd 00000000 00000000  \"................\"\n" +
+                "0050:  ffffffff                             \"....\"");
+    }
+
+    @Test
+    void marshalSqlDateCmsf2() {
+        Date actual = new java.sql.Date(0);
+        try (SimplyCloseable x = CmsfThreadLocal.push((byte)2)) {
+            out.write_value(actual);
+        }
+        assertHex("" +
+                "7fffff0a 00000034 524d493a 6a617661  \".......4RMI:java\"\n" +
+                "2e73716c 2e446174 653a3044 30393638  \".sql.Date:0D0968\"\n" +
+                "45383232 36323732 44333a31 34464134  \"E8226272D3:14FA4\"\n" +
+                "36363833 46333536 36393700 00000002  \"6683F356697.....\"\n" +
+                "0201bdbd 7fffff0a 00000044 524d493a  \"...........DRMI:\"\n" +
+                "6f72672e 6f6d672e 63757374 6f6d2e6a  \"org.omg.custom.j\"\n" +
+                "6176612e 7574696c 2e446174 653a4143  \"ava.util.Date:AC\"\n" +
+                "31313745 32384645 33363538 37413a36  \"117E28FE36587A:6\"\n" +
+                "38364138 31303134 42353937 34313900  \"86A81014B597419.\"\n" +
+                "0000000c bdbdbdbd 00000000 00000000  \"................\"\n" +
+                "ffffffff                             \"....\"");
+    }
+
+    @Test
+    void marshalSqlDatelikeJava8Cmsf1() {
+        Date actual = new java.sql.Date(0);
+        try (SimplyCloseable y = RoflThreadLocal.push(() -> IBM)) {
+            out.write_value(actual);
+        }
+        assertHex("" +
+                "0000:  7fffff0a 00000034 524d493a 6a617661  \".......4RMI:java\"\n" +
+                "0010:  2e73716c 2e446174 653a3044 30393638  \".sql.Date:0D0968\"\n" +
+                "0020:  45383232 36323732 44333a31 34464134  \"E8226272D3:14FA4\"\n" +
+                "0030:  36363833 46333536 36393700 00000010  \"6683F356697.....\"\n" +
+                "0040:  0100bdbd bdbdbdbd 00000000 00000000  \"................\"\n" +
+                "0050:  ffffffff                             \"....\"");
+    }
+
+    @Test
+    void marshalSqlDatelikeJava8Cmsf2() {
+        Date actual = new java.sql.Date(0);
+        try (
+                SimplyCloseable x = CmsfThreadLocal.push((byte)2);
+                SimplyCloseable y = RoflThreadLocal.push(() -> IBM)) {
+            out.write_value(actual);
+        }
+        assertHex("" +
+                "7fffff0a 00000034 524d493a 6a617661  \".......4RMI:java\"\n" +
+                "2e73716c 2e446174 653a3044 30393638  \".sql.Date:0D0968\"\n" +
+                "45383232 36323732 44333a31 34464134  \"E8226272D3:14FA4\"\n" +
+                "36363833 46333536 36393700 00000002  \"6683F356697.....\"\n" +
+                "0200bdbd 7fffff0a 00000044 524d493a  \"...........DRMI:\"\n" +
+                "6f72672e 6f6d672e 63757374 6f6d2e6a  \"org.omg.custom.j\"\n" +
+                "6176612e 7574696c 2e446174 653a4143  \"ava.util.Date:AC\"\n" +
+                "31313745 32384645 33363538 37413a36  \"117E28FE36587A:6\"\n" +
+                "38364138 31303134 42353937 34313900  \"86A81014B597419.\"\n" +
+                "0000000c bdbdbdbd 00000000 00000000  \"................\"\n" +
+                "ffffffff                             \"....\"");
+    }
 
     @Test
     void unmarshalDateWithDefaultWriteObjectFlag() {

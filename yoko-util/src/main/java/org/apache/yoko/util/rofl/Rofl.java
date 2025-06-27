@@ -25,8 +25,8 @@ import java.util.logging.Logger;
 
 import static java.util.Arrays.copyOf;
 import static java.util.logging.Level.WARNING;
-import static org.apache.yoko.util.rofl.Rofl.RemoteOrb.IBM;
 import static org.apache.yoko.util.rofl.Rofl.RemoteOrb.BAD;
+import static org.apache.yoko.util.rofl.Rofl.RemoteOrb.IBM;
 import static org.apache.yoko.util.rofl.Rofl.RemoteOrb.NO_DATA;
 
 /**
@@ -68,7 +68,6 @@ public interface Rofl extends Serializable {
         }
     }
     RemoteOrb type();
-    default boolean marshalDateLikeJava8() { return type() == IBM; }
 }
 
 class IbmRofl implements Rofl{

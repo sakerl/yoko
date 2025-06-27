@@ -60,11 +60,12 @@ public final class RoflThreadLocal {
         return () -> info.override = false;
     }
 
-    public static void push(Rofl rofl) {
+    public static SimplyCloseable push(Rofl rofl) {
         final Stack info = threadLocalStack.get();
         if (LOGGER.isLoggable(Level.FINER))
             LOGGER.finer(String.format("ROFL thread local version pushed onto stack: %s", rofl));
         info.head = new Frame(rofl, info.head);
+        return RoflThreadLocal::pop;
     }
 
     public static Rofl get() {
