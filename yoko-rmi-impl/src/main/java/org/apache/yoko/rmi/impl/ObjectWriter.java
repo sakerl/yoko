@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 IBM Corporation and others.
+ * Copyright 2025 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 package org.apache.yoko.rmi.impl;
 
 import org.apache.yoko.util.cmsf.CmsfThreadLocal;
+import org.apache.yoko.util.rofl.Interop;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -64,7 +65,10 @@ abstract class ObjectWriter extends ObjectOutputStream {
 
             void beforeDefaultWriteObject(ObjectWriter writer) throws IOException {
                 writer.state = IN_DEFAULT_WRITE_OBJECT;
-                writer.writeBoolean(true);
+                String customRepId = writer._desc.getCustomRepositoryID();
+                // some objects need to be written to
+                boolean flag = Interop.flagDefaultWriteObject(customRepId);
+                writer.writeBoolean(flag);
             }
 
             void beforeWriteData(ObjectWriter writer) throws IOException {
@@ -154,9 +158,7 @@ abstract class ObjectWriter extends ObjectOutputStream {
     }
 
     public final void defaultWriteObject() throws IOException {
-        if (_desc == null) {
-            throw new NotActiveException();
-        }
+        if (_desc == null) throw new NotActiveException();
 
         state.beforeDefaultWriteObject(this);
         try {

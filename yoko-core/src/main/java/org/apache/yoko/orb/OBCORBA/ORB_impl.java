@@ -110,6 +110,8 @@ import org.apache.yoko.orb.OCI.Plugin;
 import org.apache.yoko.orb.cmsf.CmsfClientInterceptor;
 import org.apache.yoko.orb.cmsf.CmsfIORInterceptor;
 import org.apache.yoko.orb.cmsf.CmsfServerInterceptor;
+import org.apache.yoko.orb.rofl.RoflClientInterceptor;
+import org.apache.yoko.orb.rofl.RoflServerInterceptor;
 import org.apache.yoko.orb.yasf.YasfClientInterceptor;
 import org.apache.yoko.orb.yasf.YasfIORInterceptor;
 import org.apache.yoko.orb.yasf.YasfServerInterceptor;
@@ -381,6 +383,15 @@ public class ORB_impl extends ORBSingleton {
                 piManager.addIORInterceptor(new YasfIORInterceptor(), true);
                 piManager.addClientRequestInterceptor(new YasfClientInterceptor());
                 piManager.addServerRequestInterceptor(new YasfServerInterceptor(piManager.allocateSlotId()));
+            } catch (DuplicateName ex) {
+                throw Assert.fail(ex);
+            }
+
+            // Install interceptors for Remote Orb Finessing Logic
+            try {
+                // read only, so no IOR interceptor required
+                piManager.addClientRequestInterceptor(new RoflClientInterceptor());
+                piManager.addServerRequestInterceptor(new RoflServerInterceptor(piManager.allocateSlotId()));
             } catch (DuplicateName ex) {
                 throw Assert.fail(ex);
             }
