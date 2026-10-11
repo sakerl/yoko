@@ -1,4 +1,4 @@
-# Copyright 2025 IBM Corporation and others.
+# Copyright 2026 IBM Corporation and others.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,6 +39,11 @@ logprops=${workspace}/test-osgi/yoko-logging.props
   junit-platform-engine,              \
   org.opentest4j,                     \
   org.hamcrest,                       \
+  org.osgi.util.function,             \
+  org.osgi.util.promise,              \
+  org.osgi.util.tracker,              \
+  org.osgi.service.component,         \
+  org.apache.felix.scr,               \
   org.apache.yoko.core,               \
   org.apache.bcel,                    \
   org.apache.commons.lang3,           \
