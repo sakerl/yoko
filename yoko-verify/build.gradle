@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 IBM Corporation and others.
+ * Copyright 2026 IBM Corporation and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,8 +92,14 @@ test {
 
   // ConcurrentHashMapMarshalTest runs in testConcurrentHashMap (above) because that task opens
   // java.util.concurrent on the client JVM.  The one exception is testClientMarshalFailsWithoutAddOpens,
-  // which must run here where java.util.concurrent is NOT opened.
-  exclude '**/testServerWithAddOpensCanMarshal*'
+  // which must run here where java.util.concurrent is NOT opened on the client.
+  //
+  // NOTE: exclude() matches class-file paths, not method names, so we cannot use it to exclude
+  // a single method.  Instead we keep the whole class and use filter.excludeTestsMatching to
+  // suppress the one method that must not run without --add-opens on the client.
+  filter {
+    excludeTestsMatching '*ConcurrentHashMapMarshalTest.testServerWithAddOpensCanMarshal'
+  }
   // ConcurrentHashMapServerMarshalFailTest also runs in testConcurrentHashMap (client needs the open)
   exclude '**/ConcurrentHashMapServerMarshalFailTest*'
 
