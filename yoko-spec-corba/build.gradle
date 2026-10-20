@@ -22,11 +22,8 @@ dependencies {
 }
 
 sourceSets.main.java {
-  srcDirs 'src/main/generated-sources/idl'
-}
-
-jar {
-  exclude '**/*.class'
+  srcDirs 'src/main/generated-sources/idl',
+          '../yoko-rmi-spec/src/main/java'
 }
 
 javadoc {
