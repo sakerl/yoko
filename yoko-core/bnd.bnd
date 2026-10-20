@@ -27,6 +27,7 @@ Bundle-Description: Apache Yoko Core
 
 Export-Package: \
     org.apache.yoko.io;mandatory:=testOnly;testOnly=true, \
+    org.apache.yoko.orb.CORBA;version=1.6.0, \
     org.apache.yoko.orb.OB;version=1.6.0, \
     org.apache.yoko.orb.OBPortableServer;version=1.6.0, \
     org.apache.yoko.orb.OCI;version=1.6.0, \

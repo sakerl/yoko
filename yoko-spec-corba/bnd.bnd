@@ -25,4 +25,5 @@ Export-Package: \
     org.omg.*;version=2.4
 
 Import-Package: \
+    org.apache.yoko.orb.CORBA;resolution:=optional, \
     *
